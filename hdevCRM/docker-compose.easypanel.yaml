@@ -38,8 +38,8 @@ services:
     depends_on:
       - postgres
       - redis
-    ports:
-      - '3000:3000'                       # exponha este serviço no domínio (ex: crm.hdev.online)
+    expose:
+      - '3000'                            # EasyPanel roteia o domínio pra esta porta interna (não publique no host)
     environment: &app_env
       NODE_ENV: production
       RAILS_ENV: production
