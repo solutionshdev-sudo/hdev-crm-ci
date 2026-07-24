@@ -33,7 +33,7 @@
       "LEARN_MORE": "webhook에 대해 자세히 알아보기",
       "PAYWALL": {
         "TITLE": "Webhooks are available on paid plans",
-        "AVAILABLE_ON": "Use webhooks to receive real-time events from your Chatwoot account.",
+        "AVAILABLE_ON": "Use webhooks to receive real-time events from your Hdev CRM account.",
         "UPGRADE_PROMPT": "Upgrade to the Startups, Business, or Enterprise plan to use webhooks.",
         "UPGRADE_NOW": "지금 업그레이드",
         "CANCEL_ANYTIME": "Change or cancel your plan anytime."
@@ -51,7 +51,7 @@
       "NO_RESULTS": "검색과 일치하는 웹훅이 없습니다",
       "FORM": {
         "CANCEL": "취소",
-        "DESC": "webhook 이벤트는 Chatwoot 계정에서 일어나는 일에 대한 실시간 정보를 제공합니다. 콜백을 구성하려면 유효한 URL을 입력하십시오.",
+        "DESC": "webhook 이벤트는 Hdev CRM 계정에서 일어나는 일에 대한 실시간 정보를 제공합니다. 콜백을 구성하려면 유효한 URL을 입력하십시오.",
         "SUBSCRIPTIONS": {
           "LABEL": "이벤트",
           "EVENTS": {
@@ -141,7 +141,7 @@
         "OPTION_LABEL": "채널 선택",
         "UPDATE": "업데이트",
         "BUTTON_TEXT": "채널 연결",
-        "DESCRIPTION": "Slack 워크스페이스가 Chatwoot에 연결되었습니다. 그러나 현재 연동이 비활성 상태입니다. 연동을 활성화하고 채널을 Chatwoot에 연결하려면 아래 버튼을 클릭하십시오.\n\n**참고:** 비공개 채널을 연결하려는 경우, 이 단계를 진행하기 전에 Chatwoot 앱을 Slack 채널에 추가하십시오.",
+        "DESCRIPTION": "Slack 워크스페이스가 Chatwoot에 연결되었습니다. 그러나 현재 연동이 비활성 상태입니다. 연동을 활성화하고 채널을 Chatwoot에 연결하려면 아래 버튼을 클릭하십시오.\n\n**참고:** 비공개 채널을 연결하려는 경우, 이 단계를 진행하기 전에 Hdev CRM 앱을 Slack 채널에 추가하십시오.",
         "ATTENTION_REQUIRED": "주의가 필요합니다",
         "EXPIRED": "Slack 연동이 만료되었습니다. Slack에서 메시지를 계속 수신하려면 연동을 삭제하고 워크스페이스를 다시 연결하십시오."
       },
@@ -243,7 +243,7 @@
     "DASHBOARD_APPS": {
       "TITLE": "대시보드 앱",
       "HEADER_BTN_TXT": "새 대시보드 앱 추가",
-      "SIDEBAR_TXT": "<p><b>대시보드 앱</b></p><p>대시보드 앱을 사용하면 조직이 Chatwoot 대시보드 내에 애플리케이션을 임베드하여 고객 지원 상담원에게 컨텍스트를 제공할 수 있습니다. 이 기능을 사용하면 독립적으로 애플리케이션을 만들고 대시보드 내에 임베드하여 사용자 정보, 주문 내역 또는 이전 결제 내역을 제공할 수 있습니다.</p><p>Chatwoot의 대시보드를 사용하여 애플리케이션을 임베드하면, 애플리케이션은 대화 및 연락처 컨텍스트를 윈도우 이벤트로 수신합니다. 컨텍스트를 수신하려면 페이지에서 메시지 이벤트에 대한 리스너를 구현하십시오.</p><p>새 대시보드 앱을 추가하려면 '새 대시보드 앱 추가' 버튼을 클릭하십시오.</p>",
+      "SIDEBAR_TXT": "<p><b>대시보드 앱</b></p><p>대시보드 앱을 사용하면 조직이 Hdev CRM 대시보드 내에 애플리케이션을 임베드하여 고객 지원 상담원에게 컨텍스트를 제공할 수 있습니다. 이 기능을 사용하면 독립적으로 애플리케이션을 만들고 대시보드 내에 임베드하여 사용자 정보, 주문 내역 또는 이전 결제 내역을 제공할 수 있습니다.</p><p>Chatwoot의 대시보드를 사용하여 애플리케이션을 임베드하면, 애플리케이션은 대화 및 연락처 컨텍스트를 윈도우 이벤트로 수신합니다. 컨텍스트를 수신하려면 페이지에서 메시지 이벤트에 대한 리스너를 구현하십시오.</p><p>새 대시보드 앱을 추가하려면 '새 대시보드 앱 추가' 버튼을 클릭하십시오.</p>",
       "DESCRIPTION": "대시보드 앱을 사용하면 조직이 대시보드 내에 애플리케이션을 임베드하여 고객 지원 상담원에게 컨텍스트를 제공할 수 있습니다. 이 기능을 사용하면 독립적으로 애플리케이션을 만들고 임베드하여 사용자 정보, 주문 내역 또는 이전 결제 내역을 제공할 수 있습니다.",
       "LEARN_MORE": "대시보드 앱에 대해 자세히 알아보기",
       "COUNT": "{n}개의 대시보드 앱 | {n}개의 대시보드 앱",

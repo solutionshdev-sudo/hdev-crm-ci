@@ -847,7 +847,7 @@
       "CONFIRM_BUTTON_LABEL": "Izveidot",
       "NAME": {
         "LABEL": "Nosaukums",
-        "PLACEHOLDER": "Lietotāja Rokasgrāmata | Chatwoot",
+        "PLACEHOLDER": "Lietotāja Rokasgrāmata | Hdev CRM",
         "MESSAGE": "Izvēlieties savam portālam nosaukumu.",
         "ERROR": "Nepieciešams nosaukums"
       },

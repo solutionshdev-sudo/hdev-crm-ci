@@ -847,7 +847,7 @@
       "CONFIRM_BUTTON_LABEL": "Gumawa",
       "NAME": {
         "LABEL": "Pangalan",
-        "PLACEHOLDER": "Gabay ng Gumagamit | Chatwoot",
+        "PLACEHOLDER": "Gabay ng Gumagamit | Hdev CRM",
         "MESSAGE": "Pumili ng pangalan para sa iyong portal.",
         "ERROR": "Kinakailangan ang pangalan"
       },

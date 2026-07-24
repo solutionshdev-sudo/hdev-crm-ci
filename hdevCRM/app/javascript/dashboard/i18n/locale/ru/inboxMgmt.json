@@ -16,7 +16,7 @@
     "CREATE_FLOW": {
       "CHANNEL": {
         "TITLE": "Выберите источник",
-        "BODY": "Выберите канал, который вы хотите подключить к Chatwoot."
+        "BODY": "Выберите канал, который вы хотите подключить к Hdev CRM."
       },
       "INBOX": {
         "TITLE": "Создать источник",
@@ -42,7 +42,7 @@
         "PLACEHOLDER": "Введите имя вашего сайта (например: Acme Inc)"
       },
       "FB": {
-        "HELP": "PS: После авторизации мы получим доступ только к вашим сообщениям на странице. Личные сообщения недоступны Chatwoot.",
+        "HELP": "PS: После авторизации мы получим доступ только к вашим сообщениям на странице. Личные сообщения недоступны Hdev CRM.",
         "CHOOSE_PAGE": "Выберите страницы",
         "CHOOSE_PLACEHOLDER": "Выберите страницу из списка",
         "INBOX_NAME": "Имя источника",
@@ -454,7 +454,7 @@
       },
       "AUTH": {
         "TITLE": "Выберите источник",
-        "DESC": "Chatwoot поддерживает виджет чата, страницу Facebook, профиль Twitter, WhatsApp, Email и т. д., как канал связи с пользователями. Если вы хотите настроить пользовательский канал, вы можете создать его с помощью канала API. Выберите один канал из списка ниже, чтобы продолжить.",
+        "DESC": "Hdev CRM поддерживает виджет чата, страницу Facebook, профиль Twitter, WhatsApp, Email и т. д., как канал связи с пользователями. Если вы хотите настроить пользовательский канал, вы можете создать его с помощью канала API. Выберите один канал из списка ниже, чтобы продолжить.",
         "TITLE_NEXT": "Завершить установку",
         "TITLE_FINISH": "Voilà!",
         "CHANNEL": {
@@ -520,7 +520,7 @@
       },
       "FINISH": {
         "TITLE": "Готово!",
-        "DESC": "Вы успешно подключили страницу Facebook к Chatwoot. В следующий раз, когда покупатель напишет вашей странице, диалог автоматически отобразится здесь.<br>Мы также предоставляем вам скрипт виджета, который вы можете легко добавить на ваш сайт. Как только вы добавите его на сайт, клиенты смогут отправлять вам сообщения прямо с вашего сайта без помощи какого-либо внешнего инструмента и диалог появится прямо здесь, в Chatwoot.<br>Круто, да"
+        "DESC": "Вы успешно подключили страницу Facebook к Hdev CRM. В следующий раз, когда покупатель напишет вашей странице, диалог автоматически отобразится здесь.<br>Мы также предоставляем вам скрипт виджета, который вы можете легко добавить на ваш сайт. Как только вы добавите его на сайт, клиенты смогут отправлять вам сообщения прямо с вашего сайта без помощи какого-либо внешнего инструмента и диалог появится прямо здесь, в Hdev CRM.<br>Круто, да"
       },
       "EMAIL_PROVIDER": {
         "TITLE": "Выберите почтового провайдера",
@@ -881,7 +881,7 @@
           "INBOX": "Электронная почта",
           "PHONE_NUMBER": "Номер телефона",
           "NOT_ENTERED": "Not entered",
-          "VERIFY_NOTICE": "Chatwoot will verify these credentials with Meta before applying any changes. If verification fails, the current configuration is left untouched.",
+          "VERIFY_NOTICE": "Hdev CRM will verify these credentials with Meta before applying any changes. If verification fails, the current configuration is left untouched.",
           "BACK": "Назад",
           "CANCEL": "Отменить",
           "CONTINUE": "Продолжить",
@@ -903,7 +903,7 @@
           },
           "REVIEW_MIGRATION": {
             "TITLE": "Review migration",
-            "DESCRIPTION": "Confirm the connection details before reconnecting this inbox. Chatwoot will verify the token, WABA, and phone number with Meta before applying changes."
+            "DESCRIPTION": "Confirm the connection details before reconnecting this inbox. Hdev CRM will verify the token, WABA, and phone number with Meta before applying changes."
           }
         }
       },
@@ -1246,7 +1246,7 @@
         "USER_MESSAGE": "Хай",
         "AGENT_MESSAGE": "Привет"
       },
-      "BRANDING_TEXT": "Работает на Chatwoot",
+      "BRANDING_TEXT": "Работает на Hdev CRM",
       "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
     },
     "EMAIL_PROVIDERS": {

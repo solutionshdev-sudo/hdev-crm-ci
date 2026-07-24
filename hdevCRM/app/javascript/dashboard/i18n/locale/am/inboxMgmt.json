@@ -454,7 +454,7 @@
       },
       "AUTH": {
         "TITLE": "ቻናል ይምረጡ",
-        "DESC": "Chatwoot የቀጥታ ውይይት ዊጅቶች፣ Facebook Messenger፣ WhatsApp፣ ኢሜይሎች እና ሌሎች ቻናሎችን ይደግፋል። በተለይ ቻናል ለመፍጠር ከፈለጉ በAPI ቻናል መፍጠር ይችላሉ። ለመጀመር ከታች አንዱን ቻናል ይምረጡ።.",
+        "DESC": "Hdev CRM የቀጥታ ውይይት ዊጅቶች፣ Facebook Messenger፣ WhatsApp፣ ኢሜይሎች እና ሌሎች ቻናሎችን ይደግፋል። በተለይ ቻናል ለመፍጠር ከፈለጉ በAPI ቻናል መፍጠር ይችላሉ። ለመጀመር ከታች አንዱን ቻናል ይምረጡ።.",
         "TITLE_NEXT": "ቅንብሩን አሟልተው ያጠናቀቁ",
         "TITLE_FINISH": "እሺ!",
         "CHANNEL": {
@@ -516,7 +516,7 @@
       },
       "DETAILS": {
         "TITLE": "የኢንቦክስ ዝርዝሮች",
-        "DESC": "ከታች ያለው ከዝርዝር ማስተካከያ በተጠቃሚው ፌስቡክ ገጽ ወደ Chatwoot ለመገናኘት ይምረጡ። ለምርጥ መለያየት የእርስዎን ኢንቦክስ በተለየ ስም ማቅረብ ይችላሉ።"
+        "DESC": "ከታች ያለው ከዝርዝር ማስተካከያ በተጠቃሚው ፌስቡክ ገጽ ወደ Hdev CRM ለመገናኘት ይምረጡ። ለምርጥ መለያየት የእርስዎን ኢንቦክስ በተለየ ስም ማቅረብ ይችላሉ።"
       },
       "FINISH": {
         "TITLE": "ተሳክቷል!",
@@ -881,7 +881,7 @@
           "INBOX": "Inbox",
           "PHONE_NUMBER": "ስልክ ቁጥር",
           "NOT_ENTERED": "Not entered",
-          "VERIFY_NOTICE": "Chatwoot will verify these credentials with Meta before applying any changes. If verification fails, the current configuration is left untouched.",
+          "VERIFY_NOTICE": "Hdev CRM will verify these credentials with Meta before applying any changes. If verification fails, the current configuration is left untouched.",
           "BACK": "Back",
           "CANCEL": "Cancel",
           "CONTINUE": "ቀጥል",
@@ -903,7 +903,7 @@
           },
           "REVIEW_MIGRATION": {
             "TITLE": "Review migration",
-            "DESCRIPTION": "Confirm the connection details before reconnecting this inbox. Chatwoot will verify the token, WABA, and phone number with Meta before applying changes."
+            "DESCRIPTION": "Confirm the connection details before reconnecting this inbox. Hdev CRM will verify the token, WABA, and phone number with Meta before applying changes."
           }
         }
       },

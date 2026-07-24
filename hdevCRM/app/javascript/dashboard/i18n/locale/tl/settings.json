@@ -37,7 +37,7 @@
       },
       "INTERFACE_SECTION": {
         "TITLE": "Interface",
-        "NOTE": "I-customize ang hitsura at pakiramdam ng iyong Chatwoot dashboard.",
+        "NOTE": "I-customize ang hitsura at pakiramdam ng iyong Hdev CRM dashboard.",
         "FONT_SIZE": {
           "TITLE": "Laki ng font",
           "NOTE": "Ayusin ang laki ng teksto sa buong dashboard ayon sa iyong kagustuhan.",
@@ -657,7 +657,7 @@
       "SP_ENTITY_ID": {
         "LABEL": "SP Entity ID",
         "HELP": "Natanging pagkakakilanlan para sa application na ito bilang isang service provider (awtomatikong ginawa).",
-        "TOOLTIP": "Natanging pagkakakilanlan para sa Chatwoot bilang Service Provider - I-configure ito sa iyong mga setting ng IdP"
+        "TOOLTIP": "Natanging pagkakakilanlan para sa Hdev CRM bilang Service Provider - I-configure ito sa iyong mga setting ng IdP"
       },
       "IDP_ENTITY_ID": {
         "LABEL": "Entity ID ng Tagapagbigay ng Pagkakakilanlan",
@@ -752,7 +752,7 @@
     }
   },
   "CREATE_ACCOUNT": {
-    "NO_ACCOUNT_WARNING": "Naku! Hindi kami makakita ng anumang Chatwoot account. Mangyaring gumawa ng bagong account upang magpatuloy.",
+    "NO_ACCOUNT_WARNING": "Naku! Hindi kami makakita ng anumang Hdev CRM account. Mangyaring gumawa ng bagong account upang magpatuloy.",
     "NEW_ACCOUNT": "Bagong Account",
     "SELECTOR_SUBTITLE": "Gumawa ng bagong account",
     "API": {

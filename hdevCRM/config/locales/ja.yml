@@ -373,7 +373,7 @@ ja:
       description: 'ダッシュボードアプリを使用すると、ユーザー情報、注文、または支払い履歴を表示するアプリケーションを作成して埋め込むことができ、カスタマーサポートエージェントにより多くのコンテキストを提供します。'
     dyte:
       name: 'Dyte'
-      short_description: 'Start video/voice calls with customers directly from Chatwoot.'
+      short_description: 'Start video/voice calls with customers directly from Hdev CRM.'
       description: 'Dyteは、オーディオおよびビデオ機能をアプリケーションに統合する製品です。この統合により、エージェントはChatwootから直接顧客とビデオ/音声通話を開始できます。'
       meeting_name: '%{agent_name} がミーティングを開始しました'
     slack:

@@ -33,7 +33,7 @@
       "LEARN_MORE": "Webhookについて詳しく知る",
       "PAYWALL": {
         "TITLE": "Webhooks are available on paid plans",
-        "AVAILABLE_ON": "Use webhooks to receive real-time events from your Chatwoot account.",
+        "AVAILABLE_ON": "Use webhooks to receive real-time events from your Hdev CRM account.",
         "UPGRADE_PROMPT": "Upgrade to the Startups, Business, or Enterprise plan to use webhooks.",
         "UPGRADE_NOW": "今すぐアップグレード",
         "CANCEL_ANYTIME": "Change or cancel your plan anytime."

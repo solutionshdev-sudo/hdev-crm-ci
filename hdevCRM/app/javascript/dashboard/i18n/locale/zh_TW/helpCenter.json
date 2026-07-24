@@ -847,7 +847,7 @@
       "CONFIRM_BUTTON_LABEL": "建立",
       "NAME": {
         "LABEL": "名稱",
-        "PLACEHOLDER": "使用者指南 | Chatwoot",
+        "PLACEHOLDER": "使用者指南 | Hdev CRM",
         "MESSAGE": "為您的入口選擇一個名稱。",
         "ERROR": "名稱為必填"
       },
