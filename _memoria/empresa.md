@@ -9,7 +9,7 @@
 **Perfil:** Solopreneur / dev solo
 **Atende clientes:** Agências (o comprador é a agência; o usuário final é o cliente da agência)
 **Equipe:** Toca sozinho
-**Ferramentas:** node 24 ✓, git ✗ (instalar antes do /salvar), gh ✗ (opcional), playwright não checado
+**Ferramentas:** node 24 ✓, git 2.55 ✓ (repo iniciado, branch main), gh ✗ (opcional), playwright não checado
 **Principais entregas:** A plataforma HDEV CRM (fork do Chatwoot em `hdevCRM/`) e os planos de revenda pras agências
 
 ## Contexto adicional

@@ -1,0 +1,91 @@
+# Hdev CRM — Deploy no EasyPanel (builda a partir DESTE código-fonte)
+#
+# Diferença pro docker-compose.production.yaml:
+#   - production.yaml usa a imagem OFICIAL (chatwoot/chatwoot:latest) -> teu rebrand NÃO vai
+#   - este arquivo faz BUILD do docker/Dockerfile -> tuas mudanças (marca, e-mails, i18n) vão junto
+#
+# Como usar no EasyPanel:
+#   1. Crie um serviço do tipo "Compose" no projeto e aponte pra este arquivo
+#      (ou use os 4 serviços via UI, seguindo INSTALAR-EASYPANEL.md)
+#   2. Preencha as variáveis marcadas com ${...} na aba Environment do EasyPanel
+#   3. O serviço "web" roda a migração (db:chatwoot_prepare) sozinho no primeiro boot
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16        # pgvector é obrigatório (extensão "vector")
+    restart: always
+    environment:
+      POSTGRES_DB: chatwoot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    restart: always
+    command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: hdev-crm:latest
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - '3000:3000'                       # exponha este serviço no domínio (ex: crm.hdev.online)
+    environment: &app_env
+      NODE_ENV: production
+      RAILS_ENV: production
+      INSTALLATION_ENV: docker
+      RAILS_LOG_TO_STDOUT: 'true'
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      FRONTEND_URL: ${FRONTEND_URL}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: '5432'
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: chatwoot
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      ACTIVE_STORAGE_SERVICE: local
+      INSTALLATION_NAME: 'Hdev CRM'
+      BRAND_NAME: 'Hdev CRM'
+      MAILER_SENDER_EMAIL: 'Hdev CRM <sac@hdev.online>'
+      # SMTP (preencha pra e-mail funcionar):
+      SMTP_ADDRESS: ${SMTP_ADDRESS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+    entrypoint: docker/entrypoints/rails.sh
+    # Migra o banco no boot (idempotente) e sobe o servidor
+    command: ["sh", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"]
+    volumes:
+      - storage_data:/app/storage
+    restart: always
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: hdev-crm:latest
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      <<: *app_env
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    volumes:
+      - storage_data:/app/storage
+    restart: always
+
+volumes:
+  postgres_data:
+  redis_data:
+  storage_data:
