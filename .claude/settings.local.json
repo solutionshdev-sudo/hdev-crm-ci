@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($src = \"C:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\hdevOS\"; $dst = \"C:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\"; robocopy $src $dst /E /XD \"$src\\\\.git\" /NFL /NDL /NJH; Write-Output \"exit=$LASTEXITCODE\")",
+      "PowerShell(Get-ChildItem -Force | Select-Object Mode, Name; Write-Output \"---- skills ----\"; \\(Get-ChildItem \".claude\\\\skills\"\\).Name -join \", \"; Write-Output \"---- .git copiado? ----\"; Test-Path \".git\")",
+      "PowerShell(if \\(Test-Path \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\"\\) { Get-Content \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\" } else { \"SEM_PERFIL_GLOBAL\" })"
+    ]
+  }
+}

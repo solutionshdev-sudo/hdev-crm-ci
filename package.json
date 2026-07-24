@@ -1,0 +1,14 @@
+{
+  "name": "hdev",
+  "private": true,
+  "description": "Template HDEV — sistema operacional do negócio dentro do Claude Code",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "verificar": "node --env-file=.env scripts/verificar-integracoes.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

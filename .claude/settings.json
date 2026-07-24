@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git --version)",
+      "Bash(node --version)",
+      "Bash(node --check:*)",
+      "Bash(gh --version)",
+      "Bash(ls:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}

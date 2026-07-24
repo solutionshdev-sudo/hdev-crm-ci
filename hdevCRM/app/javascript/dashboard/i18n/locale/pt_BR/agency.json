@@ -1,0 +1,50 @@
+{
+  "AGENCY_SETTINGS": {
+    "HEADER": "Minha Agência",
+    "DESCRIPTION": "Gerencie a marca da sua agência, as contas dos clientes e o consumo de IA.",
+    "EMPTY_STATE": "Seu usuário ainda não administra nenhuma agência. Peça ao administrador da plataforma para vincular você a uma.",
+    "STATS": {
+      "ACCOUNTS": "Contas de clientes",
+      "TOKENS": "Tokens de IA no mês",
+      "COST": "Custo de IA no mês"
+    },
+    "BRANDING": {
+      "TITLE": "Marca",
+      "NAME": "Nome da agência",
+      "BRAND_NAME": "Nome da marca",
+      "INSTALLATION_NAME": "Nome do painel",
+      "PRIMARY_COLOR": "Cor primária",
+      "CUSTOM_DOMAIN": "Domínio do painel",
+      "BRAND_URL": "URL do site",
+      "TERMS_URL": "URL dos termos de uso",
+      "PRIVACY_URL": "URL da política de privacidade",
+      "DOMAIN_NOTE": "Aponte um CNAME do seu domínio de painel para esta instalação. Seus clientes verão sua marca e cor na tela de login e em todo o painel.",
+      "SAVE": "Salvar marca"
+    },
+    "ACCOUNTS": {
+      "TITLE": "Contas de clientes",
+      "NEW": "Novo cliente",
+      "EMPTY": "Ainda não há contas de clientes.",
+      "TABLE": {
+        "NAME": "Conta",
+        "STATUS": "Status",
+        "TOKENS": "Tokens de IA (mês)",
+        "COST": "Custo de IA (mês)"
+      },
+      "FORM": {
+        "ACCOUNT_NAME": "Nome da conta",
+        "USER_NAME": "Nome do admin",
+        "EMAIL": "E-mail do admin",
+        "PASSWORD": "Senha do admin",
+        "CREATE": "Criar conta"
+      }
+    },
+    "API": {
+      "FETCH_ERROR": "Não foi possível carregar os dados da sua agência",
+      "BRANDING_SUCCESS": "Marca salva com sucesso",
+      "BRANDING_ERROR": "Não foi possível salvar a marca, tente novamente",
+      "ACCOUNT_SUCCESS": "Conta do cliente criada com sucesso",
+      "ACCOUNT_ERROR": "Não foi possível criar a conta. Verifique os dados (o e-mail pode já estar em uso)."
+    }
+  }
+}
