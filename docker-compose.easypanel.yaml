@@ -1,70 +1,62 @@
-# Hdev CRM — Deploy no EasyPanel (builda a partir DESTE código-fonte)
+# Hdev CRM — Deploy no EasyPanel (versão à prova de falha, na RAIZ do repo)
 #
-# Diferença pro docker-compose.production.yaml:
-#   - production.yaml usa a imagem OFICIAL (chatwoot/chatwoot:latest) -> teu rebrand NÃO vai
-#   - este arquivo faz BUILD do docker/Dockerfile -> tuas mudanças (marca, e-mails, i18n) vão junto
+# Diferença pra versão antiga (hdevCRM/docker-compose.easypanel.yaml):
+#   - Fica na RAIZ, então o .env que o EasyPanel cria cai do lado dele
+#   - Cada serviço lê o .env via `env_file` (NÃO usa substituição ${...})
+#     -> funciona independente do comportamento do EasyPanel
 #
-# Como usar no EasyPanel:
-#   1. Crie um serviço do tipo "Compose" no projeto e aponte pra este arquivo
-#      (ou use os 4 serviços via UI, seguindo INSTALAR-EASYPANEL.md)
-#   2. Preencha as variáveis marcadas com ${...} na aba Environment do EasyPanel
-#   3. O serviço "web" roda a migração (db:chatwoot_prepare) sozinho no primeiro boot
+# No EasyPanel (serviço Compose):
+#   - Build Path: /
+#   - Docker Compose File: docker-compose.easypanel.yaml   (na raiz, sem hdevCRM/)
+#   - Environment Variables: cola as 8 linhas (SECRET_KEY_BASE, senhas, SMTP)
+#   - LIGA o toggle "Criar arquivo .env"  <-- OBRIGATÓRIO
+#   - Implantar
 
 services:
   postgres:
-    image: pgvector/pgvector:pg16        # pgvector é obrigatório (extensão "vector")
+    image: pgvector/pgvector:pg16
     restart: always
+    env_file: [.env]                      # fornece POSTGRES_PASSWORD
     environment:
       POSTGRES_DB: chatwoot
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:alpine
     restart: always
+    env_file: [.env]                      # fornece REDIS_PASSWORD
     command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
 
   web:
     build:
-      context: .
+      context: ./hdevCRM
       dockerfile: docker/Dockerfile
     image: hdev-crm:latest
     depends_on:
       - postgres
       - redis
     expose:
-      - '3000'                            # EasyPanel roteia o domínio pra esta porta interna (não publique no host)
+      - '3000'
+    env_file: [.env]                      # SECRET_KEY_BASE, FRONTEND_URL, senhas, SMTP
     environment: &app_env
       NODE_ENV: production
       RAILS_ENV: production
       INSTALLATION_ENV: docker
       RAILS_LOG_TO_STDOUT: 'true'
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      FRONTEND_URL: ${FRONTEND_URL}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: '5432'
       POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DATABASE: chatwoot
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_URL: redis://redis:6379        # senha vem via REDIS_PASSWORD (do .env)
       ACTIVE_STORAGE_SERVICE: local
       INSTALLATION_NAME: 'Hdev CRM'
       BRAND_NAME: 'Hdev CRM'
       MAILER_SENDER_EMAIL: 'Hdev CRM <sac@hdev.online>'
-      # SMTP (preencha pra e-mail funcionar):
-      SMTP_ADDRESS: ${SMTP_ADDRESS}
-      SMTP_PORT: ${SMTP_PORT}
-      SMTP_USERNAME: ${SMTP_USERNAME}
-      SMTP_PASSWORD: ${SMTP_PASSWORD}
     entrypoint: docker/entrypoints/rails.sh
-    # Migra o banco no boot (idempotente) e sobe o servidor
     command: ["sh", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"]
     volumes:
       - storage_data:/app/storage
@@ -72,12 +64,13 @@ services:
 
   worker:
     build:
-      context: .
+      context: ./hdevCRM
       dockerfile: docker/Dockerfile
     image: hdev-crm:latest
     depends_on:
       - postgres
       - redis
+    env_file: [.env]
     environment:
       <<: *app_env
     command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
