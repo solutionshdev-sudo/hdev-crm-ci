@@ -712,7 +712,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_21_000003) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "website_token"
-    t.string "widget_color", default: "#1f93ff"
+    t.string "widget_color", default: "#00875A"
     t.string "welcome_title"
     t.string "welcome_tagline"
     t.integer "feature_flags", default: 7, null: false

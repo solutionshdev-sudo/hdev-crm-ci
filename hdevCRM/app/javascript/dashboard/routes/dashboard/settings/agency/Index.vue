@@ -19,7 +19,7 @@ const branding = reactive({
   name: '',
   brand_name: '',
   installation_name: '',
-  primary_color: '#1f93ff',
+  primary_color: '#00875A',
   custom_domain: '',
   brand_url: '',
   terms_url: '',
@@ -51,7 +51,7 @@ const syncBrandingForm = () => {
   branding.name = agency.value.name || '';
   branding.brand_name = agency.value.brand_name || '';
   branding.installation_name = agency.value.installation_name || '';
-  branding.primary_color = agency.value.primary_color || '#1f93ff';
+  branding.primary_color = agency.value.primary_color || '#00875A';
   branding.custom_domain = agency.value.custom_domain || '';
   branding.brand_url = agency.value.brand_url || '';
   branding.terms_url = agency.value.terms_url || '';

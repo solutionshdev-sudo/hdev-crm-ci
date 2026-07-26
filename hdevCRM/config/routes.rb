@@ -754,8 +754,11 @@ Rails.application.routes.draw do
 
   # ---------------------------------------------------------------------
   # Routes for swagger docs
-  get '/swagger/*path', to: 'swagger#respond'
-  get '/swagger', to: 'swagger#respond'
+  # Fora de producao ate a doc ser reescrita: era servida sem autenticacao.
+  unless Rails.env.production?
+    get '/swagger/*path', to: 'swagger#respond'
+    get '/swagger', to: 'swagger#respond'
+  end
 
   # ----------------------------------------------------------------------
   # Routes for testing

@@ -28,7 +28,7 @@
 class Agency < ApplicationRecord
   include Rails.application.routes.url_helpers
 
-  DEFAULT_COLOR = '#1f93ff'.freeze
+  DEFAULT_COLOR = '#00875A'.freeze
   ALLOWED_LOGO_CONTENT_TYPES = %w[image/jpeg image/png image/gif image/webp image/svg+xml].freeze
 
   has_many :accounts, dependent: :nullify
