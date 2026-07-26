@@ -6,10 +6,12 @@ class Chatbots::Nodes::CollectNode < Chatbots::Nodes::BaseNode
     'phone' => ->(value) { value.gsub(/\D/, '').length.between?(8, 15) },
     'number' => ->(value) { value.match?(/\A-?\d+([.,]\d+)?\z/) },
     'date' => lambda { |value|
-      Date.parse(value)
-      true
-    rescue Date::Error
-      false
+      begin
+        Date.parse(value)
+        true
+      rescue Date::Error
+        false
+      end
     },
     'cpf' => ->(value) { value.gsub(/\D/, '').length == 11 },
     'cnpj' => ->(value) { value.gsub(/\D/, '').length == 14 }
