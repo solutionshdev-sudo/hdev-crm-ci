@@ -27,13 +27,27 @@ inexistente de `agency_users` na sidebar), corrigido e publicado (commit
 `161ee71`, já em `origin/main`) — falta o rebuild da imagem no EasyPanel pra
 confirmar.
 
-**Em andamento (não comitado):** redesign split-screen das cinco telas de auth
-(login, SSO, esqueci a senha, redefinir senha, verificar e-mail) e dois
-consertos de white-label que apareceram no caminho. Detalhes em
-`_memoria/de-chatwoot.md`.
+**Feito (26/07, comitado em `2b34d7b`):** redesign split-screen das cinco telas
+de auth e dois consertos de white-label no tema escuro. Falta rebuild +
+`DEFAULT_LOCALE=pt_BR` no EasyPanel.
 
-**Próximo:** remover a pasta `enterprise/` de vez, depois textos/links visíveis,
-depois o rename do widget e dos identificadores internos.
+**Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
+textos/links visíveis, depois o rename do widget e dos identificadores internos.
+
+## Segunda trilha: features de venda (27/07 — implementadas, não comitadas)
+
+Entrega grande no working tree (~125 arquivos, plano aprovado): login do Super
+Admin no mesmo split-screen, pt-BR 100% (0 chaves faltando), **WhatsApp
+não-oficial via microserviço Baileys próprio** (`baileys-service/`, QR + proxy
+por instância + disclaimers de risco), **construtor visual de chatbot**
+(@vue-flow, 12 tipos de nó, motor próprio) e **kanban de Negócios** (Deal /
+funil, com ações na automação). Estado detalhado e pendências em
+`_memoria/analise-2026-07.md` e na memória da sessão.
+
+**Pendente pra fechar a entrega:** commit (quebrar por fase), `db:migrate` +
+rubocop/eslint num ambiente com Ruby, envs novas no EasyPanel
+(`BAILEYS_API_KEY`, `DEFAULT_LOCALE=pt_BR`), rebuild da imagem, teste do
+Baileys com chip descartável.
 
 ## O que pode esperar
 

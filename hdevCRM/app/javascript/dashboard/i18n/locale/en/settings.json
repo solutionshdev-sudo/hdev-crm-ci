@@ -414,7 +414,11 @@
     "DOCS": "Read docs",
     "SECURITY": "Security",
     "CAPTAIN_AI": "Captain",
-    "CONVERSATION_WORKFLOW": "Conversation Workflow"
+    "CONVERSATION_WORKFLOW": "Conversation Workflow",
+    "DEALS": "Deals",
+    "DEALS_BOARD": "Board",
+    "DEAL_PIPELINES": "Deal pipelines",
+    "CHATBOTS": "Chatbots"
   },
   "DATA_IMPORTS": {
     "HEADER": "Data",

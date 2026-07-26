@@ -250,7 +250,9 @@
           "WHATSAPP_CLOUD": "WhatsApp Cloud",
           "WHATSAPP_CLOUD_DESC": "Quick setup through Meta",
           "TWILIO_DESC": "Connect via Twilio credentials",
-          "360_DIALOG": "360Dialog"
+          "360_DIALOG": "360Dialog",
+          "BAILEYS": "WhatsApp Unofficial (QR)",
+          "BAILEYS_DESC": "Connect any number by scanning a QR code, no Meta approval. UNOFFICIAL API: use at your own risk."
         },
         "SELECT_PROVIDER": {
           "TITLE": "Select your API provider",
@@ -326,6 +328,45 @@
         },
         "API": {
           "ERROR_MESSAGE": "We were not able to save the WhatsApp channel"
+        },
+        "BAILEYS": {
+          "WARNING": {
+            "TITLE": "Unofficial API — read before continuing",
+            "UNOFFICIAL": "This connection uses an unofficial API with no affiliation to Meta/WhatsApp.",
+            "BAN_RISK": "Numbers connected this way can be blocked or permanently banned by WhatsApp at any time.",
+            "NO_LIABILITY": "The platform takes no responsibility for blocks, bans, or loss of the number and its history.",
+            "RECOMMENDED": "The recommended option is the official WhatsApp Cloud API (previous screen).",
+            "ACCEPT": "I have read and accept the risks of using an unofficial API, including permanent loss of the number."
+          },
+          "PAIRING_METHOD": {
+            "LABEL": "Pairing method",
+            "QR": "QR code (scan with your phone)",
+            "CODE": "Pairing code (type on your phone)"
+          },
+          "PROXY": {
+            "LABEL": "Proxy (optional)",
+            "PLACEHOLDER": "http://user:pass@host:port or socks5://host:port",
+            "HELP": "Traffic for this instance goes through this proxy. Leave blank to connect directly."
+          },
+          "SESSION": {
+            "STATUS": {
+              "DISCONNECTED": "Disconnected",
+              "CONNECTING": "Connecting…",
+              "QR": "Waiting for QR scan",
+              "PAIRING": "Waiting for pairing code",
+              "CONNECTED": "Connected"
+            },
+            "QR_ALT": "WhatsApp pairing QR code",
+            "QR_HELP": "Open WhatsApp on your phone > Linked devices > Link a device, and scan the code.",
+            "PAIRING_HELP": "Open WhatsApp on your phone > Linked devices > Link with phone number, and type this code.",
+            "CONNECT_QR": "Generate QR code",
+            "CONNECT_CODE": "Generate pairing code",
+            "LOGOUT": "Disconnect",
+            "CONTINUE": "Continue",
+            "CREATED_HELP": "Inbox created. Now pair the number to start receiving messages — you can also do this later from the inbox settings.",
+            "CONNECT_ERROR": "Could not reach the WhatsApp service. Try again in a moment.",
+            "LOGOUT_ERROR": "Could not disconnect the session. Try again in a moment."
+          }
         }
       },
       "VOICE": {
@@ -911,7 +952,9 @@
         "LABEL": "Enable voice calling",
         "DESCRIPTION": "Allow agents to start and receive WhatsApp voice calls on this inbox. Available only on embedded-signup WhatsApp Cloud channels with calling permission granted by Meta."
       },
-      "UPDATE_PRE_CHAT_FORM_SETTINGS": "Update Pre Chat Form Settings"
+      "UPDATE_PRE_CHAT_FORM_SETTINGS": "Update Pre Chat Form Settings",
+      "BAILEYS_SESSION_TITLE": "WhatsApp connection (unofficial API)",
+      "BAILEYS_SESSION_SUBHEADER": "Pair, reconnect or disconnect this number. Unofficial API — the number can be banned by WhatsApp; the platform takes no responsibility."
     },
     "HELP_CENTER": {
       "LABEL": "Help Center",

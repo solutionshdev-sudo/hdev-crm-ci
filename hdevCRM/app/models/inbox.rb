@@ -74,6 +74,12 @@ class Inbox < ApplicationRecord
   has_one :assignment_policy, through: :inbox_assignment_policy
   has_one :agent_bot_inbox, dependent: :destroy_async
   has_one :agent_bot, through: :agent_bot_inbox
+  has_many :chatbot_inboxes, dependent: :destroy_async
+  has_many :chatbots, through: :chatbot_inboxes
+
+  def active_chatbot
+    chatbots.enabled.first
+  end
   has_many :webhooks, dependent: :destroy_async
   has_many :hooks, dependent: :destroy_async, class_name: 'Integrations::Hook'
 

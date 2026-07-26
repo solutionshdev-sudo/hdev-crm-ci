@@ -20,6 +20,7 @@ negócio e as skills do HDEV.
 - `_memoria/` — quem sou, como falo, o que tá em foco
 - `identidade/` — cores, fontes, logo, padrão visual da marca HDEV CRM
 - `hdevCRM/` — o código da plataforma (fork do Chatwoot)
+- `baileys-service/` — microserviço Node do WhatsApp não-oficial (Baileys); conversa com o Rails por HTTP interno + webhook HMAC
 - `_sistema/` — núcleo de regras do HDEV (não sobrescrever)
 - `templates/`, `.claude/skills/` — moldes e skills do sistema
 

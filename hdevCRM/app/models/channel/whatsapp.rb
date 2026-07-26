@@ -25,20 +25,28 @@ class Channel::Whatsapp < ApplicationRecord
   EDITABLE_ATTRS = [:phone_number, :provider, { provider_config: {} }].freeze
 
   # default at the moment is 360dialog lets change later.
-  PROVIDERS = %w[default whatsapp_cloud].freeze
+  # baileys = API não-oficial via baileys-service (uso por conta e risco do cliente).
+  PROVIDERS = %w[default whatsapp_cloud baileys].freeze
   before_validation :ensure_webhook_verify_token
+  before_validation :ensure_baileys_instance_config
 
   validates :provider, inclusion: { in: PROVIDERS }
   validates :phone_number, presence: true, uniqueness: true
   validate :validate_provider_config
 
-  after_create :sync_templates
+  after_create :sync_templates, unless: :baileys?
   after_update_commit :log_credentials_transfer, if: :saved_change_to_provider_config?
   before_destroy :teardown_webhooks
   after_commit :setup_webhooks, on: :create, if: :should_auto_setup_webhooks?
+  after_create_commit :provision_baileys_instance, if: :baileys?
+  before_destroy :teardown_baileys_instance, if: :baileys?
 
   def name
     'Whatsapp'
+  end
+
+  def baileys?
+    provider == 'baileys'
   end
 
   # Mirrors Channel::TwilioSms#voice_enabled? so the call subsystem can duck-type across providers.
@@ -63,8 +71,11 @@ class Channel::Whatsapp < ApplicationRecord
   end
 
   def provider_service
-    if provider == 'whatsapp_cloud'
+    case provider
+    when 'whatsapp_cloud'
       Whatsapp::Providers::WhatsappCloudService.new(whatsapp_channel: self)
+    when 'baileys'
+      Whatsapp::Providers::WhatsappBaileysService.new(whatsapp_channel: self)
     else
       Whatsapp::Providers::Whatsapp360DialogService.new(whatsapp_channel: self)
     end
@@ -131,6 +142,27 @@ class Channel::Whatsapp < ApplicationRecord
 
   def ensure_webhook_verify_token
     provider_config['webhook_verify_token'] ||= SecureRandom.hex(16) if provider == 'whatsapp_cloud'
+  end
+
+  # Espelha ensure_webhook_verify_token: identidade e segredo do webhook da
+  # instância baileys nascem com o canal e nunca mudam.
+  def ensure_baileys_instance_config
+    return unless baileys?
+
+    provider_config['instance_id'] ||= SecureRandom.uuid
+    provider_config['webhook_secret'] ||= SecureRandom.hex(32)
+  end
+
+  def provision_baileys_instance
+    Whatsapp::BaileysProvisionJob.perform_later(id)
+  end
+
+  # before_destroy nunca pode barrar o delete — a instância órfã no
+  # microserviço é limpável depois, o canal preso no banco não.
+  def teardown_baileys_instance
+    Whatsapp::BaileysClient.new.destroy(provider_config['instance_id'])
+  rescue StandardError => e
+    Rails.logger.warn("[BAILEYS] teardown failed channel=#{id}: #{e.message}")
   end
 
   def validate_provider_config

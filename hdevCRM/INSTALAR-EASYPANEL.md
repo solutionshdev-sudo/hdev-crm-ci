@@ -70,6 +70,13 @@ SMTP_ADDRESS=
 SMTP_PORT=587
 SMTP_USERNAME=
 SMTP_PASSWORD=
+
+# Idioma padrão da instalação (telas de auth e contas novas)
+DEFAULT_LOCALE=pt_BR
+
+# WhatsApp não-oficial (baileys-service) — mesmo segredo usado pelo container baileys
+# Gere com: openssl rand -hex 32
+BAILEYS_API_KEY=<gerar hex de 32 bytes>
 ```
 
 > Na **Opção B** você ainda precisa adicionar os hosts do banco/redis

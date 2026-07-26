@@ -10,8 +10,8 @@
 **Atende clientes:** Agências (o comprador é a agência; o usuário final é o cliente da agência)
 **Equipe:** Toca sozinho
 **Ferramentas:** node 24 ✓, git 2.55 ✓ (repo `solutionshdev-sudo/hdev-crm` no GitHub, branch main), gh ✗ (opcional), playwright não checado
-**Infra:** EasyPanel (VPS 8 GB) — instância no ar em `hdev-crm-app-crm.jz4bvz.easypanel.host` desde 26/07/2026; domínio próprio `crm.hdev.online` ainda pendente de DNS
-**Principais entregas:** A plataforma HDEV CRM (fork do Chatwoot em `hdevCRM/`) e os planos de revenda pras agências
+**Infra:** EasyPanel (VPS 8 GB) — instância no ar em `hdev-crm-app-crm.jz4bvz.easypanel.host` desde 26/07/2026; domínio próprio `crm.hdev.online` ainda pendente de DNS. Segundo serviço no compose: `baileys-service` (Node, WhatsApp não-oficial, rede interna, env `BAILEYS_API_KEY`)
+**Principais entregas:** A plataforma HDEV CRM (fork do Chatwoot em `hdevCRM/`) e os planos de revenda pras agências. Diferenciais construídos em 27/07 (aguardando deploy): WhatsApp não-oficial via QR (Baileys, com proxy por instância), construtor visual de chatbot e kanban de Negócios com automação
 
 ## Contexto adicional
 

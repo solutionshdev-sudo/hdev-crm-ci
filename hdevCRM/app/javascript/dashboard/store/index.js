@@ -39,6 +39,9 @@ import inboxMembers from './modules/inboxMembers';
 import integrations from './modules/integrations';
 import labels from './modules/labels';
 import macros from './modules/macros';
+import deals from './modules/deals';
+import dealPipelines from './modules/dealPipelines';
+import chatbots from './modules/chatbots';
 import notifications from './modules/notifications';
 import portals from './modules/helpCenterPortals';
 import reports from './modules/reports';
@@ -105,6 +108,9 @@ export default createStore({
     integrations,
     labels,
     macros,
+    deals,
+    dealPipelines,
+    chatbots,
     notifications,
     portals,
     reports,

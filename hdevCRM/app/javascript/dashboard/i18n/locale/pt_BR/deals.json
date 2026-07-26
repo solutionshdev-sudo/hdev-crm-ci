@@ -1,0 +1,80 @@
+{
+  "DEALS": {
+    "BOARD": {
+      "TITLE": "Negócios",
+      "NEW_DEAL": "Novo negócio",
+      "EMPTY": "Nenhuma etapa neste funil ainda.",
+      "MOVE_ERROR": "Não foi possível mover o negócio. Tente de novo.",
+      "CREATE_SUCCESS": "Negócio criado.",
+      "CREATE_ERROR": "Não foi possível criar o negócio.",
+      "UPDATE_SUCCESS": "Negócio atualizado.",
+      "UPDATE_ERROR": "Não foi possível atualizar o negócio.",
+      "DELETE": "Excluir negócio",
+      "DELETE_SUCCESS": "Negócio excluído.",
+      "DELETE_ERROR": "Não foi possível excluir o negócio."
+    },
+    "FORM": {
+      "TITLE": {
+        "LABEL": "Título",
+        "PLACEHOLDER": "Ex.: Plano anual — Empresa X",
+        "ERROR": "O título é obrigatório"
+      },
+      "CONTACT": {
+        "LABEL": "Contato",
+        "PLACEHOLDER": "Busque pelo nome do contato"
+      },
+      "VALUE": {
+        "LABEL": "Valor (R$)"
+      },
+      "STAGE": {
+        "LABEL": "Etapa"
+      },
+      "ASSIGNEE": {
+        "LABEL": "Responsável",
+        "NONE": "Sem responsável"
+      },
+      "EXPECTED_CLOSE": {
+        "LABEL": "Previsão de fechamento"
+      },
+      "DESCRIPTION": {
+        "LABEL": "Descrição"
+      },
+      "CREATE": "Criar negócio",
+      "UPDATE": "Salvar",
+      "CANCEL": "Cancelar"
+    },
+    "ACTIVITY": {
+      "TITLE": "Atividades",
+      "LOADING": "Carregando atividades…",
+      "SYSTEM": "Sistema",
+      "CREATED": "{user} criou o negócio",
+      "STAGE_CHANGED": "{user} moveu de {from} para {to}",
+      "VALUE_CHANGED": "{user} alterou o valor",
+      "ASSIGNEE_CHANGED": "{user} alterou o responsável",
+      "WON": "{user} marcou como ganho 🎉",
+      "LOST": "{user} marcou como perdido",
+      "NOTE": "{user} adicionou uma nota",
+      "REOPENED": "{user} reabriu o negócio"
+    }
+  },
+  "DEAL_PIPELINES": {
+    "TITLE": "Funis de negócios",
+    "DESCRIPTION": "Configure as etapas do seu funil de vendas. Os negócios se movem entre essas etapas no quadro.",
+    "EDIT": "Editar",
+    "SAVE_SUCCESS": "Funil salvo.",
+    "SAVE_ERROR": "Não foi possível salvar o funil.",
+    "FORM": {
+      "NAME": "Nome",
+      "STAGES": "Etapas",
+      "STAGE_NAME": "Nome da etapa",
+      "ADD_STAGE": "Adicionar etapa",
+      "CANCEL": "Cancelar",
+      "SAVE": "Salvar",
+      "STAGE_TYPES": {
+        "OPEN": "Aberta",
+        "WON": "Ganho",
+        "LOST": "Perdido"
+      }
+    }
+  }
+}

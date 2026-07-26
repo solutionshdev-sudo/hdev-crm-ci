@@ -59,6 +59,7 @@ onMounted(() => {
   store.dispatch('teams/get');
   store.dispatch('labels/get');
   store.dispatch('campaigns/get');
+  store.dispatch('dealPipelines/get');
   store.dispatch('automations/get');
   if (isSLAEnabled.value) {
     store.dispatch('sla/get');

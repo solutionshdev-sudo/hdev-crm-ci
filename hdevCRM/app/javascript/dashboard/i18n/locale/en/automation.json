@@ -43,13 +43,13 @@
       }
     },
     "LIST": {
+      "404": "No automation rules found",
       "TABLE_HEADER": {
         "NAME": "Name",
         "ACTIVE": "Active",
         "CREATED_ON": "Created on",
         "ACTIONS": "Actions"
-      },
-      "404": "No automation rules found"
+      }
     },
     "DELETE": {
       "TITLE": "Delete Automation Rule",
@@ -157,7 +157,9 @@
       "CHANGE_PRIORITY": "Change Priority",
       "ADD_SLA": "Add SLA",
       "OPEN_CONVERSATION": "Open conversation",
-      "PENDING_CONVERSATION": "Mark conversation as pending"
+      "PENDING_CONVERSATION": "Mark conversation as pending",
+      "CREATE_DEAL": "Create deal in the pipeline",
+      "MOVE_DEAL_STAGE": "Move deal to stage"
     },
     "MESSAGE_TYPES": {
       "INCOMING": "Incoming Message",

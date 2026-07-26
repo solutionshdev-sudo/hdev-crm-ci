@@ -43,13 +43,13 @@
       }
     },
     "LIST": {
+      "404": "Nenhuma regra de automação encontrada",
       "TABLE_HEADER": {
         "NAME": "Nome",
         "ACTIVE": "Ativo",
         "CREATED_ON": "Criado em",
         "ACTIONS": "Ações"
-      },
-      "404": "Nenhuma regra de automação encontrada"
+      }
     },
     "DELETE": {
       "TITLE": "Excluir regra de automação",
@@ -157,7 +157,9 @@
       "CHANGE_PRIORITY": "Alterar Prioridade",
       "ADD_SLA": "Adicionar SLA",
       "OPEN_CONVERSATION": "Abrir conversa",
-      "PENDING_CONVERSATION": "Marcar conversa como pendente"
+      "PENDING_CONVERSATION": "Marcar conversa como pendente",
+      "CREATE_DEAL": "Criar negócio no funil",
+      "MOVE_DEAL_STAGE": "Mover negócio para a etapa"
     },
     "MESSAGE_TYPES": {
       "INCOMING": "Mensagem Recebida",

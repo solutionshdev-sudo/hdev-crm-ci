@@ -25,7 +25,7 @@ class Conversations::MessageWindowService
     when 'Channel::Tiktok'
       tiktok_messaging_window
     when 'Channel::Whatsapp'
-      MESSAGING_WINDOW_24_HOURS
+      whatsapp_messaging_window
     when 'Channel::TwilioSms'
       twilio_messaging_window
     end
@@ -41,6 +41,13 @@ class Conversations::MessageWindowService
     return if @conversation.inbox.channel.additional_attributes['agent_reply_time_window'].blank?
 
     @conversation.inbox.channel.additional_attributes['agent_reply_time_window'].to_i.hours
+  end
+
+  # The unofficial (baileys) provider has no session window — replies go out
+  # any time. Without this, sends past 24h are forced through send_template,
+  # which doesn't exist on the unofficial API and fails every message.
+  def whatsapp_messaging_window
+    @conversation.inbox.channel.provider == 'baileys' ? nil : MESSAGING_WINDOW_24_HOURS
   end
 
   # Check medium of the inbox to determine the messaging window

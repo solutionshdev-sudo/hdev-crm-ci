@@ -90,7 +90,7 @@
         "TITLE": "Sessões ativas",
         "NOTE": "Estes são os dispositivos atualmente conectados à sua conta.",
         "CURRENT": "Sessão atual",
-        "REVOKE": "Revoke",
+        "REVOKE": "Revogar",
         "REVOKE_SUCCESS": "Sessão revogada com sucesso",
         "REVOKE_ERROR": "Não foi possível revogar a sessão. Por favor, tente novamente.",
         "FETCH_ERROR": "Não foi possível realizar a sessão. Por favor, tente novamente.",
@@ -324,6 +324,7 @@
     "COMPANIES": "Empresas",
     "ALL_COMPANIES": "Todas as empresas",
     "CAPTAIN": "Capitão",
+    "CALLS": "Chamadas",
     "CAPTAIN_ASSISTANTS": "Assistentes",
     "CAPTAIN_OVERVIEW": "Visão geral",
     "CAPTAIN_DOCUMENTS": "Documentos",
@@ -413,7 +414,11 @@
     "DOCS": "Ler documentos",
     "SECURITY": "Segurança",
     "CAPTAIN_AI": "Capitão",
-    "CONVERSATION_WORKFLOW": "Fluxo de Conversa"
+    "CONVERSATION_WORKFLOW": "Fluxo de Conversa",
+    "DEALS": "Negócios",
+    "DEALS_BOARD": "Funil",
+    "DEAL_PIPELINES": "Funis de negócios",
+    "CHATBOTS": "Chatbots"
   },
   "DATA_IMPORTS": {
     "HEADER": "Dado",
@@ -486,7 +491,7 @@
       "ALL_SKIP_LOGS": "Todos",
       "KIND": "Tipo",
       "NO_ERRORS": "Nenhum erro registrado.",
-      "ERROR_CODE": "Code",
+      "ERROR_CODE": "Código",
       "SOURCE_OBJECT": "Objeto de origem",
       "MESSAGE": "Mensagem"
     },

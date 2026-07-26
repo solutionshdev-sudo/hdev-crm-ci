@@ -18,6 +18,8 @@ import canned from './canned/canned.routes';
 import inbox from './inbox/inbox.routes';
 import integrations from './integrations/integrations.routes';
 import labels from './labels/labels.routes';
+import dealPipelines from './dealPipelines/dealPipelines.routes';
+import chatbots from './chatbots/chatbots.routes';
 import macros from './macros/macros.routes';
 import reports from './reports/reports.routes';
 import store from '../../../store';
@@ -64,6 +66,8 @@ export default {
     ...integrations.routes,
     ...data.routes,
     ...labels.routes,
+    ...dealPipelines.routes,
+    ...chatbots.routes,
     ...macros.routes,
     ...reports.routes,
     ...sla.routes,

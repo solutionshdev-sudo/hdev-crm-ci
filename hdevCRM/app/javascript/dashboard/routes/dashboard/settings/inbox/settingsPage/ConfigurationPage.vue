@@ -10,6 +10,7 @@ import SettingsToggleSection from 'dashboard/components-next/Settings/SettingsTo
 import SettingsAccordion from 'dashboard/components-next/Settings/SettingsAccordion.vue';
 import ImapSettings from '../ImapSettings.vue';
 import SmtpSettings from '../SmtpSettings.vue';
+import BaileysSession from '../channels/whatsapp/BaileysSession.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import NextButton from 'dashboard/components-next/button/Button.vue';
@@ -23,6 +24,7 @@ export default {
     SettingsAccordion,
     ImapSettings,
     SmtpSettings,
+    BaileysSession,
     NextButton,
     TextArea,
   },
@@ -60,6 +62,9 @@ export default {
     }),
     isEmbeddedSignupWhatsApp() {
       return this.inbox.provider_config?.source === 'embedded_signup';
+    },
+    isBaileysProvider() {
+      return this.inbox.provider === 'baileys';
     },
     showWhatsAppReconfigure() {
       return (
@@ -392,8 +397,18 @@ export default {
   </div>
   <div v-else-if="isAWhatsAppChannel && !isATwilioChannel">
     <div v-if="inbox.provider_config">
+      <!-- Sessão do WhatsApp não-oficial (baileys) -->
+      <template v-if="isBaileysProvider">
+        <SettingsFieldSection
+          :label="$t('INBOX_MGMT.SETTINGS_POPUP.BAILEYS_SESSION_TITLE')"
+          :help-text="$t('INBOX_MGMT.SETTINGS_POPUP.BAILEYS_SESSION_SUBHEADER')"
+        >
+          <BaileysSession :inbox-id="inbox.id" />
+        </SettingsFieldSection>
+      </template>
+
       <!-- Embedded Signup Section -->
-      <template v-if="isEmbeddedSignupWhatsApp">
+      <template v-else-if="isEmbeddedSignupWhatsApp">
         <SettingsFieldSection
           :label="$t('INBOX_MGMT.SETTINGS_POPUP.WHATSAPP_WEBHOOK_TITLE')"
           :help-text="

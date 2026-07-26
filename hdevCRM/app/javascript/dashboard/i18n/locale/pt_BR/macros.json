@@ -28,14 +28,14 @@
       }
     },
     "LIST": {
+      "404": "Nenhuma macro encontrada",
       "TABLE_HEADER": {
         "NAME": "Nome",
         "CREATED BY": "Criada por",
         "LAST_UPDATED_BY": "Ultima atualização por",
         "VISIBILITY": "Visibilidade",
         "ACTIONS": "Ações"
-      },
-      "404": "Nenhuma macro encontrada"
+      }
     },
     "DELETE": {
       "TOOLTIP": "Excluir macro",
@@ -108,7 +108,8 @@
       "SEND_MESSAGE": "Enviar uma Mensagem",
       "CHANGE_PRIORITY": "Alterar Prioridade",
       "ADD_PRIVATE_NOTE": "Adicionar uma Nota Privada",
-      "SEND_WEBHOOK_EVENT": "Enviar evento de Webhook"
+      "SEND_WEBHOOK_EVENT": "Enviar evento de Webhook",
+      "CREATE_DEAL": "Criar negócio no funil"
     },
     "PRIORITY_TYPES": {
       "NONE": "Nenhuma",

@@ -10,6 +10,9 @@ class AsyncDispatcher < BaseDispatcher
 
   def listeners
     [
+      # ChatbotListener antes do AiAgentListener: com sessão de fluxo ativa,
+      # o guard em Ai::AgentReplyService.enabled_for? silencia a IA.
+      ChatbotListener.instance,
       AiAgentListener.instance,
       AutomationRuleListener.instance,
       CampaignListener.instance,

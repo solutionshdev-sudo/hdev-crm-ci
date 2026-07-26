@@ -1,0 +1,123 @@
+{
+  "CHATBOTS": {
+    "LIST": {
+      "TITLE": "Chatbots",
+      "DESCRIPTION": "Build automated flows per inbox — menus, data collection, conditions and human handoff.",
+      "NEW": "New chatbot",
+      "EMPTY": "No chatbots yet. Create the first one and design the flow in the visual editor.",
+      "NO_INBOX": "No inbox linked",
+      "EDIT_FLOW": "Edit flow",
+      "ACTIVATE": "Activate",
+      "DEACTIVATE": "Deactivate",
+      "CREATE_ERROR": "Could not create the chatbot.",
+      "TOGGLE_ERROR": "Could not change the status.",
+      "STATUS": {
+        "DRAFT": "Draft",
+        "ACTIVE": "Active",
+        "INACTIVE": "Inactive"
+      }
+    },
+    "FORM": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "INBOXES": "Inboxes",
+      "CREATE": "Create and open the editor",
+      "CANCEL": "Cancel"
+    },
+    "BUILDER": {
+      "PALETTE": "Blocks",
+      "SAVE": "Save",
+      "SAVING": "Saving…",
+      "SAVED": "Saved",
+      "SAVE_ERROR": "Could not save the flow.",
+      "NODES": {
+        "START": "Start",
+        "MESSAGE": "Message",
+        "QUESTION": "Question",
+        "CONDITION": "Condition",
+        "COLLECT": "Collect input",
+        "DELAY": "Wait",
+        "HANDOFF": "Hand off to human",
+        "TAG": "Label",
+        "WEBHOOK": "Webhook",
+        "AI": "AI reply",
+        "DEAL": "Create deal",
+        "END": "End"
+      },
+      "HANDLES": {
+        "OUT": "continue",
+        "TRUE": "true",
+        "FALSE": "false",
+        "FALLBACK": "not understood",
+        "TIMEOUT": "no reply",
+        "ERROR": "error",
+        "HANDOFF": "hand off"
+      },
+      "FIELDS": {
+        "CONTENT": "Message",
+        "VARIABLES_HINT": "Use {{contact.name}}, {{vars.variable_name}} etc.",
+        "INPUT_TYPE": "Reply type",
+        "INPUT_TYPES": { "BUTTONS": "Buttons / options", "FREE_TEXT": "Free text" },
+        "OPTIONS": "Options",
+        "ADD_OPTION": "Add option",
+        "INVALID_MESSAGE": "Message when not understood",
+        "MODE": "Combine rules",
+        "MODE_ALL": "All (AND)",
+        "MODE_ANY": "Any (OR)",
+        "RULE_LEFT": "Value (e.g. {{vars.answer}})",
+        "RULE_RIGHT": "Compare with",
+        "ADD_RULE": "Add rule",
+        "VALIDATION": "Validation",
+        "REGEX": "Regular expression",
+        "MAP_TO": "Save on contact",
+        "MAP_TO_NONE": "Don't save on contact",
+        "MAP_TO_NAME": "Name",
+        "MAP_TO_EMAIL": "Email",
+        "MAP_TO_PHONE": "Phone",
+        "SAVE_AS": "Save as variable",
+        "SAVE_AS_PLACEHOLDER": "e.g. contact_reason",
+        "DELAY_SECONDS": "Wait (seconds)",
+        "HANDOFF_MESSAGE": "Message before handing off",
+        "ASSIGN_TO": "Assign to",
+        "ASSIGN_NONE": "Nobody (general queue)",
+        "ASSIGN_TEAM": "Team",
+        "ASSIGN_AGENT": "Agent",
+        "TEAM": "Team",
+        "AGENT": "Agent",
+        "TAGS_ADD": "Add labels (comma separated)",
+        "TAGS_REMOVE": "Remove labels",
+        "METHOD": "Method",
+        "AI_PROMPT": "AI instructions",
+        "AI_SEND_REPLY": "Send the AI reply to the customer",
+        "PIPELINE": "Pipeline",
+        "STAGE": "Stage",
+        "DEAL_TITLE": "Deal title",
+        "DEAL_VALUE": "Value",
+        "END_MESSAGE": "Final message",
+        "RESOLVE_CONVERSATION": "Resolve the conversation when finished"
+      },
+      "OPERATORS": {
+        "EQUALS": "equals",
+        "NOT_EQUALS": "not equal to",
+        "CONTAINS": "contains",
+        "NOT_CONTAINS": "does not contain",
+        "STARTS_WITH": "starts with",
+        "GREATER_THAN": "greater than",
+        "LESS_THAN": "less than",
+        "IS_PRESENT": "is present",
+        "IS_BLANK": "is blank",
+        "MATCHES_REGEX": "matches regex"
+      },
+      "VALIDATIONS": {
+        "NONE": "None",
+        "EMAIL": "Email",
+        "PHONE": "Phone",
+        "NUMBER": "Number",
+        "DATE": "Date",
+        "CPF": "CPF",
+        "CNPJ": "CNPJ",
+        "REGEX": "Regex"
+      }
+    }
+  }
+}

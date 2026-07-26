@@ -21,6 +21,13 @@ By default, it renders:
   <title>
     <%= content_for(:title) %> - <%= application_title %>
   </title>
+  <script>
+    // Mirrors v3/App.vue: Tailwind's dark: variants only fire when `.dark`
+    // sits on the root element; nothing else adds it on ERB-rendered pages.
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
   <%= render "stylesheet" %>
   <%= vite_client_tag %>
   <%= vite_javascript_tag 'superadmin' %>

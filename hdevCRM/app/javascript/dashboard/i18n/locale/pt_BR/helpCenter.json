@@ -419,7 +419,7 @@
         "SLUG": {
           "LABEL": "Slug",
           "PLACEHOLDER": "Categoria de slug para URLs",
-          "HELP_TEXT": "app.chatwoot.com/hc/my-portal/en-US/categories/my-slug",
+          "HELP_TEXT": "seu-dominio.com/hc/meu-portal/pt-BR/categories/meu-slug",
           "ERROR": "Slug é obrigatório"
         },
         "DESCRIPTION": {
@@ -450,7 +450,7 @@
         "SLUG": {
           "LABEL": "Slug",
           "PLACEHOLDER": "Categoria de slug para URLs",
-          "HELP_TEXT": "app.chatwoot.com/hc/my-portal/en-US/categories/my-slug",
+          "HELP_TEXT": "seu-dominio.com/hc/meu-portal/pt-BR/categories/meu-slug",
           "ERROR": "Slug é obrigatório"
         },
         "DESCRIPTION": {
@@ -707,7 +707,7 @@
       "NEW_LOCALE_BUTTON_TEXT": "Nova localização",
       "SEARCH_PLACEHOLDER": "Pesquisar locais...",
       "SEARCH_EMPTY_STATE": {
-        "TITLE": "No matching locales",
+        "TITLE": "Nenhum idioma correspondente",
         "SUBTITLE": "Não conseguimos encontrar nenhum idioma correspondente à sua pesquisa. Tente um termo diferente."
       },
       "LOCALE_CARD": {
@@ -818,7 +818,7 @@
       "EDIT_ARTICLE": {
         "MORE_PROPERTIES": "Mais propriedades",
         "UNCATEGORIZED": "Não categorizado",
-        "EDITOR_PLACEHOLDER": "Write your content here. Type '/' for formatting options."
+        "EDITOR_PLACEHOLDER": "Escreva seu conteúdo aqui. Digite '/' para opções de formatação."
       },
       "ARTICLE_PROPERTIES": {
         "ARTICLE_PROPERTIES": "Propriedades do artigo",

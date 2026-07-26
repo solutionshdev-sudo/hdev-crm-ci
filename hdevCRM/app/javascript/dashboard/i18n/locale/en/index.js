@@ -10,6 +10,7 @@ import bulkActions from './bulkActions.json';
 import calls from './calls.json';
 import campaign from './campaign.json';
 import cannedMgmt from './cannedMgmt.json';
+import chatbots from './chatbots.json';
 import chatlist from './chatlist.json';
 import companies from './companies.json';
 import components from './components.json';
@@ -19,6 +20,7 @@ import conversation from './conversation.json';
 import csatMgmt from './csatMgmt.json';
 import customRole from './customRole.json';
 import datePicker from './datePicker.json';
+import deals from './deals.json';
 import emoji from './emoji.json';
 import general from './general.json';
 import generalSettings from './generalSettings.json';
@@ -59,6 +61,7 @@ export default {
   ...calls,
   ...campaign,
   ...cannedMgmt,
+  ...chatbots,
   ...chatlist,
   ...companies,
   ...components,
@@ -68,6 +71,7 @@ export default {
   ...csatMgmt,
   ...customRole,
   ...datePicker,
+  ...deals,
   ...emoji,
   ...general,
   ...generalSettings,

@@ -136,6 +136,18 @@ Rails.application.routes.draw do
           resources :macros, only: [:index, :create, :show, :update, :destroy] do
             post :execute, on: :member
           end
+          resources :deal_pipelines, only: [:index, :create, :show, :update, :destroy] do
+            post :reorder_stages, on: :member
+          end
+          resources :chatbots, only: [:index, :create, :show, :update, :destroy] do
+            post :clone, on: :member
+            post :toggle, on: :member
+            resources :sessions, only: [:index, :destroy], module: :chatbots
+          end
+          resources :deals, only: [:index, :create, :show, :update, :destroy] do
+            post :move, on: :member
+            resources :activities, only: [:index], module: :deals
+          end
           resources :sla_policies, only: [:index, :create, :show, :update, :destroy]
           resources :custom_roles, only: [:index, :create, :show, :update, :destroy]
           resources :agent_capacity_policies, only: [:index, :create, :show, :update, :destroy] do
@@ -290,6 +302,10 @@ Rails.application.routes.draw do
             get :health, on: :member
             post :register_webhook, on: :member
             post :reset_secret, on: :member
+            # WhatsApp não-oficial (baileys-service): sessão QR/pairing por inbox
+            get :baileys_status, on: :member, controller: 'channels/baileys', action: :status
+            post :baileys_connect, on: :member, controller: 'channels/baileys', action: :connect
+            post :baileys_logout, on: :member, controller: 'channels/baileys', action: :logout
             if ChatwootApp.enterprise?
               resource :conference, only: %i[create destroy], controller: 'conference' do
                 get :token, on: :member
@@ -654,6 +670,7 @@ Rails.application.routes.draw do
   post 'webhooks/sms/:phone_number', to: 'webhooks/sms#process_payload'
   get 'webhooks/whatsapp/:phone_number', to: 'webhooks/whatsapp#verify'
   post 'webhooks/whatsapp/:phone_number', to: 'webhooks/whatsapp#process_payload'
+  post 'webhooks/baileys/:instance_id', to: 'webhooks/baileys#process_payload'
   get 'webhooks/instagram', to: 'webhooks/instagram#verify'
   post 'webhooks/instagram', to: 'webhooks/instagram#events'
   post 'webhooks/tiktok', to: 'webhooks/tiktok#events'

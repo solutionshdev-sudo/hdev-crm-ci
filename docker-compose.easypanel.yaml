@@ -56,6 +56,11 @@ services:
       INSTALLATION_NAME: 'Hdev CRM'
       BRAND_NAME: 'Hdev CRM'
       MAILER_SENDER_EMAIL: 'Hdev CRM <sac@hdev.online>'
+      # WhatsApp não-oficial (baileys-service, rede interna do compose)
+      BAILEYS_URL: http://baileys:3025
+      # O microserviço fala com o Rails por dentro da rede, não pelo domínio público
+      RAILS_INTERNAL_URL: http://web:3000
+      # BAILEYS_API_KEY vem do .env (mesmo segredo nos dois lados)
     entrypoint: docker/entrypoints/rails.sh
     command: ["sh", "-c", "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"]
     volumes:
@@ -78,7 +83,23 @@ services:
       - storage_data:/app/storage
     restart: always
 
+  baileys:
+    build:
+      context: ./baileys-service
+    image: hdev-baileys:latest
+    restart: always
+    env_file: [.env]                      # fornece BAILEYS_API_KEY
+    environment:
+      NODE_ENV: production
+      PORT: '3025'
+      SESSIONS_DIR: /data/sessions
+    expose:
+      - '3025'                            # só rede interna — nunca dar domínio/ports
+    volumes:
+      - baileys_data:/data
+
 volumes:
   postgres_data:
   redis_data:
   storage_data:
+  baileys_data:

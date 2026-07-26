@@ -72,6 +72,20 @@
     "RATING_TITLE": "Classificação",
     "FEEDBACK_TITLE": "Feedback",
     "REPLY_MESSAGE_NOT_FOUND": "Mensagem não disponível",
+    "CAPTAIN_GENERATION": {
+      "TITLE": "Como esta resposta foi gerada?",
+      "GENERATED_BY": "Gerada pelo Captain",
+      "LOADING": "Carregando detalhes…",
+      "EMPTY": "Nenhum detalhe de geração disponível para esta mensagem.",
+      "TIMELINE": "Etapas da geração",
+      "STEP_TOOL": "Chamou {name}",
+      "STEP_HANDOFF": "Transferiu para {name}",
+      "REASONING": "Raciocínio",
+      "SOURCES": "Base de conhecimento",
+      "SOURCES_SUMMARY": "{count} resultado | {count} resultados",
+      "MODEL": "Gerada com {model}",
+      "CREDITS": "Créditos: {credits}"
+    },
     "CARD": {
       "SHOW_LABELS": "Mostrar etiquetas",
       "HIDE_LABELS": "Ocultar as etiquetas",

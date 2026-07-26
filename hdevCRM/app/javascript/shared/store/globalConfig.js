@@ -56,8 +56,12 @@ const state = {
 export const getters = {
   get: $state => $state,
   isOnChatwootCloud: $state => $state.deploymentEnv === 'cloud',
-  isACustomBrandedInstance: $state => $state.installationName !== 'Chatwoot',
-  isAChatwootInstance: $state => $state.installationName === 'Chatwoot',
+  // The fork is always a custom-branded install: the platform brand (Hdev CRM)
+  // or an agency brand. These used to compare installationName against the
+  // upstream product name, which never matches here — the constants make the
+  // gates for upstream-cloud-only UI (testimonials, hosted email flow) explicit.
+  isACustomBrandedInstance: () => true,
+  isAChatwootInstance: () => false,
 };
 
 export const actions = {};

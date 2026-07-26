@@ -23,6 +23,8 @@ module Ai
       return false if conversation.resolved?
       return false if conversation.assignee_id.present?
       return false if truthy?(conversation.custom_attributes['ai_agent_handoff'])
+      # Um fluxo de chatbot ativo conduz a conversa — sem isso, IA e fluxo respondem juntos.
+      return false if ChatbotSession.active.exists?(conversation_id: conversation.id)
 
       inbox_allowed?(account, conversation.inbox_id)
     end

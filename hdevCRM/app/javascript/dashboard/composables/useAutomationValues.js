@@ -27,6 +27,17 @@ export default function useAutomationValues() {
   const labels = useMapGetter('labels/getLabels');
   const teams = useMapGetter('teams/getTeams');
   const slaPolicies = useMapGetter('sla/getSLA');
+  const dealPipelines = useMapGetter('dealPipelines/getPipelines');
+
+  // Etapas achatadas como "Funil — Etapa" para o dropdown de move_deal_stage.
+  const dealStages = computed(() =>
+    dealPipelines.value.flatMap(pipeline =>
+      (pipeline.stages || []).map(stage => ({
+        id: stage.id,
+        name: `${pipeline.name} — ${stage.name}`,
+      }))
+    )
+  );
 
   const booleanFilterOptions = computed(() => [
     { id: true, name: t('FILTER.ATTRIBUTE_LABELS.TRUE') },
@@ -137,6 +148,7 @@ export default function useAutomationValues() {
       labels: labels.value,
       teams: teams.value,
       slaPolicies: slaPolicies.value,
+      dealStages: dealStages.value,
       languages,
       type,
       addNoneToListFn: addNoneToList,

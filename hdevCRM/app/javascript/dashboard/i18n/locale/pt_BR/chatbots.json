@@ -1,0 +1,123 @@
+{
+  "CHATBOTS": {
+    "LIST": {
+      "TITLE": "Chatbots",
+      "DESCRIPTION": "Crie fluxos de atendimento automático por caixa de entrada — menus, coleta de dados, condições e transferência para humano.",
+      "NEW": "Novo chatbot",
+      "EMPTY": "Nenhum chatbot ainda. Crie o primeiro e desenhe o fluxo no editor visual.",
+      "NO_INBOX": "Nenhuma caixa vinculada",
+      "EDIT_FLOW": "Editar fluxo",
+      "ACTIVATE": "Ativar",
+      "DEACTIVATE": "Desativar",
+      "CREATE_ERROR": "Não foi possível criar o chatbot.",
+      "TOGGLE_ERROR": "Não foi possível alterar o status.",
+      "STATUS": {
+        "DRAFT": "Rascunho",
+        "ACTIVE": "Ativo",
+        "INACTIVE": "Inativo"
+      }
+    },
+    "FORM": {
+      "NAME": "Nome",
+      "DESCRIPTION": "Descrição",
+      "INBOXES": "Caixas de entrada",
+      "CREATE": "Criar e abrir o editor",
+      "CANCEL": "Cancelar"
+    },
+    "BUILDER": {
+      "PALETTE": "Blocos",
+      "SAVE": "Salvar",
+      "SAVING": "Salvando…",
+      "SAVED": "Salvo",
+      "SAVE_ERROR": "Não foi possível salvar o fluxo.",
+      "NODES": {
+        "START": "Início",
+        "MESSAGE": "Mensagem",
+        "QUESTION": "Pergunta",
+        "CONDITION": "Condição",
+        "COLLECT": "Coletar dado",
+        "DELAY": "Esperar",
+        "HANDOFF": "Transferir p/ humano",
+        "TAG": "Etiquetar",
+        "WEBHOOK": "Webhook",
+        "AI": "Resposta com IA",
+        "DEAL": "Criar negócio",
+        "END": "Fim"
+      },
+      "HANDLES": {
+        "OUT": "continuar",
+        "TRUE": "verdadeiro",
+        "FALSE": "falso",
+        "FALLBACK": "não entendeu",
+        "TIMEOUT": "sem resposta",
+        "ERROR": "erro",
+        "HANDOFF": "transferir"
+      },
+      "FIELDS": {
+        "CONTENT": "Mensagem",
+        "VARIABLES_HINT": "Use {{contact.name}}, {{vars.nome_da_variavel}} etc.",
+        "INPUT_TYPE": "Tipo de resposta",
+        "INPUT_TYPES": { "BUTTONS": "Botões / opções", "FREE_TEXT": "Texto livre" },
+        "OPTIONS": "Opções",
+        "ADD_OPTION": "Adicionar opção",
+        "INVALID_MESSAGE": "Mensagem quando não entender",
+        "MODE": "Combinar regras",
+        "MODE_ALL": "Todas (E)",
+        "MODE_ANY": "Qualquer (OU)",
+        "RULE_LEFT": "Valor (ex.: {{vars.resposta}})",
+        "RULE_RIGHT": "Comparar com",
+        "ADD_RULE": "Adicionar regra",
+        "VALIDATION": "Validação",
+        "REGEX": "Expressão regular",
+        "MAP_TO": "Salvar no contato",
+        "MAP_TO_NONE": "Não salvar no contato",
+        "MAP_TO_NAME": "Nome",
+        "MAP_TO_EMAIL": "E-mail",
+        "MAP_TO_PHONE": "Telefone",
+        "SAVE_AS": "Salvar como variável",
+        "SAVE_AS_PLACEHOLDER": "ex.: motivo_contato",
+        "DELAY_SECONDS": "Espera (segundos)",
+        "HANDOFF_MESSAGE": "Mensagem antes de transferir",
+        "ASSIGN_TO": "Atribuir a",
+        "ASSIGN_NONE": "Ninguém (fila geral)",
+        "ASSIGN_TEAM": "Equipe",
+        "ASSIGN_AGENT": "Agente",
+        "TEAM": "Equipe",
+        "AGENT": "Agente",
+        "TAGS_ADD": "Adicionar etiquetas (separadas por vírgula)",
+        "TAGS_REMOVE": "Remover etiquetas",
+        "METHOD": "Método",
+        "AI_PROMPT": "Instruções para a IA",
+        "AI_SEND_REPLY": "Enviar a resposta da IA para o cliente",
+        "PIPELINE": "Funil",
+        "STAGE": "Etapa",
+        "DEAL_TITLE": "Título do negócio",
+        "DEAL_VALUE": "Valor",
+        "END_MESSAGE": "Mensagem final",
+        "RESOLVE_CONVERSATION": "Resolver a conversa ao terminar"
+      },
+      "OPERATORS": {
+        "EQUALS": "é igual a",
+        "NOT_EQUALS": "é diferente de",
+        "CONTAINS": "contém",
+        "NOT_CONTAINS": "não contém",
+        "STARTS_WITH": "começa com",
+        "GREATER_THAN": "maior que",
+        "LESS_THAN": "menor que",
+        "IS_PRESENT": "está preenchido",
+        "IS_BLANK": "está vazio",
+        "MATCHES_REGEX": "casa com regex"
+      },
+      "VALIDATIONS": {
+        "NONE": "Nenhuma",
+        "EMAIL": "E-mail",
+        "PHONE": "Telefone",
+        "NUMBER": "Número",
+        "DATE": "Data",
+        "CPF": "CPF",
+        "CNPJ": "CNPJ",
+        "REGEX": "Regex"
+      }
+    }
+  }
+}

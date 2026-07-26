@@ -63,7 +63,7 @@ pt_BR:
       reporting_timezone:
         invalid: não é um fuso horário válido
       support_email:
-        invalid: is not a valid email address
+        invalid: não é um endereço de e-mail válido
     validations:
       presence: não pode ficar em branco
     webhook:
@@ -590,7 +590,21 @@ pt_BR:
       subject: 'Termine de configurar %{custom_domain}'
     ssl_status:
       custom_domain_not_configured: 'Domínio personalizado não está configurado'
+  chatbots:
+    invalid_option: 'Desculpe, não entendi. Escolha uma das opções (pode responder com o número).'
+    invalid_answer: 'Esse valor não parece válido. Pode tentar de novo?'
   super_admin:
+    login:
+      headline: 'Bem-vindo de volta à'
+      subtitle: 'Console administrativo — gerencie contas, agências, usuários e configurações da plataforma.'
+      rights: 'Todos os direitos reservados.'
+      card_title: 'Acesso do Super Admin'
+      card_subtitle: 'Informe suas credenciais para acessar o console.'
+      email: 'E-mail'
+      email_placeholder: 'alguem@exemplo.com'
+      password: 'Senha'
+      password_placeholder: 'Senha'
+      submit: 'Entrar'
     captain_model_overrides:
       form:
         helper_text: 'Deixe um modelo em branco para usar o padrão YAML para esse recurso AI.'

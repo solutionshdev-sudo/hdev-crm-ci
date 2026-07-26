@@ -40,6 +40,9 @@
   - Do not use inline styles  
   - Always use Tailwind utility classes  
 - **Colors**: Refer to `tailwind.config.js` for color definitions
+- **Known exceptions to "Tailwind Only"** (vendor/structural CSS, not theming):
+  - `@vue-flow/core/dist/style.css` — structural CSS required by the chatbot flow builder (viewport positioning, pointer-events). Never import its `theme-default.css`; node/edge styling stays in Tailwind.
+  - `scss/super_admin/index.scss` `.auth-brand*`/`.auth-cta` — mirrors the scoped CSS of `v3/components/Auth/AuthSplitLayout.vue` for the ERB-rendered super admin sign-in (scoped styles can't reach ERB; multi-stop radial gradients have no utility equivalent).
 
 ## General Guidelines
 

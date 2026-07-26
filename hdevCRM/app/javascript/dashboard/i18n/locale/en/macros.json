@@ -28,14 +28,14 @@
       }
     },
     "LIST": {
+      "404": "No macros found",
       "TABLE_HEADER": {
         "NAME": "Name",
         "CREATED BY": "Created by",
         "LAST_UPDATED_BY": "Last updated by",
         "VISIBILITY": "Visibility",
         "ACTIONS": "Actions"
-      },
-      "404": "No macros found"
+      }
     },
     "DELETE": {
       "TOOLTIP": "Delete macro",
@@ -108,7 +108,8 @@
       "SEND_MESSAGE": "Send a Message",
       "CHANGE_PRIORITY": "Change Priority",
       "ADD_PRIVATE_NOTE": "Add a Private Note",
-      "SEND_WEBHOOK_EVENT": "Send Webhook Event"
+      "SEND_WEBHOOK_EVENT": "Send Webhook Event",
+      "CREATE_DEAL": "Create deal in the pipeline"
     },
     "PRIORITY_TYPES": {
       "NONE": "None",

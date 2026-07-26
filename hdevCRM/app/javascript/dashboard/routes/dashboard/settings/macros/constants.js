@@ -20,6 +20,11 @@ export const MACRO_ACTION_TYPES = [
     inputType: 'multi_select',
   },
   {
+    key: 'create_deal',
+    label: 'CREATE_DEAL',
+    inputType: null,
+  },
+  {
     key: 'remove_assigned_agent',
     label: 'REMOVE_ASSIGNED_AGENT',
     inputType: null,

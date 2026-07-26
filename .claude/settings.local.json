@@ -17,7 +17,8 @@
       "Bash(head -289 app/javascript/v3/views/login/Index.vue)",
       "Read(//tmp/**)",
       "Bash(npx eslint *)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const j=require\\('./app/javascript/dashboard/i18n/locale/pt_BR/login.json'\\); console.log\\(JSON.stringify\\(j.LOGIN.BRAND,null,1\\), j.LOGIN.CARD?JSON.stringify\\(j.LOGIN.CARD,null,1\\):'no CARD', j.LOGIN.FOOTER?JSON.stringify\\(j.LOGIN.FOOTER,null,1\\):''\\)\")"
     ]
   }
 }

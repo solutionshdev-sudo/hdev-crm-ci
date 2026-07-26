@@ -606,7 +606,21 @@ en:
       subject: 'Finish setting up %{custom_domain}'
     ssl_status:
       custom_domain_not_configured: 'Custom domain is not configured'
+  chatbots:
+    invalid_option: "Sorry, I didn't understand. Please pick one of the options (you can reply with the number)."
+    invalid_answer: "That doesn't look valid. Could you try again?"
   super_admin:
+    login:
+      headline: 'Welcome back to'
+      subtitle: 'Admin console — manage accounts, agencies, users and platform settings.'
+      rights: 'All rights reserved.'
+      card_title: 'Super Admin sign in'
+      card_subtitle: 'Enter your credentials to access the console.'
+      email: 'Email address'
+      email_placeholder: 'someone@example.com'
+      password: 'Password'
+      password_placeholder: 'Password'
+      submit: 'Sign in'
     captain_model_overrides:
       form:
         helper_text: 'Leave a model blank to use the YAML default for that AI feature.'

@@ -776,6 +776,16 @@ export const AUTOMATION_ACTION_TYPES = [
     inputType: null,
   },
   {
+    key: 'create_deal',
+    label: 'CREATE_DEAL',
+    inputType: null,
+  },
+  {
+    key: 'move_deal_stage',
+    label: 'MOVE_DEAL_STAGE',
+    inputType: 'search_select',
+  },
+  {
     key: 'send_webhook_event',
     label: 'SEND_WEBHOOK_EVENT',
     inputType: 'url',

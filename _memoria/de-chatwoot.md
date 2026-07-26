@@ -73,7 +73,7 @@ o desligava diariamente. Agora pode ser ligado por conta e permanece.
 - Os 10 valores de marca restaurados no banco (saída confirmou `OK` para todos)
 - Chave Redis do alerta (`CHATWOOT_CONFIG_RESET_WARNING`) limpa
 
-### 🟡 Telas de auth redesenhadas — pronto no código, falta comitar e deployar
+### 🟡 Telas de auth redesenhadas — comitadas (`2b34d7b`), falta deployar
 
 As cinco telas de auth (login, SSO/SAML, esqueci a senha, redefinir senha,
 verificar e-mail) saíram do card centralizado herdado do Chatwoot e passaram a
@@ -101,8 +101,8 @@ substitui "Chatwoot", então a marca vazava em domínio de agência).
 
 Regra de acento pra telas novas registrada em `identidade/design-guide.md`.
 
-**Falta:** comitar, definir `DEFAULT_LOCALE=pt_BR` no EasyPanel (sem isso a tela
-abre em inglês mesmo com a tradução pronta) e rebuildar a imagem.
+**Falta:** definir `DEFAULT_LOCALE=pt_BR` no EasyPanel (sem isso a tela abre em
+inglês mesmo com a tradução pronta) e rebuildar a imagem.
 
 ### 🟡 Erro 500 do Super Admin — corrigido e publicado; falta deployar
 
@@ -125,8 +125,60 @@ não basta porque a imagem é buildada do repo). Depois, confirmar que
 pra garantir que não há outro recurso sem `index`.
 
 Observação menor vista no log (não bloqueia): WARN `Session activity update
-failed: wrong number of arguments (given 1, expected 0)` no login do Super
-Admin — investigar depois.
+failed: wrong number of arguments (given 1, expected 0)` no login do Super Admin.
+
+Rastreado até `app/controllers/concerns/track_session_activity.rb` — o concern é
+incluído no `ApplicationController`, e o `SuperAdmin::ApplicationController` herda
+dele via Administrate, então o `after_action` roda também no `/super_admin`.
+A causa exata ficou em aberto: pela ordem do método, a exceção tem de vir da
+linha 11 (`return unless current_user`), porque a linha 12 já barraria o resto
+(`request.headers['client']` é header do dashboard, navegador não manda) — e
+`current_user`, no escopo `:super_admin`, passa pelo Warden com as estratégias do
+devise_token_auth no meio. Nada no nosso código sobrescreve `current_user`.
+
+Como o `rescue StandardError` só logava `e.message`, o backtrace se perdia e o
+bug era indiagnosticável. O log agora inclui classe + 3 primeiros frames — no
+próximo login do Super Admin depois do rebuild, o log aponta o culpado direto.
+Se confirmar que é ruído do Warden, a correção limpa é um
+`skip_after_action :update_session_activity` no `SuperAdmin::ApplicationController`
+(rastrear sessão de agente não faz sentido no Super Admin).
+
+### ✅ Preflight da Fase 3 feito (auditoria estática, nada removido ainda)
+
+Varredura de tudo que referencia `enterprise/` ou `Enterprise::` fora da pasta.
+O gate da Fase 3 (48h com `DISABLE_ENTERPRISE` + o 500 confirmado) continua de pé
+— quando abrir, a remoção vira commit mecânico com a lista abaixo.
+
+**Falsos alarmes — confirmado que não quebram nada (não mexer):**
+
+| Ponto | Por que é seguro |
+|---|---|
+| `config/routes.rb` (10 refs) | todas dentro de `if ChatwootApp.enterprise?`, que já é `false` hoje |
+| `app/views/api/v1/models/_account.json.jbuilder:9` | `resource.respond_to?(:billing_currency) && Enterprise::Billing::Currencies...` — `billing_currency` só existe em `enterprise/app/models/enterprise/account.rb`, então o `&&` curto-circuita antes de resolver a constante |
+| `_conversation.json.jbuilder:61-62` | usa `respond_to?(:sla_applicable?)` + a coluna `sla_policy_id` (do core) |
+| `app/models/conversation.rb` | SLA só aparece no comentário de schema; não há associação |
+| `app/models/message.rb:229,376` | `'Captain::Assistant'` é **string** em `sender_type`, não constante |
+| `lib/captain/*`, `api/v1/accounts/captain/*`, `Captain::TasksPolicy` | zero dependência de `enterprise/lib/captain/` — a checagem do plano confirmou. Ficam |
+| `app/javascript/dashboard/api/enterprise/*` | mora em `app/javascript`, não sai. Chama rotas de billing (só cloud) que já respondem 404 |
+
+**O que o plano da Fase 3 não previu — adicionar ao commit:**
+
+1. **`spec/models/enterprise/audit/conversation_spec.rb`** — está fora de
+   `spec/enterprise/`, então o `git rm -r spec/enterprise/` do plano **não pega**.
+   É exatamente o `NameError` que o plano queria evitar (o `.rspec` só tem
+   `--require spec_helper`, sem `--exclude-pattern`). Remover junto.
+2. **Factories de models enterprise**: `spec/factories/sla_policies.rb`,
+   `spec/factories/applied_slas.rb`, `spec/factories/sla_events.rb` —
+   `SlaPolicy`/`AppliedSla`/`SlaEvent` vivem todos em `enterprise/app/models/`.
+3. **`Rakefile:6-7`** — `require enterprise/tasks_railtie.rb`. Tem guarda
+   `File.exist?`, então não quebra; sai como código morto.
+4. **Rake tasks órfãs**: `lib/tasks/apply_sla.rake` (usa `SlaPolicy`),
+   `lib/tasks/captain_assistant_migration.rake` e `lib/tasks/captain_chat.rake`
+   (usam os models Captain, que são enterprise). Resolução em runtime, então não
+   derrubam boot — mas passam a estourar se alguém rodar.
+
+**Confirmado também:** todos os 9 models `Captain::*` são de `enterprise/`, e o
+`report_data_seeder.rb` os usa nas linhas 100-104, 239-269 — o plano já previa.
 
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 

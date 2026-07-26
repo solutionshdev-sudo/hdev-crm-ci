@@ -17,6 +17,7 @@ module TrackSessionActivity
       client_id: request.headers['client']
     ).update_activity!
   rescue StandardError => e
-    Rails.logger.warn "Session activity update failed: #{e.message}"
+    Rails.logger.warn "Session activity update failed: #{e.class}: #{e.message} " \
+                      "(#{e.backtrace&.first(3)&.join(' | ')})"
   end
 end

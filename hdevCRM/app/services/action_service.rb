@@ -71,6 +71,35 @@ class ActionService
     @conversation.update!(team_id: team_ids[0])
   end
 
+  # Kanban de Negócios: params = [stage_id]. Cria o negócio no funil/etapa
+  # dados (ou no default) ligado ao contato + conversa. Idempotente por
+  # conversa: não duplica se já existe negócio aberto pra essa conversa.
+  def create_deal(params = [])
+    return if @conversation.contact.blank?
+    return if @account.deals.open.exists?(conversation_id: @conversation.id)
+
+    stage = find_deal_stage(params[0])
+    return if stage.blank?
+
+    @account.deals.create!(
+      deal_pipeline_id: stage.deal_pipeline_id,
+      deal_stage: stage,
+      contact: @conversation.contact,
+      conversation: @conversation,
+      title: @conversation.contact.name.presence || "Conversa ##{@conversation.display_id}",
+      position: stage.deals.minimum(:position).to_f - 1024
+    )
+  end
+
+  # params = [stage_id]. Move o negócio aberto ligado à conversa.
+  def move_deal_stage(params = [])
+    stage = find_deal_stage(params[0])
+    deal = @account.deals.open.find_by(conversation_id: @conversation.id)
+    return if stage.blank? || deal.blank? || deal.deal_pipeline_id != stage.deal_pipeline_id
+
+    deal.update!(deal_stage: stage, position: stage.deals.minimum(:position).to_f - 1024)
+  end
+
   def remove_assigned_agent(_params)
     @conversation.update!(assignee_id: nil)
   end
@@ -94,6 +123,12 @@ class ActionService
   end
 
   private
+
+  def find_deal_stage(stage_id)
+    return DealPipeline.ensure_default!(@account).deal_stages.order(:position).first if stage_id.blank?
+
+    DealStage.where(account_id: @account.id).find_by(id: stage_id)
+  end
 
   def last_responding_agent_id
     @conversation.messages.outgoing.where(sender_type: 'User', private: false).last&.sender_id

@@ -650,6 +650,19 @@ const menuItems = computed(() => {
       ],
     },
     {
+      name: 'Deals',
+      label: t('SIDEBAR.DEALS'),
+      icon: 'i-lucide-circle-dollar-sign',
+      children: [
+        {
+          name: 'Deals Board',
+          label: t('SIDEBAR.DEALS_BOARD'),
+          to: accountScopedRoute('deals_board_index'),
+          activeOn: ['deals_board_index'],
+        },
+      ],
+    },
+    {
       name: 'Companies',
       label: t('SIDEBAR.COMPANIES'),
       icon: 'i-lucide-building-2',
@@ -845,6 +858,18 @@ const menuItems = computed(() => {
           label: t('SIDEBAR.LABELS'),
           icon: 'i-lucide-tags',
           to: accountScopedRoute('labels_list'),
+        },
+        {
+          name: 'Settings Chatbots',
+          label: t('SIDEBAR.CHATBOTS'),
+          icon: 'i-lucide-bot',
+          to: accountScopedRoute('chatbots_list'),
+        },
+        {
+          name: 'Settings Deal Pipelines',
+          label: t('SIDEBAR.DEAL_PIPELINES'),
+          icon: 'i-lucide-circle-dollar-sign',
+          to: accountScopedRoute('deal_pipelines_list'),
         },
         {
           name: 'Settings Custom Attributes',

@@ -19,6 +19,9 @@ class TriggerScheduledItemsJob < ApplicationJob
 
     # Job to sync whatsapp templates
     Channels::Whatsapp::TemplatesSyncSchedulerJob.perform_later
+
+    # Job to expire abandoned chatbot sessions
+    Chatbots::TimeoutSweepJob.perform_later
   end
 end
 
