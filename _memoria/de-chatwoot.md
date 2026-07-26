@@ -73,7 +73,38 @@ o desligava diariamente. Agora pode ser ligado por conta e permanece.
 - Os 10 valores de marca restaurados no banco (saída confirmou `OK` para todos)
 - Chave Redis do alerta (`CHATWOOT_CONFIG_RESET_WARNING`) limpa
 
-### 🟡 Erro 500 do Super Admin — diagnosticado e corrigido; falta deployar
+### 🟡 Telas de auth redesenhadas — pronto no código, falta comitar e deployar
+
+As cinco telas de auth (login, SSO/SAML, esqueci a senha, redefinir senha,
+verificar e-mail) saíram do card centralizado herdado do Chatwoot e passaram a
+usar um layout split-screen próprio: `app/javascript/v3/components/Auth/AuthSplitLayout.vue`
+(painel escuro com brilho radial em CSS, logo, headline e rodapé; formulário à
+direita). Textos novos em `en/login.json` e `pt_BR/login.json`.
+
+A segunda linha da headline é o `globalConfig.installationName` em runtime, não
+uma string traduzida — cada agência vê o próprio nome sem tradução nova, e nada
+no texto cita "Hdev CRM" (o `LOGIN.TITLE` antigo citava, e o `useBranding` só
+substitui "Chatwoot", então a marca vazava em domínio de agência).
+
+**Dois bugs de white-label anteriores, corrigidos junto:**
+
+1. **A cor da agência sumia no tema escuro.** O ERB injetava em `:root`, mas o
+   `_next-colors.scss` redeclara os mesmos tokens em `.dark`, e essa classe é
+   aplicada num elemento interno (`v3/App.vue`, `themeHelper`). Custom property
+   redeclarada num descendente vence o valor herdado do ancestral, `!important`
+   ou não. Agora o ERB emite os dois seletores.
+2. **`brand_rgb` só escurecia.** Ao ligar o `.dark` do item 1, o texto de acento
+   da agência ia pra ~2,5:1 sobre o card escuro. O método passou a aceitar
+   percentual negativo (clareia em direção ao branco) e o bloco `.dark` usa
+   `-10`/`-35`. Contraste medido: 6,0:1. As expectativas do spec existente de
+   `brand_rgb` continuam valendo (caminho positivo inalterado).
+
+Regra de acento pra telas novas registrada em `identidade/design-guide.md`.
+
+**Falta:** comitar, definir `DEFAULT_LOCALE=pt_BR` no EasyPanel (sem isso a tela
+abre em inglês mesmo com a tradução pronta) e rebuildar a imagem.
+
+### 🟡 Erro 500 do Super Admin — corrigido e publicado; falta deployar
 
 O log de produção mostrou o trace: `No route matches {action: "index",
 controller: "super_admin/agency_users"}` em `_navigation.html.erb:40`.
@@ -86,10 +117,12 @@ do Super Admin gera link de `index` pra todo recurso do Administrate e o
 adicionando `"agency_users"` ao skip list em
 `hdevCRM/app/views/super_admin/application/_navigation.html.erb:36`.
 
-**Falta:** commit + push + rebuild da imagem no EasyPanel (é ERB, muda com o
-código — restart não basta porque a imagem é buildada do repo). Depois,
-confirmar que `/super_admin` abre e navegar pelas telas (Accounts, Agencies,
-Users, Settings) pra garantir que não há outro recurso sem `index`.
+**Feito:** commit `161ee71`, já em `origin/main`.
+
+**Falta:** rebuild da imagem no EasyPanel (é ERB, muda com o código — restart
+não basta porque a imagem é buildada do repo). Depois, confirmar que
+`/super_admin` abre e navegar pelas telas (Accounts, Agencies, Users, Settings)
+pra garantir que não há outro recurso sem `index`.
 
 Observação menor vista no log (não bloqueia): WARN `Session activity update
 failed: wrong number of arguments (given 1, expected 0)` no login do Super

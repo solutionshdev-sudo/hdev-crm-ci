@@ -3,12 +3,13 @@ import { useVuelidate } from '@vuelidate/core';
 import { useAlert } from 'dashboard/composables';
 import { required, minLength, email } from '@vuelidate/validators';
 import { useBranding } from 'shared/composables/useBranding';
+import AuthSplitLayout from '../../../../components/Auth/AuthSplitLayout.vue';
 import FormInput from '../../../../components/Form/Input.vue';
 import { resetPassword } from '../../../../api/auth';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 
 export default {
-  components: { FormInput, NextButton },
+  components: { AuthSplitLayout, FormInput, NextButton },
   setup() {
     const { replaceInstallationName } = useBranding();
     return { v$: useVuelidate(), replaceInstallationName };
@@ -63,16 +64,12 @@ export default {
 </script>
 
 <template>
-  <div
-    class="flex flex-col justify-center w-full min-h-screen py-12 bg-n-brand/5 dark:bg-n-background sm:px-6 lg:px-8"
-  >
+  <AuthSplitLayout :subtitle="$t('LOGIN.BRAND.SUBTITLE')">
     <form
-      class="bg-white shadow sm:mx-auto sm:w-full sm:max-w-lg dark:bg-n-solid-2 p-11 sm:shadow-lg sm:rounded-lg"
+      class="w-full p-8 shadow-lg rounded-xl bg-n-solid-1 outline outline-1 outline-n-weak"
       @submit.prevent="submit"
     >
-      <h1
-        class="mb-1 text-2xl font-medium tracking-tight text-left text-n-slate-12"
-      >
+      <h1 class="mb-1 text-2xl font-semibold text-left text-n-slate-12">
         {{ $t('RESET_PASSWORD.TITLE') }}
       </h1>
       <p
@@ -101,10 +98,13 @@ export default {
       </div>
       <p class="mt-4 -mb-1 text-sm text-n-slate-11">
         {{ $t('RESET_PASSWORD.GO_BACK_TO_LOGIN') }}
-        <router-link to="/auth/login" class="text-link text-n-brand">
+        <router-link
+          to="/auth/login"
+          class="font-medium text-n-blue-11 hover:text-n-blue-10"
+        >
           {{ $t('COMMON.CLICK_HERE') }}.
         </router-link>
       </p>
     </form>
-  </div>
+  </AuthSplitLayout>
 </template>

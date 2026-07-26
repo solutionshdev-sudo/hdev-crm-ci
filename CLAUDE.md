@@ -54,6 +54,6 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 ## Ferramentas / ambiente
 
 - [x] node 24
-- [x] git 2.55 — repo iniciado (branch main); falta conectar ao GitHub (`/salvar`)
+- [x] git 2.55 — repo `solutionshdev-sudo/hdev-crm` no GitHub, `main` sincronizada
 - [ ] gh (GitHub CLI) — opcional
 - [ ] playwright — só quando for usar render de carrossel

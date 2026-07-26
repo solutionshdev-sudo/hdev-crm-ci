@@ -84,5 +84,21 @@ do Hdev CRM), não o contrário.
 - A paleta do produto vive em `hdevCRM/app/javascript/dashboard/assets/scss/_next-colors.scss`
   (tokens `--blue-*`, que apesar do nome legado valem VERDE) e em `hdevCRM/theme/colors.js`
   (`brand` / `brandVivid`). Mudou a marca? Mudar lá e aqui juntos.
+
+### Regra de acento no white-label (não esquecer)
+
+Numa tela nova, **acento sempre em `n-blue-9/10/11`, nunca em `n-brand`**:
+
+- `n-brand` (#00875A) e `n-brandVivid` (#00D488) são **hex fixos** no
+  `theme/colors.js` — não seguem a marca da agência.
+- `n-blue-9/10/11` são CSS vars que o servidor **sobrescreve por domínio
+  customizado** (`app/views/layouts/vueapp.html.erb`, a partir de
+  `Agency#brand_rgb`). Quem usa esses tokens acompanha a cor da agência de graça.
+- A rampa anda em **direções opostas por tema**: sobre fundo claro o 10/11
+  escurecem; sobre fundo escuro clareiam (`brand_rgb` com percentual negativo).
+  Inverter isso joga o texto de acento pra ~2:1 de contraste no escuro.
+- O botão primário do `components-next/button/Button.vue` ainda usa `bg-n-brand`
+  fixo — por isso as telas de auth forçam `!bg-n-blue-9`. Trocar no componente
+  conserta o app inteiro, mas mexe em toda a UI: é tarefa própria.
 - E-mails transacionais usam `#00875A` hardcoded em
   `hdevCRM/app/views/layouts/mailer/base.liquid` e `.../devise/mailer/_confirmation_body.html.erb`.

@@ -34,11 +34,27 @@
         /* Per-agency brand color, resolved server-side by custom domain.
            --blue-9/10/11 are the runtime accent tokens of the `n-` design
            system (_next-colors.scss); !important lets this inline override win
-           over the compiled stylesheet loaded afterwards. */
+           over the compiled stylesheet loaded afterwards.
+
+           `.dark` needs its own rule: _next-colors.scss redeclares the same
+           tokens under `.dark`, and that class is set on an inner element
+           (v3/App.vue, dashboard themeHelper) rather than on <html>. A custom
+           property redeclared on a descendant beats the value inherited from
+           an ancestor no matter the !important, so without this selector every
+           agency falls back to the Hdev green in dark mode.
+
+           The two blocks step the ramp in opposite directions, mirroring the
+           built-in one: --blue-10/11 go darker over a light ground and lighter
+           over a dark one, so accent text keeps its contrast either way. */
         :root {
           --blue-9: <%= @agency.brand_rgb %> !important;
           --blue-10: <%= @agency.brand_rgb(8) %> !important;
           --blue-11: <%= @agency.brand_rgb(15) %> !important;
+        }
+        .dark {
+          --blue-9: <%= @agency.brand_rgb %> !important;
+          --blue-10: <%= @agency.brand_rgb(-10) %> !important;
+          --blue-11: <%= @agency.brand_rgb(-35) %> !important;
         }
       </style>
     <% end %>

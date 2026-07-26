@@ -92,14 +92,22 @@ class Agency < ApplicationRecord
 
   # Returns the brand color as a space separated RGB triplet ("39 129 246"),
   # the format used by the runtime design tokens in _next-colors.scss.
-  # `darken_percent` mixes the color towards black for hover/active shades.
+  # A positive `darken_percent` mixes towards black for the hover/active shades
+  # on a light ground; a negative one mixes towards white, which is what the
+  # same tokens need on a dark ground so accent text stays readable.
   def brand_rgb(darken_percent = 0)
     hex = primary_color_or_default.delete('#')
     hex = hex.chars.map { |char| char * 2 }.join if hex.length == 3
-    hex.scan(/../).map { |component| (component.hex * (100 - darken_percent) / 100.0).round }.join(' ')
+    hex.scan(/../).map { |component| shift_channel(component.hex, darken_percent) }.join(' ')
   end
 
   private
+
+  def shift_channel(value, darken_percent)
+    return (value * (100 - darken_percent) / 100.0).round if darken_percent >= 0
+
+    (value + ((255 - value) * -darken_percent / 100.0)).round
+  end
 
   def attachment_url(attachment)
     return unless attachment.attached?

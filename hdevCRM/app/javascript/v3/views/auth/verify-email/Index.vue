@@ -6,6 +6,7 @@ import { useStore } from 'vuex';
 import { useAlert } from 'dashboard/composables';
 import VueHcaptcha from '@hcaptcha/vue3-hcaptcha';
 import NextButton from 'dashboard/components-next/button/Button.vue';
+import AuthSplitLayout from '../../../components/Auth/AuthSplitLayout.vue';
 import { resendConfirmation } from '../../../api/auth';
 
 const props = defineProps({
@@ -69,11 +70,9 @@ const onCaptchaError = () => {
 </script>
 
 <template>
-  <main
-    class="flex flex-col w-full min-h-screen py-20 bg-n-brand/5 dark:bg-n-background sm:px-6 lg:px-8"
-  >
+  <AuthSplitLayout :subtitle="$t('LOGIN.BRAND.SUBTITLE')">
     <section
-      class="bg-white shadow sm:mx-auto mt-11 sm:w-full sm:max-w-lg dark:bg-n-solid-2 p-11 sm:shadow-lg sm:rounded-lg"
+      class="w-full p-8 shadow-lg rounded-xl bg-n-solid-1 outline outline-1 outline-n-weak"
     >
       <div class="mb-6">
         <h2 class="text-2xl font-semibold text-n-slate-12">
@@ -106,5 +105,5 @@ const onCaptchaError = () => {
         />
       </div>
     </section>
-  </main>
+  </AuthSplitLayout>
 </template>

@@ -73,6 +73,24 @@ body {
   @apply text-n-brand font-medium hover:text-n-blue-10;
 }
 
+/* Accent halo under the primary auth CTA. Written as plain CSS because the
+   colour has to come from the runtime token, so an agency brand lights its
+   own button. Not applied to disabled buttons — a glowing dead control
+   reads as active. */
+.auth-cta:not(:disabled) {
+  box-shadow: 0 10px 28px -12px rgb(var(--blue-9) / 0.75);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.auth-cta:not(:disabled):hover {
+  box-shadow: 0 12px 32px -12px rgb(var(--blue-9) / 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-cta:not(:disabled) {
+    transition: none;
+  }
+}
+
 .v-popper--theme-tooltip .v-popper__inner {
   background: black !important;
   font-size: 0.75rem;

@@ -23,8 +23,14 @@ fechado (commit `5d1208e`); kill-switch `DISABLE_ENTERPRISE` ativo em produção
 valores de marca restaurados no banco.
 
 **Bloqueador agora:** erro 500 do `/super_admin` diagnosticado (rota `index`
-inexistente de `agency_users` na sidebar) e corrigido no código — falta
-commit + push + rebuild no EasyPanel pra confirmar.
+inexistente de `agency_users` na sidebar), corrigido e publicado (commit
+`161ee71`, já em `origin/main`) — falta o rebuild da imagem no EasyPanel pra
+confirmar.
+
+**Em andamento (não comitado):** redesign split-screen das cinco telas de auth
+(login, SSO, esqueci a senha, redefinir senha, verificar e-mail) e dois
+consertos de white-label que apareceram no caminho. Detalhes em
+`_memoria/de-chatwoot.md`.
 
 **Próximo:** remover a pasta `enterprise/` de vez, depois textos/links visíveis,
 depois o rename do widget e dos identificadores internos.

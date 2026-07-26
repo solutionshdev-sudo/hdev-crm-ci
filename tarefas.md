@@ -6,10 +6,16 @@
 
 ## Agora
 
-- 🔴 **Erro 500 no `/super_admin`** — pegar o stack trace no log do container web
-  antes de mexer em qualquer coisa (`docker logs <web> --since 15m | grep -A40 "Completed 500"`)
-- Verificar se o resto da app (dashboard, conversas, widget) está OK ou se o 500 é geral
-- Conferir amanhã se `INSTALLATION_NAME` continua "Hdev CRM" — prova de que o job de reversão morreu
+- 🔴 **Rebuild da imagem no EasyPanel** — destrava duas coisas de uma vez: o fix
+  do 500 do `/super_admin` (commit `161ee71`, já no remoto) e as telas de auth
+  novas. Restart não basta: o Dockerfile roda `assets:precompile` no build
+- Depois do rebuild: abrir `/super_admin` e navegar por Accounts, Agencies, Users
+  e Settings, pra garantir que não há outro recurso sem rota `index`
+- Comitar o redesign das telas de auth (5 telas + `AuthSplitLayout.vue` + os dois
+  consertos de white-label em `vueapp.html.erb` e `agency.rb`)
+- Definir `DEFAULT_LOCALE=pt_BR` no EasyPanel — sem isso as telas de auth abrem
+  em inglês mesmo com a tradução pronta
+- Conferir se `INSTALLATION_NAME` continua "Hdev CRM" — prova de que o job de reversão morreu
 
 ## Em espera
 

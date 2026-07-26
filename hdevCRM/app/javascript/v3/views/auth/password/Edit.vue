@@ -2,6 +2,7 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, minLength } from '@vuelidate/validators';
 import { useAlert } from 'dashboard/composables';
+import AuthSplitLayout from '../../../components/Auth/AuthSplitLayout.vue';
 import FormInput from '../../../components/Form/Input.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 import { DEFAULT_REDIRECT_URL } from 'dashboard/constants/globals';
@@ -9,6 +10,7 @@ import { setNewPassword } from '../../../api/auth';
 
 export default {
   components: {
+    AuthSplitLayout,
     FormInput,
     NextButton,
   },
@@ -86,16 +88,12 @@ export default {
 </script>
 
 <template>
-  <div
-    class="flex flex-col justify-center w-full min-h-screen py-12 bg-n-brand/5 dark:bg-n-background sm:px-6 lg:px-8"
-  >
+  <AuthSplitLayout :subtitle="$t('LOGIN.BRAND.SUBTITLE')">
     <form
-      class="bg-white shadow sm:mx-auto sm:w-full sm:max-w-lg dark:bg-n-solid-2 p-11 sm:shadow-lg sm:rounded-lg"
+      class="w-full p-8 shadow-lg rounded-xl bg-n-solid-1 outline outline-1 outline-n-weak"
       @submit.prevent="submitForm"
     >
-      <h1
-        class="mb-1 text-2xl font-medium tracking-tight text-left text-n-slate-12"
-      >
+      <h1 class="mb-1 text-2xl font-semibold text-left text-n-slate-12">
         {{ $t('SET_NEW_PASSWORD.TITLE') }}
       </h1>
 
@@ -135,5 +133,5 @@ export default {
         />
       </div>
     </form>
-  </div>
+  </AuthSplitLayout>
 </template>

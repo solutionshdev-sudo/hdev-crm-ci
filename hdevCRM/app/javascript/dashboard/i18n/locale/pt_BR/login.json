@@ -1,6 +1,18 @@
 {
   "LOGIN": {
     "TITLE": "Entrar no Hdev CRM",
+    "BRAND": {
+      "HEADLINE": "Bem-vindo de volta à",
+      "SUBTITLE": "WhatsApp, Instagram, e-mail e chat numa única caixa de entrada — com o histórico completo de cada cliente à mão."
+    },
+    "CARD": {
+      "TITLE": "Entrar na sua conta",
+      "SUBTITLE": "Informe seus dados para acessar o painel."
+    },
+    "NO_ACCOUNT": "Não tem uma conta?",
+    "FOOTER": {
+      "RIGHTS": "Todos os direitos reservados."
+    },
     "EMAIL": {
       "LABEL": "E-mail",
       "PLACEHOLDER": "nome{'@'}empresa.com.br",
@@ -17,10 +29,10 @@
     },
     "OAUTH": {
       "GOOGLE_LOGIN": "Entrar com o Google",
-      "BUSINESS_ACCOUNTS_ONLY": "Use o endereço de endereço eletrônico da empresa para fazer ‘login’",
+      "BUSINESS_ACCOUNTS_ONLY": "Use o e-mail da empresa para entrar",
       "NO_ACCOUNT_FOUND": "Não encontramos uma conta para seu endereço de correio eletrônico."
     },
-    "FORGOT_PASSWORD": "Esqueceu-se da sua senha?",
+    "FORGOT_PASSWORD": "Esqueceu a senha?",
     "CREATE_NEW_ACCOUNT": "Criar nova conta",
     "SUBMIT": "Entrar",
     "SAML": {

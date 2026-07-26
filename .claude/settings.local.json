@@ -13,7 +13,11 @@
       "Bash(awk -F: '{print $1}')",
       "PowerShell(git checkout -b de-chatwoot 2>&1)",
       "PowerShell($s = Get-Content hdevCRM\\\\db\\\\schema.rb; \\($s[1130..1145] -join \"`n\"\\); Write-Output '--- portals ---'; \\($s[1306..1330] -join \"`n\"\\) | Select-String -Pattern 'color' -Context 0,0; $s | Select-String -Pattern '\"color\", default' | ForEach-Object { \"$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\)\\)\" })",
-      "PowerShell(foreach \\($t in 'magick','inkscape','rsvg-convert','node'\\) { $c = Get-Command $t -ErrorAction SilentlyContinue; if \\($c\\) { Write-Output \"$t : $\\($c.Source\\)\" } else { Write-Output \"$t : NAO\" } })"
+      "PowerShell(foreach \\($t in 'magick','inkscape','rsvg-convert','node'\\) { $c = Get-Command $t -ErrorAction SilentlyContinue; if \\($c\\) { Write-Output \"$t : $\\($c.Source\\)\" } else { Write-Output \"$t : NAO\" } })",
+      "Bash(head -289 app/javascript/v3/views/login/Index.vue)",
+      "Read(//tmp/**)",
+      "Bash(npx eslint *)",
+      "Bash(node -e ' *)"
     ]
   }
 }

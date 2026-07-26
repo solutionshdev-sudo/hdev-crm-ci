@@ -1,6 +1,18 @@
 {
   "LOGIN": {
     "TITLE": "Login to Hdev CRM",
+    "BRAND": {
+      "HEADLINE": "Welcome back to",
+      "SUBTITLE": "WhatsApp, Instagram, email and live chat in one inbox — with every customer's full history at hand."
+    },
+    "CARD": {
+      "TITLE": "Sign in to your account",
+      "SUBTITLE": "Enter your credentials to access the panel."
+    },
+    "NO_ACCOUNT": "Don't have an account?",
+    "FOOTER": {
+      "RIGHTS": "All rights reserved."
+    },
     "EMAIL": {
       "LABEL": "Email",
       "PLACEHOLDER": "example{'@'}companyname.com",

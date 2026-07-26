@@ -20,6 +20,10 @@ import FluentIcon from 'shared/components/FluentIcon/DashboardIcon.vue';
 const i18n = createI18n({
   legacy: false, // https://github.com/intlify/vue-i18n/issues/1902
   locale: 'en',
+  // v3/App.vue switches `locale` to chatwootConfig.selectedLocale on mount.
+  // Pinning the fallback keeps missing keys resolving to English instead of
+  // rendering the key path once that switch happens.
+  fallbackLocale: 'en',
   messages: i18nMessages,
 });
 
