@@ -6,36 +6,39 @@
 
 ## Fase
 
-Construção do produto — white-label do fork do Chatwoot pra virar HDEV CRM.
+Produto no ar (EasyPanel, 26/07/2026) — em processo de desvinculação total do
+Chatwoot antes de abrir pra agências.
 
 ## Prioridade principal
 
-Rebrand Chatwoot → Hdev CRM (grafia oficial: "Hdev CRM"). Trocar só a marca
-visível ao usuário, sem quebrar identificadores internos (classes
-`ChatwootApp`/`ChatwootHub`, pacotes npm `@chatwoot/*`, variáveis
-`latestChatwootVersion`/`isOnChatwootCloud`, tabelas, feature flags, serviços
-de deploy).
+**Desvincular o Hdev CRM do Chatwoot.** Status detalhado, decisões e armadilhas
+em `_memoria/de-chatwoot.md` — ler antes de mexer no código.
 
-**Progresso (rebrand — feito nesta sessão, 3 commits em `main`):**
-- ✓ i18n frontend (todos os idiomas): 2.067 strings
-- ✓ i18n backend/locales YAML: 273 strings
-- ✓ Views e e-mails do backend: títulos, onboarding, e-mails de exclusão, "Powered by"
-- ✓ `installation_config.yml`: TERMS_URL/PRIVACY_URL neutralizadas
-- ✓ E-mails de suporte: `sac@hdev.online` (cliente) e `contato@hdev.online` (admin)
-- ✓ Logos, manifest.json e INSTALLATION_NAME já eram "Hdev CRM"
+Resumo: sair do modo enterprise (licença proíbe revenda), cortar telemetria,
+remover toda menção ao Chatwoot (inclusive identificadores internos e a
+superfície JS do widget) e completar a identidade visual verde.
 
-**Falta no rebrand:**
-- URLs de documentação em `constants/globals.js` ainda apontam pra chatwoot.com/docs
-- Setar `MAILER_SUPPORT_EMAIL` = `sac@hdev.online` no painel Super Admin
-- Teste real: subir a instância Rails+Vue e conferir dashboard/e-mails na tela
+**Feito (26/07):** paleta verde completa + favicons regerados + `/swagger`
+fechado (commit `5d1208e`); kill-switch `DISABLE_ENTERPRISE` ativo em produção;
+valores de marca restaurados no banco.
+
+**Bloqueador agora:** `/super_admin` retornando erro 500 — diagnosticar pelo log
+antes de qualquer outra coisa.
+
+**Próximo:** remover a pasta `enterprise/` de vez, depois textos/links visíveis,
+depois o rename do widget e dos identificadores internos.
 
 ## O que pode esperar
 
 - Definição da estrutura de planos de revenda pras agências (ainda em estudo).
+- Reconstrução das features enterprise com código próprio (SLA, audit logs,
+  custom roles, companies) — só depois da desvinculação terminar.
 - Skills de marketing/conteúdo do template (carrossel, SEO, ads) — o foco
   agora é produto, não divulgação.
 
 ## Contexto com prazo
 
-- Git instalado (v2.55) e repo inicializado (branch `main`, 3 commits locais).
-  Falta conectar ao GitHub remoto pra dar push — rodar `/salvar` quando quiser.
+- Domínio `crm.hdev.online` sem DNS. Como `FRONTEND_URL` já aponta pra ele,
+  links de e-mail saem quebrados até criar o registro A no Cloudflare.
+- SMTP não configurado: convites de agente e recuperação de senha não saem.
+- Backup do Postgres feito manualmente uma vez; falta a rotina de cron.

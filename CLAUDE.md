@@ -38,11 +38,17 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 ## Regras do sistema
 
 - O código da plataforma fica em `hdevCRM/`. Antes de mexer nele, ler o
-  contexto de rebrand em `_memoria/estrategia.md`.
-- Rebrand Chatwoot → HDEV CRM: trocar só a marca **visível ao usuário**.
-  Não renomear identificadores internos de código (classes, módulos,
-  pacotes npm `@chatwoot/*`, tabelas, feature flags, nomes de serviço de
-  deploy) sem verificação — quebra o sistema.
+  status da migração em `_memoria/de-chatwoot.md`.
+- Rebrand Chatwoot → Hdev CRM: **remover toda menção**, inclusive
+  identificadores internos e a superfície JS do widget, sem
+  retrocompatibilidade. O fork segue vida própria (não puxa updates do
+  upstream). Renomear com cuidado: Zeitwerk exige arquivo e constante
+  casados, e há resoluções por string que busca-e-substitui não pega.
+  Exceções conhecidas em `_memoria/de-chatwoot.md`.
+- **Nunca reativar o diretório `enterprise/`.** A licença dele exige
+  assinatura paga para uso em produção e proíbe revenda — o oposto do
+  modelo de negócio. O núcleo é MIT e pode ser vendido; nunca alterar
+  o arquivo `LICENSE`.
 - Nunca comitar `.env` nem chaves/tokens (ver seção Segurança nas regras).
 
 ## Ferramentas / ambiente
