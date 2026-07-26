@@ -73,28 +73,27 @@ o desligava diariamente. Agora pode ser ligado por conta e permanece.
 - Os 10 valores de marca restaurados no banco (saída confirmou `OK` para todos)
 - Chave Redis do alerta (`CHATWOOT_CONFIG_RESET_WARNING`) limpa
 
-### 🔴 Bloqueador aberto — Super Admin dando erro 500
+### 🟡 Erro 500 do Super Admin — diagnosticado e corrigido; falta deployar
 
-Depois de rodar os comandos da Fase 2, o **`/super_admin` retorna 500 e não abre**.
-Ainda não diagnosticado. Hipóteses a testar, em ordem:
+O log de produção mostrou o trace: `No route matches {action: "index",
+controller: "super_admin/agency_users"}` em `_navigation.html.erb:40`.
+**Não tinha relação com `DISABLE_ENTERPRISE`** (as 3 hipóteses anteriores caíram).
 
-1. As views de Super Admin leem `ChatwootApp.enterprise?` e `ChatwootHub.pricing_plan`
-   em vários pontos (`settings/show.html.erb`, `_upgrade_button_enterprise.html.erb`,
-   `app/helpers/super_admin/features.yml` com ERB `<%= ChatwootApp.enterprise? %>`).
-   Com `DISABLE_ENTERPRISE`, `enterprise?` passa a retornar **`nil`** (não `false`) —
-   um `nil` interpolado num YAML de features pode gerar valor inválido.
-2. `DISPLAY_MANIFEST` voltou para `false` e alguma view do Super Admin pode depender dele.
-3. Algum `InstallationConfig` que a tela espera existir ficou com valor inesperado.
+Causa: a camada custom de agências registrou `resources :agency_users` só com
+`new/create/show/destroy` (sem `index`, igual ao `account_users`), mas a sidebar
+do Super Admin gera link de `index` pra todo recurso do Administrate e o
+`agency_users` não estava na lista de exclusão da navegação. Corrigido
+adicionando `"agency_users"` ao skip list em
+`hdevCRM/app/views/super_admin/application/_navigation.html.erb:36`.
 
-**Como diagnosticar (primeira coisa da próxima sessão):**
-```
-docker logs <container_web> --since 15m | grep -B5 -A40 "Completed 500\|Error\|Exception"
-```
-ou, dentro do container: `tail -200 /app/log/production.log`.
+**Falta:** commit + push + rebuild da imagem no EasyPanel (é ERB, muda com o
+código — restart não basta porque a imagem é buildada do repo). Depois,
+confirmar que `/super_admin` abre e navegar pelas telas (Accounts, Agencies,
+Users, Settings) pra garantir que não há outro recurso sem `index`.
 
-O stack trace vai apontar a linha exata. **Não mexer em nada antes de ver o trace** —
-o resto da aplicação (dashboard, conversas, widget) precisa ser verificado também
-para saber se o 500 é só do Super Admin ou geral.
+Observação menor vista no log (não bloqueia): WARN `Session activity update
+failed: wrong number of arguments (given 1, expected 0)` no login do Super
+Admin — investigar depois.
 
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 

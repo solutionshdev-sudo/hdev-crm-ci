@@ -3,7 +3,17 @@
     "allow": [
       "PowerShell($src = \"C:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\hdevOS\"; $dst = \"C:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\"; robocopy $src $dst /E /XD \"$src\\\\.git\" /NFL /NDL /NJH; Write-Output \"exit=$LASTEXITCODE\")",
       "PowerShell(Get-ChildItem -Force | Select-Object Mode, Name; Write-Output \"---- skills ----\"; \\(Get-ChildItem \".claude\\\\skills\"\\).Name -join \", \"; Write-Output \"---- .git copiado? ----\"; Test-Path \".git\")",
-      "PowerShell(if \\(Test-Path \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\"\\) { Get-Content \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\" } else { \"SEM_PERFIL_GLOBAL\" })"
+      "PowerShell(if \\(Test-Path \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\"\\) { Get-Content \"$env:USERPROFILE\\\\.hdev\\\\perfil.md\" } else { \"SEM_PERFIL_GLOBAL\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri 'https://hdev-crm-app-crm.jz4bvz.easypanel.host' -TimeoutSec 30 -UseBasicParsing -MaximumRedirection 5; Write-Output \"Status: $\\($r.StatusCode\\)\"; $t = $r.Content; if \\($t.Length -gt 600\\) { $t = $t.Substring\\(0,600\\) }; Write-Output $t } catch { Write-Output \"Falhou: $\\($_.Exception.Message\\)\"; if \\($_.Exception.Response\\) { Write-Output \"HTTP: $\\([int]$_.Exception.Response.StatusCode\\)\" } })",
+      "Bash(grep -n -iE '#[0-9a-f]{3,8}\\\\b|--w-|woot-' app/javascript/dashboard/assets/scss/_base.scss)",
+      "Bash(grep -n -iE '#[0-9a-f]{3,8}\\\\b|--w-' app/javascript/dashboard/assets/scss/_woot.scss)",
+      "Bash(awk -F: '{print $3}')",
+      "Bash(grep -n -iE '#[0-9a-f]{3,6}' app/javascript/survey/assets/scss/woot.scss)",
+      "Bash(grep -n -iE '#[0-9a-f]{3,6}|color-woot' app/javascript/dashboard/assets/scss/super_admin/index.scss)",
+      "Bash(awk -F: '{print $1}')",
+      "PowerShell(git checkout -b de-chatwoot 2>&1)",
+      "PowerShell($s = Get-Content hdevCRM\\\\db\\\\schema.rb; \\($s[1130..1145] -join \"`n\"\\); Write-Output '--- portals ---'; \\($s[1306..1330] -join \"`n\"\\) | Select-String -Pattern 'color' -Context 0,0; $s | Select-String -Pattern '\"color\", default' | ForEach-Object { \"$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\)\\)\" })",
+      "PowerShell(foreach \\($t in 'magick','inkscape','rsvg-convert','node'\\) { $c = Get-Command $t -ErrorAction SilentlyContinue; if \\($c\\) { Write-Output \"$t : $\\($c.Source\\)\" } else { Write-Output \"$t : NAO\" } })"
     ]
   }
 }

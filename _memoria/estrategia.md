@@ -22,8 +22,9 @@ superfície JS do widget) e completar a identidade visual verde.
 fechado (commit `5d1208e`); kill-switch `DISABLE_ENTERPRISE` ativo em produção;
 valores de marca restaurados no banco.
 
-**Bloqueador agora:** `/super_admin` retornando erro 500 — diagnosticar pelo log
-antes de qualquer outra coisa.
+**Bloqueador agora:** erro 500 do `/super_admin` diagnosticado (rota `index`
+inexistente de `agency_users` na sidebar) e corrigido no código — falta
+commit + push + rebuild no EasyPanel pra confirmar.
 
 **Próximo:** remover a pasta `enterprise/` de vez, depois textos/links visíveis,
 depois o rename do widget e dos identificadores internos.
