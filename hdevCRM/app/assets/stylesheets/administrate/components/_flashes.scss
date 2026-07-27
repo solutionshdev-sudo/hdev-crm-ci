@@ -1,27 +1,31 @@
 $base-spacing: 1.5em !default;
+
+// (fundo passo 3, texto passo 11) por tipo — tokens runtime, flipam com .dark.
+// O mix() original não funciona com var(), por isso os pares explícitos.
 $flashes: (
-  "alert": #fff6bf,
-  "error": #fbe3e4,
-  "notice": #e5edf8,
-  "success": #e6efc2,
+  "alert": (unquote("rgb(var(--amber-3))"), unquote("rgb(var(--amber-11))")),
+  "error": (unquote("rgb(var(--ruby-3))"), unquote("rgb(var(--ruby-11))")),
+  "notice": (unquote("rgb(var(--blue-3))"), unquote("rgb(var(--blue-11))")),
+  "success": (unquote("rgb(var(--teal-3))"), unquote("rgb(var(--teal-11))")),
 ) !default;
 
-@each $flash-type, $color in $flashes {
+@each $flash-type, $pair in $flashes {
   .flash-#{$flash-type} {
-    background-color: $color;
-    color: mix($black, $color, 60%);
+    background-color: nth($pair, 1);
+    border-radius: 8px;
+    color: nth($pair, 2);
     display: block;
     margin-bottom: $base-spacing / 2;
     padding: $base-spacing / 2;
     text-align: center;
 
     a {
-      color: mix($black, $color, 70%);
+      color: nth($pair, 2);
       text-decoration: underline;
 
       &:focus,
       &:hover {
-        color: mix($black, $color, 90%);
+        color: unquote("rgb(var(--slate-12))");
       }
     }
   }

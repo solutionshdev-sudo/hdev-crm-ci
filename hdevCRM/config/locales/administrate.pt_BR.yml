@@ -29,6 +29,20 @@ pt_BR:
     search:
       clear: Limpar busca
       label: Buscar %{resource}
+    # Nomes dos COLLECTION_FILTERS dos dashboards (o partial _filters.html.erb
+    # consulta administrate.filters.<nome> com fallback pro titleize inglês).
+    filters:
+      active: Ativas
+      suspended: Suspensas
+      marked_for_deletion: Marcadas pra exclusão
+      recent: Recentes
+      confirmed: Confirmados
+      unconfirmed: Não confirmados
+      super_admin: Super admins
+      open: Abertos
+      user: Usuário
+      agent_bot: Robô de agente
+      platform_app: App de plataforma
     sidebar:
       collapse: Recolher menu
       expand: Expandir menu
@@ -37,6 +51,109 @@ pt_BR:
       create: 'Criar %{model}'
       update: 'Salvar %{model}'
       submit: 'Salvar %{model}'
+    # Cabeçalhos de coluna e rótulos por recurso. As views do Administrate
+    # consultam helpers.label.<recurso>.<atributo> ANTES do fallback
+    # human_attribute_name — sem essas chaves o índice fica em inglês.
+    label:
+      account:
+        id: ID
+        name: Nome
+        locale: Idioma
+        users: Usuários
+        conversations: Conversas
+        status: Status
+        agency: Agência
+        account_users: Vínculos de conta
+        custom_attributes: Atributos personalizados
+        limits: Limites
+        created_at: Criado em
+        updated_at: Atualizado em
+      user:
+        id: ID
+        avatar_url: Avatar
+        avatar: Avatar
+        name: Nome
+        display_name: Nome de exibição
+        email: E-mail
+        unconfirmed_email: E-mail não confirmado
+        password: Senha
+        provider: Provedor
+        uid: UID
+        type: Tipo
+        accounts: Contas
+        account_users: Vínculos de conta
+        access_token: Token de acesso
+        tokens: Tokens
+        pubsub_token: Token pub/sub
+        sign_in_count: Total de logins
+        current_sign_in_at: Login atual em
+        last_sign_in_at: Último login em
+        current_sign_in_ip: IP do login atual
+        last_sign_in_ip: IP do último login
+        confirmation_token: Token de confirmação
+        confirmed_at: Confirmado em
+        confirmation_sent_at: Confirmação enviada em
+        created_at: Criado em
+        updated_at: Atualizado em
+      agency:
+        id: ID
+        name: Nome
+        slug: Slug
+        custom_domain: Domínio customizado
+        status: Status
+        installation_name: Nome da instalação
+        brand_name: Nome da marca
+        brand_url: URL da marca
+        widget_brand_url: URL da marca no widget
+        terms_url: URL dos termos de uso
+        privacy_url: URL de privacidade
+        primary_color: Cor primária
+        logo: Logo
+        logo_dark: Logo (tema escuro)
+        logo_thumbnail: Ícone do logo
+        accounts: Contas
+        agency_users: Vínculos da agência
+        created_at: Criado em
+        updated_at: Atualizado em
+      agent_bot:
+        id: ID
+        avatar_url: Avatar
+        avatar: Avatar
+        name: Nome
+        account: Conta
+        description: Descrição
+        outgoing_url: URL de saída
+        access_token: Token de acesso
+        created_at: Criado em
+        updated_at: Atualizado em
+      platform_app:
+        id: ID
+        name: Nome
+        access_token: Token de acesso
+        created_at: Criado em
+        updated_at: Atualizado em
+      account_user:
+        id: ID
+        account: Conta
+        user: Usuário
+        inviter: Convidado por
+        role: Papel
+        created_at: Criado em
+        updated_at: Atualizado em
+      agency_user:
+        id: ID
+        agency: Agência
+        user: Usuário
+        role: Papel
+        created_at: Criado em
+        updated_at: Atualizado em
+      platform_banner:
+        id: ID
+        banner_message: Mensagem do banner
+        banner_type: Tipo do banner
+        active: Ativo
+        created_at: Criado em
+        updated_at: Atualizado em
   activerecord:
     models:
       account:
@@ -57,6 +174,12 @@ pt_BR:
       account_user:
         one: Vínculo de conta
         other: Vínculos de conta
+      agency_user:
+        one: Vínculo de agência
+        other: Vínculos de agência
+      platform_banner:
+        one: Banner da plataforma
+        other: Banners da plataforma
   # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
   # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
   attributes:

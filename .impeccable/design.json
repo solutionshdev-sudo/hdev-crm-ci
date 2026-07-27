@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-27T21:11:10Z",
+  "title": "Design System: Hdev CRM",
+  "extensions": {
+    "colorMeta": {
+      "brand-vivid": {
+        "role": "primary",
+        "displayName": "Verde Hdev Vivo",
+        "canonical": "#00D488",
+        "tonalRamp": ["#083826", "#006946", "#00875A", "#00A96C", "#00D488", "#49C896", "#9CE7C8", "#EBFBF3"]
+      },
+      "brand-solid": {
+        "role": "primary",
+        "displayName": "Verde Sólido (CTA)",
+        "canonical": "#00875A",
+        "tonalRamp": ["#083826", "#006946", "#00774F", "#00875A", "#009C67", "#49C896", "#BAF0D9", "#F6FEFA"]
+      },
+      "neutral-bg-light": {
+        "role": "neutral",
+        "displayName": "Slate Neutro",
+        "canonical": "#FCFCFD",
+        "tonalRamp": ["#1C2024", "#60646C", "#8B8D98", "#CDCED6", "#E0E1E6", "#F0F0F3", "#F9F9FB", "#FCFCFD"]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Ruby (erro/destrutivo)",
+        "canonical": "#E54666",
+        "tonalRamp": ["#641717", "#CA244D", "#DC3B5D", "#E54666", "#EF9AB8", "#F8BFC8", "#FEEAED", "#FFFCFD"]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Título de página (Inter 700)." },
+      "body": { "displayName": "Body", "purpose": "Conteúdo e células de tabela (14px)." },
+      "label": { "displayName": "Label", "purpose": "Meta, cabeçalhos de tabela, badges (12px/500)." }
+    },
+    "shadows": [
+      { "name": "overlay", "value": "0 8px 24px rgba(0,0,0,0.12)", "purpose": "Só em dropdowns e modais; superfícies em repouso são planas." }
+    ],
+    "motion": [
+      { "name": "state-transition", "value": "150ms ease", "purpose": "Hover, focus, toggle — só transição de estado, nunca decoração." }
+    ],
+    "breakpoints": [
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA verde sólido; único elemento de alto acento da tela.",
+      "html": "<button class=\"ds-btn-primary\">Nova conta</button>",
+      "css": ".ds-btn-primary { background: rgb(0 135 90); color: #fff; font: 500 14px/1 Inter, system-ui, sans-serif; padding: 9px 16px; border: none; border-radius: 8px; cursor: pointer; transition: background 150ms ease; } .ds-btn-primary:hover { background: rgb(0 119 79); } .ds-btn-primary:focus-visible { outline: 2px solid rgb(0 212 136); outline-offset: 1px; }"
+    },
+    {
+      "name": "Botão fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ação secundária discreta.",
+      "html": "<button class=\"ds-btn-ghost\">Editar</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: rgb(96 100 108); font: 500 14px/1 Inter, system-ui, sans-serif; padding: 9px 12px; border: none; border-radius: 8px; cursor: pointer; transition: background 150ms ease, color 150ms ease; } .ds-btn-ghost:hover { background: rgb(240 240 243); color: rgb(28 32 36); } .ds-btn-ghost:focus-visible { outline: 2px solid rgb(0 212 136); outline-offset: 1px; }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Input padrão de formulário.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Buscar contas\" />",
+      "css": ".ds-input { background: rgb(252 252 253); color: rgb(28 32 36); font: 400 14px/1.4 Inter, system-ui, sans-serif; padding: 8px 12px; border: 1px solid rgb(205 206 214); border-radius: 8px; width: 240px; transition: border-color 150ms ease, box-shadow 150ms ease; } .ds-input::placeholder { color: rgb(128 131 141); } .ds-input:focus { outline: none; border-color: rgb(0 212 136); box-shadow: 0 0 0 3px rgb(0 212 136 / 0.2); }"
+    },
+    {
+      "name": "Item de navegação",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Item da sidebar com estado ativo verde.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z\"/></svg>Contas</a><a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\"/></svg>Agências</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 200px; background: rgb(249 249 251); padding: 8px; border-radius: 12px; } .ds-nav-item { display: flex; align-items: center; gap: 8px; color: rgb(96 100 108); font: 400 14px/1 Inter, system-ui, sans-serif; text-decoration: none; padding: 8px; border-radius: 8px; transition: background 150ms ease, color 150ms ease; } .ds-nav-item:hover { background: rgb(240 240 243); color: rgb(28 32 36); } .ds-nav-item--active { background: rgb(212 247 231); color: rgb(0 105 70); font-weight: 500; }"
+    },
+    {
+      "name": "Switch de tema",
+      "kind": "custom",
+      "refersTo": "theme-switch",
+      "description": "Pill compacto claro/escuro; trilho verde quando ligado.",
+      "html": "<button class=\"ds-switch\" role=\"switch\" aria-checked=\"true\" aria-label=\"Tema escuro\"><span class=\"ds-switch__thumb\"></span></button>",
+      "css": ".ds-switch { position: relative; width: 36px; height: 20px; background: rgb(0 135 90); border: none; border-radius: 9999px; cursor: pointer; transition: background 150ms ease; } .ds-switch[aria-checked=\"false\"] { background: rgb(217 217 224); } .ds-switch__thumb { position: absolute; top: 2px; left: 18px; width: 16px; height: 16px; background: #fff; border-radius: 9999px; transition: left 150ms ease; } .ds-switch[aria-checked=\"false\"] .ds-switch__thumb { left: 2px; } .ds-switch:focus-visible { outline: 2px solid rgb(0 212 136); outline-offset: 2px; }"
+    },
+    {
+      "name": "Badge de status",
+      "kind": "chip",
+      "refersTo": "badge-status",
+      "description": "Estado de conta (ativa) — verde discreto, pill.",
+      "html": "<span class=\"ds-badge\">Ativa</span>",
+      "css": ".ds-badge { display: inline-block; background: rgb(212 247 231); color: rgb(0 105 70); font: 500 12px/1 Inter, system-ui, sans-serif; padding: 4px 10px; border-radius: 9999px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Ferramenta que Desaparece",
+    "overview": "Interface de trabalho tech e direta: neutros slate com leve frieza, muito respiro, e um único acento — o verde Hdev — usado com parcimônia cirúrgica. A estética segue o produto (dashboard), nunca o contrário: nada de gradientes chamativos, sombras raras, contraste de fundo no lugar de elevação. O sistema inteiro vive em CSS custom properties de 12 passos (escala Radix) que flipam com a classe .dark no elemento raiz — todo componente novo nasce nos dois temas ao mesmo tempo.",
+    "keyCharacteristics": [
+      "Um acento só (verde Hdev), neutros slate pra todo o resto",
+      "Claro/escuro por CSS vars (.dark no root), nunca por página",
+      "Densidade de ferramenta: tabelas e painéis compactos, tipografia contida",
+      "Bordas 1px discretas no lugar de sombras",
+      "White-label: o acento acompanha a marca da agência via tokens"
+    ],
+    "rules": [
+      { "name": "The Agency Override Rule", "body": "Acento em telas novas usa SEMPRE os tokens n-blue-9/10/11 (CSS vars sobrescritas por domínio via Agency#brand_rgb) — nunca n-brand/n-brandVivid nem hex fixo.", "section": "colors" },
+      { "name": "The No-Text-On-Vivid Rule", "body": "#00D488 e #00FF9F jamais recebem texto por cima; texto branco só sobre o sólido #00875A.", "section": "colors" },
+      { "name": "The No-Chatwoot-Blue Rule", "body": "#2781F6 e #1F93FF são proibidos em qualquer superfície.", "section": "colors" }
+    ],
+    "dos": [
+      "Do usar classes Tailwind n-* (bg-n-slate-2, text-n-slate-12, bg-n-blue-9...) — resolvem pra CSS vars e flipam com .dark de graça.",
+      "Do definir os dois temas no mesmo commit de qualquer tela nova.",
+      "Do usar --blue-11 pra texto verde e --blue-9 pra fundo com texto branco, respeitando a direção invertida da rampa no escuro.",
+      "Do transições de 150–250ms só pra estado (hover, focus, abrir/fechar)."
+    ],
+    "donts": [
+      "Don't hex fixo de marca em tela nova — quebra o override por agência.",
+      "Don't texto sobre #00D488/#00FF9F (1,95:1, ilegível).",
+      "Don't azuis do Chatwoot (#2781F6, #1F93FF), em nenhuma hipótese.",
+      "Don't sombras decorativas, gradientes chamativos ou motion de decoração.",
+      "Don't cinza puro — os neutros são slate, levemente frios."
+    ]
+  }
+}

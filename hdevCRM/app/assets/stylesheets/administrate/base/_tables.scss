@@ -11,10 +11,13 @@ table {
 }
 
 tr {
-  border-bottom: $base-border;
+  border-bottom: 1px solid unquote("rgb(var(--slate-4))");
 
   th {
+    color: $hint-grey;
+    font-size: $font-size-mini;
     font-weight: $font-weight-medium;
+    letter-spacing: 0.02em;
 
     &.cell-label--avatar-field {
       a {
@@ -22,6 +25,10 @@ tr {
       }
     }
   }
+}
+
+thead tr {
+  border-bottom: $base-border;
 }
 
 tbody tr {

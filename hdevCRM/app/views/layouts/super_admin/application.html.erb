@@ -31,14 +31,20 @@ By default, it renders:
     function toggleSaTheme() {
       var dark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('sa_theme', dark ? 'dark' : 'light');
+      syncSaThemeToggle();
     }
+    function syncSaThemeToggle() {
+      var el = document.getElementById('sa-theme-switch');
+      if (el) el.setAttribute('aria-checked', document.documentElement.classList.contains('dark'));
+    }
+    document.addEventListener('DOMContentLoaded', syncSaThemeToggle);
   </script>
   <%= render "stylesheet" %>
   <%= vite_client_tag %>
   <%= vite_javascript_tag 'superadmin' %>
   <%= csrf_meta_tags %>
 </head>
-<body class="antialiased w-full h-full">
+<body class="antialiased w-full h-full bg-n-slate-1 text-n-slate-12">
   <%= render "icons" %>
   <div class="flex w-full h-full">
     <%= render "navigation" -%>

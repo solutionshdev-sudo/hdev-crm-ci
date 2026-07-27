@@ -22,7 +22,7 @@ input[type='submit']:not(.reset-base),
   white-space: nowrap;
 
   &:hover {
-    background-color: mix($black, $color-woot, 20%);
+    background-color: $color-primary-dark;
     color: $white;
   }
 

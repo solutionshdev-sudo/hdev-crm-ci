@@ -21,3 +21,33 @@
 .feature-container {
   max-width: 100rem;
 }
+
+// O CSS do selectize (dropdowns de belongs_to) vem do gem com branco fixo;
+// esses overrides puxam os campos pros tokens e fazem o dark funcionar.
+.selectize-input,
+.selectize-input input,
+.selectize-dropdown {
+  background: $surface-color;
+  border-color: $base-border-color;
+  color: $base-font-color;
+}
+
+.selectize-input.focus {
+  border-color: $action-color;
+  box-shadow: none;
+}
+
+.selectize-dropdown {
+  .option {
+    color: $base-font-color;
+  }
+
+  .active {
+    background: unquote("rgb(var(--slate-3))");
+    color: $base-font-color;
+  }
+}
+
+.selectize-control.single .selectize-input {
+  background-image: none;
+}

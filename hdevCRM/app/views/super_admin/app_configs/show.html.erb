@@ -26,25 +26,25 @@
             <%= form.select "app_config[#{key}]",
               [['Ativado', true], ['Desativado', false]],
               { selected: ActiveModel::Type::Boolean.new.cast(@app_config[key]) },
-              class: "mt-2 border border-slate-100 p-1 rounded-md"
+              class: "mt-2 border border-n-slate-6 bg-n-slate-1 text-n-slate-12 p-1 rounded-lg"
             %>
           <% elsif @installation_configs[key]&.dig('type') == 'code' %>
             <%= form.text_area "app_config[#{key}]",
                 value: @app_config[key],
                 rows: 12,
                 wrap: 'off',
-                class: "mt-2 border font-mono text-xs border-slate-100 p-1 rounded-md overflow-scroll"
+                class: "mt-2 border font-mono text-xs border-n-slate-6 bg-n-slate-1 text-n-slate-12 p-1 rounded-lg overflow-scroll"
             %>
           <% elsif @installation_configs[key]&.dig('type') == 'secret' %>
             <div class="relative">
               <%= form.password_field "app_config[#{key}]",
                   id: "app_config_#{key}",
                   value: @app_config[key],
-                  class: "mt-2 border border-slate-100 p-1.5 pr-8 rounded-md w-full"
+                  class: "mt-2 border border-n-slate-6 bg-n-slate-1 text-n-slate-12 p-1.5 pr-8 rounded-lg w-full"
               %>
               <button
                 type="button"
-                class="absolute reset-base !bg-white top-1/2 !outline-0 !text-n-slate-11 -translate-y-1/2 right-2 p-1 hover:!bg-n-slate-5 rounded-sm toggle-password"
+                class="absolute reset-base !bg-n-slate-1 top-1/2 !outline-0 !text-n-slate-11 -translate-y-1/2 right-2 p-1 hover:!bg-n-slate-5 rounded-sm toggle-password"
                 data-target="app_config_<%= key %>"
               >
                 <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -57,13 +57,13 @@
             <%= form.select "app_config[#{key}]",
               @installation_configs[key]['options'].map { |val, label| [label, val] },
               { selected: @app_config[key] },
-              class: "mt-2 border border-slate-100 p-1 rounded-md"
+              class: "mt-2 border border-n-slate-6 bg-n-slate-1 text-n-slate-12 p-1 rounded-lg"
             %>
         <% else %>
           <%= form.text_field "app_config[#{key}]", value: @app_config[key] %>
         <% end %>
           <%if @installation_configs[key]&.dig('description').present? %>
-            <p class="pt-2 text-xs italic text-slate-400">
+            <p class="pt-2 text-xs italic text-n-slate-10">
               <%= @installation_configs[key]&.dig('description') %>
             </p>
           <% end %>

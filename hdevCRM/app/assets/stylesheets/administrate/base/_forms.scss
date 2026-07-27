@@ -40,16 +40,17 @@ select {
 input:not([type]),
 textarea {
   appearance: none;
-  background-color: $white;
+  background-color: $surface-color;
   border: $base-border;
   border-radius: $base-border-radius;
+  color: $base-font-color;
   font-family: $base-font-family;
   padding: 0.5em;
   transition: border-color $base-duration $base-timing;
   width: 100%;
 
   &:hover {
-    border-color: mix($black, $base-border-color, 20%);
+    border-color: unquote("rgb(var(--slate-8))");
   }
 
   &:focus {
@@ -58,7 +59,7 @@ textarea {
   }
 
   &:disabled {
-    background-color: mix($black, $white, 5%);
+    background-color: unquote("rgb(var(--slate-3))");
     cursor: not-allowed;
 
     &:hover {

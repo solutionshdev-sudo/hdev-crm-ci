@@ -8,6 +8,14 @@ const props = defineProps({
   },
 });
 
+// Acento via token --blue-9 (segue a marca e o tema); fallback pro sólido Hdev.
+const accentColor = () => {
+  const v = getComputedStyle(document.documentElement)
+    .getPropertyValue('--blue-9')
+    .trim();
+  return v ? `rgb(${v})` : '#00875A';
+};
+
 const prepareData = sourceData => {
   var labels = [];
   var data = [];
@@ -20,7 +28,7 @@ const prepareData = sourceData => {
     datasets: [
       {
         type: 'bar',
-        backgroundColor: 'rgb(31, 147, 255)',
+        backgroundColor: accentColor(),
         yAxisID: 'y',
         label: 'Conversas',
         data: data,

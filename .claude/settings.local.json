@@ -27,5 +27,33 @@
       "Bash(cd \"c:/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Hdev-CRM/hdevCRM\" && echo \"=== outbound.ts ===\"; cat -n ../baileys-service/src/translate/outbound.ts | head -40; echo \"=== whatsapp_phone_source_id ===\"; grep -n -E \"def whatsapp_phone_source_id|def whatsapp_source_id\" -A 8 app/services/whatsapp/incoming_message_identifier_helper.rb; echo \"=== send service ===\"; grep -rn \"source_id\\\\|send_message\" app/services/whatsapp/send_on_whatsapp_service.rb 2>/dev/null || find app -name \"*send_on_whatsapp*\")",
       "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/baileys-service/src/translate/**)"
     ]
-  }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\" ] || node \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\"",
+            "timeout": 5,
+            "statusMessage": "Checking UI changes"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\" ] || node \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Design deep pass"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "Impeccable design detector: immediate-tier checks after Edit/Write/MultiEdit on UI files, full-rule deep pass on Stop."
 }

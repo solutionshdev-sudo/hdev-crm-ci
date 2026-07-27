@@ -1,7 +1,7 @@
-<li class="px-4 mb-1">
-  <% text_class_name = current_page?(url) ? 'text-woot-500 bg-slate-25' : 'text-slate-800' %>
-  <%= link_to(url, class: text_class_name + " -ml-1 focus:outline-none cursor-pointer flex items-center px-2 py-1.5 text-slate-800 cursor-pointer hover:text-woot-500 hover:bg-slate-25 rounded-lg") do %>
-    <svg width="16" height="16"><use xlink:href="#<%= icon %>" /></svg>
-    <span class="ml-2 text-sm"><%= label %></span>
+<li class="px-4 mb-0.5">
+  <% link_classes = current_page?(url) ? 'bg-n-blue-3 text-n-blue-11 font-medium' : 'text-n-slate-11 hover:text-n-slate-12 hover:bg-n-slate-3' %>
+  <%= link_to(url, class: link_classes + " flex items-center px-2 py-1.5 rounded-lg text-sm transition-colors duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-n-blue-8") do %>
+    <svg width="16" height="16" class="flex-shrink-0"><use xlink:href="#<%= icon %>" /></svg>
+    <span class="ml-2"><%= label %></span>
   <% end %>
 </li>
