@@ -66,7 +66,9 @@ class Chatbots::Nodes::BaseNode
         node_id: node['id']
       }
     }
-    Messages::MessageBuilder.new(nil, conversation, params).perform
+    # Hash puro faz o builder pular @items (message_builder.rb exige
+    # ActionController::Parameters) e gravar items: nil → validator quebra.
+    Messages::MessageBuilder.new(nil, conversation, ActionController::Parameters.new(params)).perform
   end
 
   def default_timeout

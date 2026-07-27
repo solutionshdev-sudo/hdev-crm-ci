@@ -15,17 +15,26 @@ class Webhooks::BaileysController < ActionController::API
 
   private
 
+  # Sempre 401 (nunca 404): baileys-service só trata 401 como terminal — outro
+  # status queimaria as 5 tentativas de retry à toa. O motivo fica no log.
   def verify_signature!
     channel = channel_by_instance_id
-    return head :unauthorized if channel.blank?
+    if channel.blank?
+      Rails.logger.warn("[BAILEYS] webhook 401: no channel for instance=#{params[:instance_id]}")
+      return head :unauthorized
+    end
 
     secret = channel.provider_config['webhook_secret']
-    return head :unauthorized if secret.blank?
+    if secret.blank?
+      Rails.logger.warn("[BAILEYS] webhook 401: channel missing webhook_secret instance=#{params[:instance_id]}")
+      return head :unauthorized
+    end
 
     signature = request.headers['X-Baileys-Signature'].to_s.delete_prefix('sha256=')
     expected = OpenSSL::HMAC.hexdigest('sha256', secret, request.raw_post)
     return if ActiveSupport::SecurityUtils.secure_compare(expected, signature)
 
+    Rails.logger.warn("[BAILEYS] webhook 401: invalid signature instance=#{params[:instance_id]}")
     head :unauthorized
   end
 

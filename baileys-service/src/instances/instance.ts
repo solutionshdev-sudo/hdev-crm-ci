@@ -238,19 +238,61 @@ export class Instance {
     }
   }
 
+  // lid → PN: contas migradas chegam endereçadas por @lid. remoteJidAlt traz o
+  // PN; senão, o mapeamento que a própria lib persiste ao receber mensagens.
+  // Grupo/broadcast → null (v1 é só chat direto).
+  private async resolveUserJid(
+    jid?: string | null,
+    alt?: string | null
+  ): Promise<string | null> {
+    if (!jid) return null;
+    if (isDirectUserJid(jid)) return jid;
+    if (!jid.endsWith('@lid')) return null;
+    if (alt && isDirectUserJid(alt)) return alt;
+    const mapped = await this.socket?.signalRepository.lidMapping
+      .getPNForLID(jid)
+      .catch(() => null);
+    return mapped && isDirectUserJid(mapped) ? mapped : null;
+  }
+
   private async handleIncoming(message: WAMessage): Promise<void> {
     try {
-      const jid = message.key.remoteJid;
+      if (message.key.fromMe) return;
       // v1: direct user chats only — no groups, no status broadcast, no self.
-      if (!isDirectUserJid(jid) || message.key.fromMe) return;
+      const rawJid = message.key.remoteJid;
+      const jid = await this.resolveUserJid(rawJid, message.key.remoteJidAlt);
+      if (!jid) {
+        if (rawJid?.endsWith('@lid')) {
+          logger.warn(
+            { id: this.config.id, jid: rawJid, msgId: message.key.id },
+            'inbound dropped: lid without resolvable PN'
+          );
+        } else {
+          logger.info(
+            { id: this.config.id, jid: rawJid },
+            'inbound dropped: non-direct jid'
+          );
+        }
+        return;
+      }
       if (!message.message || !message.key.id) return;
 
       const media = await this.downloadMedia(message);
       const content = translateMessageContent(message.message, media);
-      if (!content) return;
+      if (!content) {
+        logger.info(
+          {
+            id: this.config.id,
+            msgId: message.key.id,
+            keys: Object.keys(message.message),
+          },
+          'inbound dropped: untranslatable content'
+        );
+        return;
+      }
 
       const cloudMessage: CloudMessage = {
-        from: jidToNumber(jid as string),
+        from: jidToNumber(jid),
         id: prefixedId(this.config.id, message.key.id),
         timestamp: String(
           Number(message.messageTimestamp) || Math.floor(Date.now() / 1000)
@@ -266,7 +308,7 @@ export class Instance {
         buildMessagesPayload(
           this.config.id,
           this.config.phoneNumber,
-          jidToNumber(jid as string),
+          jidToNumber(jid),
           message.pushName || undefined,
           cloudMessage
         )
@@ -282,18 +324,31 @@ export class Instance {
   private async handleStatusUpdates(
     updates: Array<{ key: WAMessage['key']; update: Partial<WAMessage> }>
   ): Promise<void> {
-    const statuses = updates
-      .filter(item => item.key.fromMe && isDirectUserJid(item.key.remoteJid))
-      .map(item => {
-        const status = translateStatus(item.update.status as number | undefined);
-        if (!status || !item.key.id) return null;
-        return {
-          id: prefixedId(this.config.id, item.key.id),
-          status,
-          recipientId: jidToNumber(item.key.remoteJid as string),
-        };
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null);
+    const statuses: Array<{ id: string; status: string; recipientId: string }> = [];
+    for (const item of updates) {
+      if (!item.key.fromMe || !item.key.id) continue;
+      const jid = await this.resolveUserJid(item.key.remoteJid, item.key.remoteJidAlt);
+      if (!jid) {
+        logger.info(
+          { id: this.config.id, jid: item.key.remoteJid },
+          'status dropped: unresolvable jid'
+        );
+        continue;
+      }
+      const status = translateStatus(item.update.status as number | undefined);
+      if (!status) {
+        logger.info(
+          { id: this.config.id, msgId: item.key.id, rawStatus: item.update.status },
+          'status dropped: unmapped status'
+        );
+        continue;
+      }
+      statuses.push({
+        id: prefixedId(this.config.id, item.key.id),
+        status,
+        recipientId: jidToNumber(jid),
+      });
+    }
 
     if (!statuses.length) return;
     await deliverWebhook(

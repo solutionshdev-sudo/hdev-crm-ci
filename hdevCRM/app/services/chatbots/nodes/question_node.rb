@@ -17,7 +17,7 @@ class Chatbots::Nodes::QuestionNode < Chatbots::Nodes::BaseNode
 
     if data['input_type'] == 'free_text' || Array(data['options']).blank?
       save_answer(message.content)
-      return [:continue, next_id]
+      return [:continue, next_or_default('out')]
     end
 
     option_id = Chatbots::AnswerMatcher.new(data, session, message).match
@@ -31,7 +31,11 @@ class Chatbots::Nodes::QuestionNode < Chatbots::Nodes::BaseNode
     if retries >= max_retries
       session.context['retries'] = 0
       fallback = next_id('fallback')
-      return fallback ? [:continue, fallback] : [:halt, :aborted]
+      return [:continue, fallback] if fallback
+
+      # sem fallback: não abandonar o cliente — devolve pra fila humana
+      conversation.bot_handoff!
+      return [:halt, :aborted]
     end
 
     session.context['retries'] = retries

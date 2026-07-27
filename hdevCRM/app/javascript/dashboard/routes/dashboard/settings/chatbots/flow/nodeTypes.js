@@ -110,6 +110,7 @@ export const newNodeId = type => {
 
 export const outputHandles = node => {
   if (node.type === 'question') {
+    if (node.data?.input_type === 'free_text') return ['out', 'timeout'];
     const options = node.data?.options || [];
     return [...options.map(option => option.id), 'fallback', 'timeout'];
   }

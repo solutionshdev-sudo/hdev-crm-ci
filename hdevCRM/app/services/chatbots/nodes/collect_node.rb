@@ -41,7 +41,7 @@ class Chatbots::Nodes::CollectNode < Chatbots::Nodes::BaseNode
     end
 
     store(content)
-    [:continue, next_id]
+    [:continue, next_or_default('out')]
   end
 
   private

@@ -24,7 +24,9 @@ class Chatbots::TriggerService
     return false if chatbot.blank?
     return false if conversation.resolved?
     return false if conversation.assignee_id.present?
-    return false if ChatbotSession.active.exists?(conversation_id: conversation.id)
+    # Qualquer sessão (ativa OU terminada) bloqueia novo disparo na conversa —
+    # senão o bot sequestra conversa que já passou por handoff.
+    return false if ChatbotSession.exists?(conversation_id: conversation.id)
     return false unless keyword_match?
 
     true

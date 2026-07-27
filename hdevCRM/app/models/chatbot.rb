@@ -21,14 +21,15 @@ class Chatbot < ApplicationRecord
     (flow['nodes'] || []).find { |node| node['id'] == node_id }
   end
 
-  # Aresta saindo de node_id pelo handle dado. Nós com uma única saída não
-  # marcam sourceHandle no Vue Flow, então nil casa com qualquer handle.
+  # Aresta saindo de node_id pelo handle dado. Sem handle: aresta sem
+  # sourceHandle, ou a ÚNICA aresta do nó — nunca chutar entre múltiplas
+  # arestas nomeadas (o builder sempre grava sourceHandle).
   def next_node_id(node_id, handle = nil)
     edges = (flow['edges'] || []).select { |edge| edge['source'] == node_id }
     edge = if handle.present?
              edges.find { |item| item['sourceHandle'] == handle }
            else
-             edges.first
+             edges.find { |item| item['sourceHandle'].blank? } || (edges.first if edges.one?)
            end
     edge && edge['target']
   end
