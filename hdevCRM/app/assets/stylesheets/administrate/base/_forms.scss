@@ -50,7 +50,7 @@ textarea {
   width: 100%;
 
   &:hover {
-    border-color: unquote("rgb(var(--slate-8))");
+    border-color: unquote("var(--sa-slate-8)");
   }
 
   &:focus {
@@ -59,7 +59,7 @@ textarea {
   }
 
   &:disabled {
-    background-color: unquote("rgb(var(--slate-3))");
+    background-color: unquote("var(--sa-slate-3)");
     cursor: not-allowed;
 
     &:hover {

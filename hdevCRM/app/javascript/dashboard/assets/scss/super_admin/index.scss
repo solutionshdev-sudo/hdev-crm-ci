@@ -242,6 +242,40 @@ body {
   }
 }
 
+// Pontes pro CSS do Administrate (Sprockets). O SassCompressor (libsass)
+// re-parseia o CSS comprimido e explode em `rgb(var(--x))` — função rgb sem
+// os 3 argumentos. Por isso o administrate usa só `var(--sa-*)`, e as cores
+// completas são montadas aqui (dart-sass/Vite aceita rgb+var). Como as
+// triplas flipam com .dark, esses tokens seguem o tema sozinhos.
+:root {
+  --sa-slate-1: rgb(var(--slate-1));
+  --sa-slate-2: rgb(var(--slate-2));
+  --sa-slate-3: rgb(var(--slate-3));
+  --sa-slate-4: rgb(var(--slate-4));
+  --sa-slate-6: rgb(var(--slate-6));
+  --sa-slate-7: rgb(var(--slate-7));
+  --sa-slate-8: rgb(var(--slate-8));
+  --sa-slate-9: rgb(var(--slate-9));
+  --sa-slate-10: rgb(var(--slate-10));
+  --sa-slate-11: rgb(var(--slate-11));
+  --sa-slate-12: rgb(var(--slate-12));
+  --sa-blue-3: rgb(var(--blue-3));
+  --sa-blue-4: rgb(var(--blue-4));
+  --sa-blue-9: rgb(var(--blue-9));
+  --sa-blue-10: rgb(var(--blue-10));
+  --sa-blue-11: rgb(var(--blue-11));
+  --sa-ruby-3: rgb(var(--ruby-3));
+  --sa-ruby-9: rgb(var(--ruby-9));
+  --sa-ruby-11: rgb(var(--ruby-11));
+  --sa-amber-3: rgb(var(--amber-3));
+  --sa-amber-9: rgb(var(--amber-9));
+  --sa-amber-11: rgb(var(--amber-11));
+  --sa-teal-3: rgb(var(--teal-3));
+  --sa-teal-9: rgb(var(--teal-9));
+  --sa-teal-11: rgb(var(--teal-11));
+  --sa-focus-ring: rgb(var(--blue-8) / 0.5);
+}
+
 // Auth split-screen (super admin sign-in). Mirrors the scoped CSS in
 // v3/components/Auth/AuthSplitLayout.vue — scoped styles can't reach this ERB
 // page, and the multi-stop radial gradients have no Tailwind equivalent.

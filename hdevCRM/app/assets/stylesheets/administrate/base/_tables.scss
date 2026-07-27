@@ -11,7 +11,7 @@ table {
 }
 
 tr {
-  border-bottom: 1px solid unquote("rgb(var(--slate-4))");
+  border-bottom: 1px solid unquote("var(--sa-slate-4)");
 
   th {
     color: $hint-grey;

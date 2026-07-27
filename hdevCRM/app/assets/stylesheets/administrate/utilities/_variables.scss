@@ -42,31 +42,31 @@ $woot-logo-padding: $space-large $space-two;
 
 // Colors — tokens runtime (ver library/_variables.scss). $color-white é
 // "superfície", não branco literal: vira slate-1 e escurece com .dark.
-$color-woot: unquote("rgb(var(--blue-9))");
-$color-gray: unquote("rgb(var(--slate-11))");
-$color-light-gray: unquote("rgb(var(--slate-10))");
-$color-border: unquote("rgb(var(--slate-6))");
-$color-border-light: unquote("rgb(var(--slate-4))");
-$color-background: unquote("rgb(var(--slate-2))");
-$color-border-dark: unquote("rgb(var(--slate-7))");
-$color-background-light: unquote("rgb(var(--slate-2))");
-$color-white: unquote("rgb(var(--slate-1))");
-$color-body: unquote("rgb(var(--slate-12))");
-$color-heading: unquote("rgb(var(--slate-12))");
-$color-extra-light-blue: unquote("rgb(var(--slate-3))");
+$color-woot: unquote("var(--sa-blue-9)");
+$color-gray: unquote("var(--sa-slate-11)");
+$color-light-gray: unquote("var(--sa-slate-10)");
+$color-border: unquote("var(--sa-slate-6)");
+$color-border-light: unquote("var(--sa-slate-4)");
+$color-background: unquote("var(--sa-slate-2)");
+$color-border-dark: unquote("var(--sa-slate-7)");
+$color-background-light: unquote("var(--sa-slate-2)");
+$color-white: unquote("var(--sa-slate-1)");
+$color-body: unquote("var(--sa-slate-12)");
+$color-heading: unquote("var(--sa-slate-12)");
+$color-extra-light-blue: unquote("var(--sa-slate-3)");
 
 $primary-color: $color-woot;
-$secondary-color: unquote("rgb(var(--slate-9))");
-$success-color: unquote("rgb(var(--teal-9))");
-$warning-color: unquote("rgb(var(--amber-9))");
-$alert-color: unquote("rgb(var(--ruby-9))");
+$secondary-color: unquote("var(--sa-slate-9)");
+$success-color: unquote("var(--sa-teal-9)");
+$warning-color: unquote("var(--sa-amber-9)");
+$alert-color: unquote("var(--sa-ruby-9)");
 
 $masked-bg: rgba(0, 0, 0, .4);
 
 // Color-palettes
 
-$color-primary-light: unquote("rgb(var(--blue-4))");
-$color-primary-dark: unquote("rgb(var(--blue-10))");
+$color-primary-light: unquote("var(--sa-blue-4)");
+$color-primary-dark: unquote("var(--sa-blue-10)");
 
 // Thumbnail
 $thumbnail-radius: 4rem;

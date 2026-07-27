@@ -43,7 +43,7 @@
   }
 
   .active {
-    background: unquote("rgb(var(--slate-3))");
+    background: unquote("var(--sa-slate-3)");
     color: $base-font-color;
   }
 }

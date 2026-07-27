@@ -5,8 +5,8 @@
 }
 
 .report-card {
-  background: unquote("rgb(var(--slate-2))");
-  border: 1px solid unquote("rgb(var(--slate-4))");
+  background: unquote("var(--sa-slate-2)");
+  border: 1px solid unquote("var(--sa-slate-4)");
   border-radius: 12px;
   color: $hint-grey;
   flex: 1;
