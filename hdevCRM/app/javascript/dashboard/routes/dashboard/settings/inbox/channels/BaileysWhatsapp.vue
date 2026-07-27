@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router';
 import { useAlert } from 'dashboard/composables';
 import { isPhoneE164OrEmpty } from 'shared/helpers/Validators';
 import NextButton from 'dashboard/components-next/button/Button.vue';
+import PhoneNumberInput from 'dashboard/components-next/phonenumberinput/PhoneNumberInput.vue';
 import BaileysSession from './whatsapp/BaileysSession.vue';
 
 const store = useStore();
@@ -105,11 +106,9 @@ const finishWizard = () => {
       <div class="flex-grow-0 flex-shrink-0">
         <label :class="{ error: v$.phoneNumber.$error }">
           {{ t('INBOX_MGMT.ADD.WHATSAPP.PHONE_NUMBER.LABEL') }}
-          <input
+          <PhoneNumberInput
             v-model="phoneNumber"
-            type="text"
             :placeholder="t('INBOX_MGMT.ADD.WHATSAPP.PHONE_NUMBER.PLACEHOLDER')"
-            @blur="v$.phoneNumber.$touch"
           />
           <span v-if="v$.phoneNumber.$error" class="message">
             {{ t('INBOX_MGMT.ADD.WHATSAPP.PHONE_NUMBER.ERROR') }}

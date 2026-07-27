@@ -34,6 +34,7 @@ Se ainda não subiu: rode `/salvar` no HDEV (repo **privado**).
 | 2 | `redis` | Redis | senha abaixo |
 | 3 | `web` | App | Source: GitHub · Build: Dockerfile `docker/Dockerfile` · Port 3000 · domínio |
 | 4 | `worker` | App | mesmo build do `web` · sem domínio |
+| 5 | `baileys` | App | Source: GitHub · Build Path `baileys-service/` · Port 3025 · **sem domínio** (só rede interna) |
 
 - **web** → Command: `bundle exec rails s -p 3000 -b 0.0.0.0`
 - **worker** → Command: `bundle exec sidekiq -C config/sidekiq.yml`
@@ -87,7 +88,16 @@ BAILEYS_API_KEY=<gerar hex de 32 bytes>
 > POSTGRES_USERNAME=postgres
 > POSTGRES_DATABASE=chatwoot
 > REDIS_URL=redis://:<REDIS_PASSWORD>@hdev-crm_redis:6379
+> BAILEYS_URL=http://hdev-crm_baileys:3025
+> RAILS_INTERNAL_URL=http://hdev-crm_web:3000
 > ```
+>
+> Atenção: fora do Compose os defaults `http://baileys:3025` e o fallback
+> pra `FRONTEND_URL` **não funcionam** — sem essas duas linhas o QR do
+> WhatsApp não-oficial nunca aparece e o webhook sai pela internet pública.
+> No serviço `baileys`, defina também `BAILEYS_API_KEY` (mesmo valor do
+> `web`/`worker`), `PORT=3025` e `SESSIONS_DIR=/data/sessions` com um
+> volume montado em `/data`.
 
 ---
 

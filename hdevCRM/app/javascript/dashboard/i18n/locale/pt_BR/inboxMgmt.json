@@ -354,7 +354,8 @@
               "CONNECTING": "Conectando…",
               "QR": "Aguardando leitura do QR",
               "PAIRING": "Aguardando código de pareamento",
-              "CONNECTED": "Conectado"
+              "CONNECTED": "Conectado",
+              "ERROR": "Erro de conexão"
             },
             "QR_ALT": "QR code de pareamento do WhatsApp",
             "QR_HELP": "Abra o WhatsApp no celular > Aparelhos conectados > Conectar um aparelho, e escaneie o código.",
@@ -365,7 +366,9 @@
             "CONTINUE": "Continuar",
             "CREATED_HELP": "Caixa de entrada criada. Agora pareie o número para começar a receber mensagens — dá pra fazer isso depois nas configurações da caixa também.",
             "CONNECT_ERROR": "Não foi possível falar com o serviço de WhatsApp. Tente de novo em instantes.",
-            "LOGOUT_ERROR": "Não foi possível desconectar a sessão. Tente de novo em instantes."
+            "LOGOUT_ERROR": "Não foi possível desconectar a sessão. Tente de novo em instantes.",
+            "ERROR_DETAIL": "Detalhe do erro",
+            "SERVICE_UNREACHABLE": "O serviço de WhatsApp não está respondendo. Verifique se o container baileys está no ar e tente de novo."
           }
         }
       },

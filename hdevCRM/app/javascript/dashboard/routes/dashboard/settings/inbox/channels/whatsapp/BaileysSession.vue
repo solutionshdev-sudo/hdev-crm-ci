@@ -20,10 +20,15 @@ const { t } = useI18n();
 const status = ref('disconnected');
 const qrDataUrl = ref('');
 const pairingCode = ref('');
+const errorDetail = ref('');
 const isWorking = ref(false);
 let pollTimer = null;
+let pollFailures = 0;
 
 const POLLING_STATES = ['connecting', 'qr', 'pairing'];
+// Depois disso o serviço é dado como fora do ar e a UI mostra erro em vez
+// de "Conectando..." eterno (~15s com polling de 3s).
+const MAX_POLL_FAILURES = 5;
 
 const statusLabel = computed(() =>
   t(`INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.STATUS.${status.value.toUpperCase()}`)
@@ -35,12 +40,20 @@ const statusBadgeClass = computed(() => {
   return 'bg-n-ruby-3 text-n-ruby-11';
 });
 
+const showErrorDetail = computed(
+  () => errorDetail.value && status.value !== 'connected'
+);
+
 const refreshStatus = async () => {
   try {
     const { data } = await BaileysAPI.getStatus(props.inboxId);
+    pollFailures = 0;
     const previous = status.value;
     status.value = data.status || 'disconnected';
     pairingCode.value = data.pairingCode || '';
+    errorDetail.value =
+      [data.lastDisconnectReason, data.lastError].filter(Boolean).join(' — ') ||
+      '';
     if (data.qr) {
       qrDataUrl.value = await QRCode.toDataURL(data.qr, { width: 264 });
     } else {
@@ -50,17 +63,30 @@ const refreshStatus = async () => {
       emit('connected');
     }
   } catch (error) {
-    // instância ainda não provisionada: mantém o estado atual e segue o polling
+    // A instância pode ainda não estar provisionada; tolera falhas
+    // transitórias, mas depois de N seguidas assume serviço fora do ar.
+    pollFailures += 1;
+    if (pollFailures >= MAX_POLL_FAILURES) {
+      status.value = 'error';
+      errorDetail.value =
+        error?.response?.data?.error ||
+        t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.SERVICE_UNREACHABLE');
+    }
   }
 };
 
 const connect = async (usePairingCode = false) => {
   isWorking.value = true;
   try {
+    pollFailures = 0;
+    errorDetail.value = '';
     await BaileysAPI.connect(props.inboxId, { usePairingCode });
     await refreshStatus();
   } catch (error) {
-    useAlert(t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECT_ERROR'));
+    useAlert(
+      error?.response?.data?.error ||
+        t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECT_ERROR')
+    );
   } finally {
     isWorking.value = false;
   }
@@ -111,6 +137,14 @@ onBeforeUnmount(stopPolling);
       >
         {{ statusLabel }}
       </span>
+    </div>
+
+    <div
+      v-if="showErrorDetail"
+      class="p-3 text-sm border rounded-lg bg-n-ruby-3 border-n-ruby-6 text-n-ruby-11"
+    >
+      {{ t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.ERROR_DETAIL') }}:
+      <span class="font-mono">{{ errorDetail }}</span>
     </div>
 
     <div

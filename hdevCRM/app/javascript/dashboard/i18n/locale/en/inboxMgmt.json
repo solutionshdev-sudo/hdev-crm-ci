@@ -354,7 +354,8 @@
               "CONNECTING": "Connecting…",
               "QR": "Waiting for QR scan",
               "PAIRING": "Waiting for pairing code",
-              "CONNECTED": "Connected"
+              "CONNECTED": "Connected",
+              "ERROR": "Connection error"
             },
             "QR_ALT": "WhatsApp pairing QR code",
             "QR_HELP": "Open WhatsApp on your phone > Linked devices > Link a device, and scan the code.",
@@ -365,7 +366,9 @@
             "CONTINUE": "Continue",
             "CREATED_HELP": "Inbox created. Now pair the number to start receiving messages — you can also do this later from the inbox settings.",
             "CONNECT_ERROR": "Could not reach the WhatsApp service. Try again in a moment.",
-            "LOGOUT_ERROR": "Could not disconnect the session. Try again in a moment."
+            "LOGOUT_ERROR": "Could not disconnect the session. Try again in a moment.",
+            "ERROR_DETAIL": "Error detail",
+            "SERVICE_UNREACHABLE": "The WhatsApp service is not responding. Check that the baileys container is running and try again."
           }
         }
       },
