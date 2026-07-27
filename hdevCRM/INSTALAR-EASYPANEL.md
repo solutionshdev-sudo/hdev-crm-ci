@@ -90,6 +90,9 @@ BAILEYS_API_KEY=<gerar hex de 32 bytes>
 > REDIS_URL=redis://:<REDIS_PASSWORD>@hdev-crm_redis:6379
 > BAILEYS_URL=http://hdev-crm_baileys:3025
 > RAILS_INTERNAL_URL=http://hdev-crm_web:3000
+> DISABLE_ENTERPRISE=true
+> DISABLE_TELEMETRY=true
+> ENABLE_PUSH_RELAY_SERVER=false
 > ```
 >
 > Atenção: fora do Compose os defaults `http://baileys:3025` e o fallback
