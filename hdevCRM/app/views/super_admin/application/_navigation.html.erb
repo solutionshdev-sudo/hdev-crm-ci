@@ -13,6 +13,7 @@ as defined by the routes in the `admin/` namespace
 <%
   sidebar_icons = {
     accounts: 'icon-building-4-line',
+    agencies: 'icon-briefcase-line',
     users: 'icon-user-follow-line',
     platform_apps: 'icon-apps-2-line',
     agent_bots: 'icon-robot-line',
@@ -26,12 +27,12 @@ as defined by the routes in the `admin/` namespace
       <%= link_to image_tag('/brand-assets/logo_thumbnail.svg', alt: 'Hdev CRM Admin Dashboard', class: 'h-10'), super_admin_root_url %>
       <div class="flex flex-col ml-3">
         <div class="text-sm">Hdev CRM <%= Chatwoot.config[:version] %></div>
-        <div class="text-xs text-slate-700 mt-0.5">Super Admin Console</div>
+        <div class="text-xs text-slate-700 mt-0.5">Console do Super Admin</div>
       </div>
     </div>
 
     <ul class="my-4">
-      <%= render partial: "nav_item", locals: { icon: 'icon-grid-line', url: super_admin_root_url, label: 'Dashboard' } %>
+      <%= render partial: "nav_item", locals: { icon: 'icon-grid-line', url: super_admin_root_url, label: 'Painel' } %>
       <% Administrate::Namespace.new(namespace).resources.each do |resource| %>
         <% next if ["account_users", "agency_users", "access_tokens", "installation_configs", "dashboard", "devise/sessions", "app_configs", "instance_statuses", "settings", "push_diagnostics"].include?  resource.resource %>
         <% next if resource.resource == "platform_banners" && !ChatwootApp.chatwoot_cloud? %>
@@ -48,11 +49,17 @@ as defined by the routes in the `admin/` namespace
   </div>
   <div>
     <ul class="my-4">
-      <%= render partial: "nav_item", locals: { icon: 'icon-mist-fill', url: sidekiq_web_url, label: 'Sidekiq Dashboard' } %>
-      <%= render partial: "nav_item", locals: { icon: 'icon-health-book-line', url: super_admin_instance_status_url, label: 'Instance Health' } %>
-      <%= render partial: "nav_item", locals: { icon: 'icon-mail-send-fill', url: super_admin_push_diagnostics_url, label: 'Push Diagnostics' } %>
-      <%= render partial: "nav_item", locals: { icon: 'icon-dashboard-line', url: '/', label: 'Agent Dashboard' } %>
-      <%= render partial: "nav_item", locals: { icon: 'icon-logout-circle-r-line', url: super_admin_logout_url, label: 'Logout' } %>
+      <li class="px-4 mb-1">
+        <button type="button" onclick="toggleSaTheme()" class="-ml-1 w-full focus:outline-none cursor-pointer flex items-center px-2 py-1.5 text-slate-800 hover:text-woot-500 hover:bg-slate-25 rounded-lg">
+          <svg width="16" height="16"><use xlink:href="#icon-contrast-line" /></svg>
+          <span class="ml-2 text-sm">Tema claro/escuro</span>
+        </button>
+      </li>
+      <%= render partial: "nav_item", locals: { icon: 'icon-mist-fill', url: sidekiq_web_url, label: 'Filas (Sidekiq)' } %>
+      <%= render partial: "nav_item", locals: { icon: 'icon-health-book-line', url: super_admin_instance_status_url, label: 'Saúde da instância' } %>
+      <%= render partial: "nav_item", locals: { icon: 'icon-mail-send-fill', url: super_admin_push_diagnostics_url, label: 'Diagnóstico de push' } %>
+      <%= render partial: "nav_item", locals: { icon: 'icon-dashboard-line', url: '/', label: 'Painel do agente' } %>
+      <%= render partial: "nav_item", locals: { icon: 'icon-logout-circle-r-line', url: super_admin_logout_url, label: 'Sair' } %>
     </ul>
   </div>
 </div>

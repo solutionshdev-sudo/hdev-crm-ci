@@ -22,10 +22,15 @@ By default, it renders:
     <%= content_for(:title) %> - <%= application_title %>
   </title>
   <script>
-    // Mirrors v3/App.vue: Tailwind's dark: variants only fire when `.dark`
-    // sits on the root element; nothing else adds it on ERB-rendered pages.
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // Tailwind's dark: variants only fire when `.dark` sits on the root
+    // element. Escolha manual (localStorage) vence; sem escolha, segue o sistema.
+    var saTheme = localStorage.getItem('sa_theme');
+    if (saTheme === 'dark' || (!saTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
+    }
+    function toggleSaTheme() {
+      var dark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('sa_theme', dark ? 'dark' : 'light');
     }
   </script>
   <%= render "stylesheet" %>

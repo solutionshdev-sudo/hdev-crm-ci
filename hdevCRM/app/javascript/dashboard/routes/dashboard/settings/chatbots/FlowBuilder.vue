@@ -1,5 +1,5 @@
 <script setup>
-import { computed, markRaw, onMounted, ref, watch } from 'vue';
+import { computed, markRaw, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'dashboard/composables/store';
@@ -36,6 +36,7 @@ const nodeTypes = Object.keys(NODE_TYPES).reduce((map, type) => {
 const {
   onConnect,
   onNodeClick,
+  onNodeDoubleClick,
   onPaneClick,
   onEdgeClick,
   addEdges,
@@ -61,6 +62,11 @@ onConnect(connection => {
 });
 
 onNodeClick(({ node }) => {
+  selectedNode.value = node;
+});
+
+// Rede de segurança: se o clique virar micro-arrasto, o duplo-clique abre.
+onNodeDoubleClick(({ node }) => {
   selectedNode.value = node;
 });
 
@@ -133,6 +139,17 @@ const autosave = useDebounceFn(save, 1500);
 
 watch([nodes, edges], () => autosave(), { deep: true });
 
+const paletteQuery = ref('');
+const paletteTypes = computed(() => {
+  const query = paletteQuery.value.trim().toLowerCase();
+  if (!query) return PALETTE_TYPES;
+  return PALETTE_TYPES.filter(type =>
+    t(`CHATBOTS.BUILDER.NODES.${type.toUpperCase()}`)
+      .toLowerCase()
+      .includes(query)
+  );
+});
+
 const savedLabel = computed(() => {
   if (isSaving.value) return t('CHATBOTS.BUILDER.SAVING');
   if (lastSavedAt.value) return t('CHATBOTS.BUILDER.SAVED');
@@ -145,7 +162,9 @@ onMounted(async () => {
   const flow = record.flow?.nodes?.length ? record.flow : emptyFlow();
   nodes.value = flow.nodes.map(node => ({ ...node }));
   edges.value = (flow.edges || []).map(edge => ({ ...edge }));
+  await nextTick();
   if (flow.viewport) setViewport(flow.viewport);
+  else fitView();
   await Promise.all([
     store.dispatch('teams/get'),
     store.dispatch('agents/get'),
@@ -193,8 +212,14 @@ onMounted(async () => {
         <span class="mb-1 text-xs font-semibold uppercase text-n-slate-10">
           {{ t('CHATBOTS.BUILDER.PALETTE') }}
         </span>
+        <input
+          v-model="paletteQuery"
+          type="search"
+          class="!h-8 !mb-1 !text-sm"
+          :placeholder="t('CHATBOTS.BUILDER.PALETTE_SEARCH')"
+        />
         <button
-          v-for="type in PALETTE_TYPES"
+          v-for="type in paletteTypes"
           :key="type"
           type="button"
           class="flex items-center gap-2 px-2 py-1.5 text-sm text-left rounded-lg text-n-slate-12 hover:bg-n-alpha-1"
@@ -215,10 +240,13 @@ onMounted(async () => {
           v-model:nodes="nodes"
           v-model:edges="edges"
           :node-types="nodeTypes"
-          :default-edge-options="{ type: 'smoothstep' }"
+          :default-edge-options="{ type: 'smoothstep', animated: true }"
           :min-zoom="0.2"
           :max-zoom="2"
-          fit-view-on-init
+          :node-drag-threshold="4"
+          :zoom-on-double-click="false"
+          snap-to-grid
+          :snap-grid="[20, 20]"
           class="w-full h-full"
         >
           <Background :gap="20" />

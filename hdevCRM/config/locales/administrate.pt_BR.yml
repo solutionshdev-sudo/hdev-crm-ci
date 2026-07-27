@@ -1,0 +1,81 @@
+# Tradução pt-BR do Administrate (Super Admin). O gem só embarca a chave
+# "pt-BR" (com hífen); o app roda com :pt_BR, então as chaves vivem aqui.
+pt_BR:
+  administrate:
+    actions:
+      back: Voltar
+      confirm: Tem certeza?
+      destroy: Excluir
+      edit: Editar
+      edit_resource: Editar %{name}
+      show_resource: Detalhes de %{name}
+      new_resource: Novo(a) %{name}
+    controller:
+      create:
+        success: '%{resource} criado(a) com sucesso.'
+      destroy:
+        success: '%{resource} excluído(a) com sucesso.'
+      update:
+        success: '%{resource} atualizado(a) com sucesso.'
+    fields:
+      has_many:
+        more: 'Mostrando %{count} de %{total_count}'
+        none: Nenhum
+      polymorphic:
+        none: Nenhum
+    form:
+      error: erro
+      errors: '%{pluralized_errors} impediram que este(a) %{resource_name} fosse salvo(a):'
+    search:
+      clear: Limpar busca
+      label: Buscar %{resource}
+    sidebar:
+      collapse: Recolher menu
+      expand: Expandir menu
+  helpers:
+    submit:
+      create: 'Criar %{model}'
+      update: 'Salvar %{model}'
+      submit: 'Salvar %{model}'
+  activerecord:
+    models:
+      account:
+        one: Conta
+        other: Contas
+      user:
+        one: Usuário
+        other: Usuários
+      agency:
+        one: Agência
+        other: Agências
+      agent_bot:
+        one: Robô de agente
+        other: Robôs de agente
+      platform_app:
+        one: App de plataforma
+        other: Apps de plataforma
+      account_user:
+        one: Vínculo de conta
+        other: Vínculos de conta
+  # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
+  # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
+  attributes:
+    name: Nome
+    display_name: Nome de exibição
+    email: E-mail
+    password: Senha
+    role: Papel
+    account: Conta
+    user: Usuário
+    agency: Agência
+    locale: Idioma
+    domain: Domínio
+    support_email: E-mail de suporte
+    status: Status
+    feature_flags: Recursos
+    limits: Limites
+    custom_attributes: Atributos personalizados
+    confirmed_at: Confirmado em
+    active_at: Ativo em
+    created_at: Criado em
+    updated_at: Atualizado em

@@ -31,23 +31,42 @@ confirmar.
 de auth e dois consertos de white-label no tema escuro. Falta rebuild +
 `DEFAULT_LOCALE=pt_BR` no EasyPanel.
 
+**Feito (27/07):** super admin 100% limpo — widget de suporte/phone-home do
+Chatwoot removido, versão própria 1.0.0 (não expõe mais a 4.16.0 do upstream),
+cards EE com botões de upgrade removidos, links do Discord deles trocados por
+contato@hdev.online, console todo em pt-BR (locale `administrate.pt_BR.yml`),
+ícone de Agências e toggle claro/escuro.
+
 **Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
 textos/links visíveis, depois o rename do widget e dos identificadores internos.
 
-## Segunda trilha: features de venda (27/07 — implementadas, não comitadas)
+## Segunda trilha: features de venda (27/07 — deployadas e validadas)
 
-Entrega grande no working tree (~125 arquivos, plano aprovado): login do Super
-Admin no mesmo split-screen, pt-BR 100% (0 chaves faltando), **WhatsApp
-não-oficial via microserviço Baileys próprio** (`baileys-service/`, QR + proxy
-por instância + disclaimers de risco), **construtor visual de chatbot**
-(@vue-flow, 12 tipos de nó, motor próprio) e **kanban de Negócios** (Deal /
-funil, com ações na automação). Estado detalhado e pendências em
-`_memoria/analise-2026-07.md` e na memória da sessão.
+Entrega comitada e em produção: login do Super Admin no split-screen, pt-BR
+100%, **WhatsApp não-oficial via microserviço Baileys próprio**
+(`baileys-service/`, baileys `7.0.0-rc13` — o WhatsApp rejeitou a linha 6.x),
+**construtor visual de chatbot** (@vue-flow, 12 nós) e **kanban de Negócios**.
 
-**Pendente pra fechar a entrega:** commit (quebrar por fase), `db:migrate` +
-rubocop/eslint num ambiente com Ruby, envs novas no EasyPanel
-(`BAILEYS_API_KEY`, `DEFAULT_LOCALE=pt_BR`), rebuild da imagem, teste do
-Baileys com chip descartável.
+**27/07:** diagnóstico completo das duas frentes (~30 achados) e conserto dos
+críticos no commit `9d16269`: JID `@lid` era a causa do "conectou mas não
+recebia" (Baileys 7 endereça chats por `@lid`; agora resolve pro número real) +
+6 bugs quebra-tudo do chatbot (botões crashavam a sessão, delay nunca
+retomava, roteamento de arestas, handoff). **WhatsApp validado ponta a ponta
+em produção com chip real: recebe e envia.**
+
+**Rodada 2 (plano aprovado, não implementado):** UX do Baileys pro cliente
+final (mensagens de erro amigáveis — `code_515` é restart normal e assusta;
+aba de reconexão nas configurações da inbox, que existe mas está inalcançável;
+teardown com retry na exclusão; tela final sem QR wa.me), **regra de automação
+de fábrica** pro kanban (hoje nenhum card nasce sozinho E um bug de validação
+impede até salvar a regra à mão — `create_deal` fora do `noParamActions` do
+`validations.js`) e rename "Negócios" → "Kanban". Plano em
+`~/.claude/plans/snug-munching-peach.md`.
+
+**Feito (27/07, sem commit):** polish UX do canvas do chatbot estilo Make —
+duplo-clique abre config, drag threshold, snap-to-grid, arestas animadas,
+busca na paleta, handles acessíveis (~30px) e fix do viewport inicial.
+Pendente: commit + rebuild.
 
 ## O que pode esperar
 
@@ -63,3 +82,8 @@ Baileys com chip descartável.
   links de e-mail saem quebrados até criar o registro A no Cloudflare.
 - SMTP não configurado: convites de agente e recuperação de senha não saem.
 - Backup do Postgres feito manualmente uma vez; falta a rotina de cron.
+- `db/schema.rb` do repo desatualizado (parou em 2026_07_21, sem as tabelas de
+  chatbot/kanban) — regenerar no container web e comitar.
+- 2 instâncias zumbis do baileys no volume (`0ed2d284-…` e `685e21f5-…`, de
+  canais deletados) ficam martelando registro no WhatsApp — limpar via
+  `DELETE /instances/:id` (comandos na memória da sessão).

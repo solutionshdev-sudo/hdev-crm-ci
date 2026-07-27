@@ -58,14 +58,16 @@ const summary = computed(() => {
 
 <template>
   <div
-    class="min-w-[180px] max-w-[240px] rounded-xl bg-n-solid-1 shadow-md outline outline-1"
+    class="min-w-[180px] max-w-[240px] rounded-xl bg-n-solid-1 shadow-md outline outline-1 cursor-pointer"
     :class="selected ? 'outline-n-brand outline-2' : 'outline-n-weak'"
   >
+    <!-- after:-inset-2 amplia a área clicável dos handles pra ~30px (WCAG)
+         sem inflar o ponto visível. -->
     <Handle
       v-if="type !== 'start'"
       type="target"
       :position="Position.Left"
-      class="!bg-n-slate-9 !w-2.5 !h-2.5"
+      class="!bg-n-slate-9 !w-3.5 !h-3.5 after:absolute after:-inset-2 after:content-['']"
     />
 
     <div
@@ -87,7 +89,7 @@ const summary = computed(() => {
 
     <div v-if="handles.length > 1" class="flex flex-col gap-1 px-3 pb-2">
       <div
-        v-for="(handle, index) in handles"
+        v-for="handle in handles"
         :key="handle"
         class="relative flex items-center justify-end h-5 text-[11px] text-n-slate-10"
       >
@@ -96,8 +98,8 @@ const summary = computed(() => {
           :id="handle"
           type="source"
           :position="Position.Right"
-          class="!bg-n-slate-9 !w-2.5 !h-2.5"
-          :style="{ top: `${index * 0}px`, position: 'absolute', right: '-16px' }"
+          class="!bg-n-slate-9 !w-3.5 !h-3.5 after:absolute after:-inset-2 after:content-['']"
+          :style="{ right: '-16px' }"
         />
       </div>
     </div>
@@ -106,7 +108,7 @@ const summary = computed(() => {
       :id="handles[0]"
       type="source"
       :position="Position.Right"
-      class="!bg-n-slate-9 !w-2.5 !h-2.5"
+      class="!bg-n-slate-9 !w-3.5 !h-3.5 after:absolute after:-inset-2 after:content-['']"
     />
   </div>
 </template>

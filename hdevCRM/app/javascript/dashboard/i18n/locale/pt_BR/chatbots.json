@@ -26,6 +26,7 @@
     },
     "BUILDER": {
       "PALETTE": "Blocos",
+      "PALETTE_SEARCH": "Buscar bloco…",
       "SAVE": "Salvar",
       "SAVING": "Salvando…",
       "SAVED": "Salvo",

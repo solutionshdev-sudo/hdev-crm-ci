@@ -26,6 +26,7 @@
     },
     "BUILDER": {
       "PALETTE": "Blocks",
+      "PALETTE_SEARCH": "Search block…",
       "SAVE": "Save",
       "SAVING": "Saving…",
       "SAVED": "Saved",

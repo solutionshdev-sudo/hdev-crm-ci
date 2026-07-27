@@ -1,5 +1,5 @@
 <% content_for(:title) do %>
-  Configure Settings - <%= @config.titleize %>
+  Configurações - <%= @config.titleize %>
 <% end %>
 
 <header class="main-content__header" role="banner">
@@ -24,7 +24,7 @@
         <div class="-mt-2 field-unit__field ">
           <% if @installation_configs[key]&.dig('type') == 'boolean' %>
             <%= form.select "app_config[#{key}]",
-              [["True", true], ["False", false]],
+              [['Ativado', true], ['Desativado', false]],
               { selected: ActiveModel::Type::Boolean.new.cast(@app_config[key]) },
               class: "mt-2 border border-slate-100 p-1 rounded-md"
             %>
@@ -71,7 +71,7 @@
       </div>
     <% end %>
     <div class="form-actions">
-      <%= form.submit "Submit" %>
+      <%= form.submit "Salvar" %>
     </div>
   <% end %>
 </section>

@@ -22,7 +22,7 @@ const prepareData = sourceData => {
         type: 'bar',
         backgroundColor: 'rgb(31, 147, 255)',
         yAxisID: 'y',
-        label: 'Conversations',
+        label: 'Conversas',
         data: data,
       },
     ],
@@ -41,7 +41,7 @@ const { accountsCount, usersCount, inboxesCount, conversationsCount } =
   <div class="w-full h-full">
     <header class="main-content__header" role="banner">
       <h1 id="page-title" class="main-content__page-title">
-        {{ 'Admin Dashboard' }}
+        {{ 'Painel administrativo' }}
       </h1>
     </header>
 
@@ -49,19 +49,19 @@ const { accountsCount, usersCount, inboxesCount, conversationsCount } =
       <div class="report--list">
         <div class="report-card">
           <div class="metric">{{ accountsCount }}</div>
-          <div>{{ 'Accounts' }}</div>
+          <div>{{ 'Contas' }}</div>
         </div>
         <div class="report-card">
           <div class="metric">{{ usersCount }}</div>
-          <div>{{ 'Users' }}</div>
+          <div>{{ 'Usuários' }}</div>
         </div>
         <div class="report-card">
           <div class="metric">{{ inboxesCount }}</div>
-          <div>{{ 'Inboxes' }}</div>
+          <div>{{ 'Caixas de entrada' }}</div>
         </div>
         <div class="report-card">
           <div class="metric">{{ conversationsCount }}</div>
-          <div>{{ 'Conversations' }}</div>
+          <div>{{ 'Conversas' }}</div>
         </div>
       </div>
     </section>

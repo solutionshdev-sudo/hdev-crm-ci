@@ -18,7 +18,14 @@
       "Read(//tmp/**)",
       "Bash(npx eslint *)",
       "Bash(node -e ' *)",
-      "Bash(node -e \"const j=require\\('./app/javascript/dashboard/i18n/locale/pt_BR/login.json'\\); console.log\\(JSON.stringify\\(j.LOGIN.BRAND,null,1\\), j.LOGIN.CARD?JSON.stringify\\(j.LOGIN.CARD,null,1\\):'no CARD', j.LOGIN.FOOTER?JSON.stringify\\(j.LOGIN.FOOTER,null,1\\):''\\)\")"
+      "Bash(node -e \"const j=require\\('./app/javascript/dashboard/i18n/locale/pt_BR/login.json'\\); console.log\\(JSON.stringify\\(j.LOGIN.BRAND,null,1\\), j.LOGIN.CARD?JSON.stringify\\(j.LOGIN.CARD,null,1\\):'no CARD', j.LOGIN.FOOTER?JSON.stringify\\(j.LOGIN.FOOTER,null,1\\):''\\)\")",
+      "Bash(git check-ignore *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(curl -s https://registry.npmjs.org/baileys/latest)",
+      "Bash(curl -s https://registry.npmjs.org/@whiskeysockets%2Fbaileys/latest)",
+      "WebSearch",
+      "Bash(cd \"c:/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Hdev-CRM/hdevCRM\" && echo \"=== outbound.ts ===\"; cat -n ../baileys-service/src/translate/outbound.ts | head -40; echo \"=== whatsapp_phone_source_id ===\"; grep -n -E \"def whatsapp_phone_source_id|def whatsapp_source_id\" -A 8 app/services/whatsapp/incoming_message_identifier_helper.rb; echo \"=== send service ===\"; grep -rn \"source_id\\\\|send_message\" app/services/whatsapp/send_on_whatsapp_service.rb 2>/dev/null || find app -name \"*send_on_whatsapp*\")",
+      "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/baileys-service/src/translate/**)"
     ]
   }
 }
