@@ -55,7 +55,7 @@
       },
       "FIELDS": {
         "CONTENT": "Mensagem",
-        "VARIABLES_HINT": "Use {{contact.name}}, {{vars.nome_da_variavel}} etc.",
+        "VARIABLES_HINT": "Use {'{{'}contact.name{'}}'}, {'{{'}vars.nome_da_variavel{'}}'} etc.",
         "INPUT_TYPE": "Tipo de resposta",
         "INPUT_TYPES": { "BUTTONS": "Botões / opções", "FREE_TEXT": "Texto livre" },
         "OPTIONS": "Opções",
@@ -64,7 +64,7 @@
         "MODE": "Combinar regras",
         "MODE_ALL": "Todas (E)",
         "MODE_ANY": "Qualquer (OU)",
-        "RULE_LEFT": "Valor (ex.: {{vars.resposta}})",
+        "RULE_LEFT": "Valor (ex.: {'{{'}vars.resposta{'}}'})",
         "RULE_RIGHT": "Comparar com",
         "ADD_RULE": "Adicionar regra",
         "VALIDATION": "Validação",

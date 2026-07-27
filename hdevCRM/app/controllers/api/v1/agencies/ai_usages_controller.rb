@@ -1,4 +1,4 @@
-class Api::V1::Agencies::AiUsageController < Api::BaseController
+class Api::V1::Agencies::AiUsagesController < Api::BaseController
   include EnsureAgencyAccess
 
   def show

@@ -345,7 +345,7 @@
           },
           "PROXY": {
             "LABEL": "Proxy (optional)",
-            "PLACEHOLDER": "http://user:pass@host:port or socks5://host:port",
+            "PLACEHOLDER": "http://user:pass{'@'}host:port or socks5://host:port",
             "HELP": "Traffic for this instance goes through this proxy. Leave blank to connect directly."
           },
           "SESSION": {

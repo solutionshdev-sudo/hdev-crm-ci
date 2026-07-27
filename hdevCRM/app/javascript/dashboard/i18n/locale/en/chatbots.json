@@ -55,7 +55,7 @@
       },
       "FIELDS": {
         "CONTENT": "Message",
-        "VARIABLES_HINT": "Use {{contact.name}}, {{vars.variable_name}} etc.",
+        "VARIABLES_HINT": "Use {'{{'}contact.name{'}}'}, {'{{'}vars.variable_name{'}}'} etc.",
         "INPUT_TYPE": "Reply type",
         "INPUT_TYPES": { "BUTTONS": "Buttons / options", "FREE_TEXT": "Free text" },
         "OPTIONS": "Options",
@@ -64,7 +64,7 @@
         "MODE": "Combine rules",
         "MODE_ALL": "All (AND)",
         "MODE_ANY": "Any (OR)",
-        "RULE_LEFT": "Value (e.g. {{vars.answer}})",
+        "RULE_LEFT": "Value (e.g. {'{{'}vars.answer{'}}'})",
         "RULE_RIGHT": "Compare with",
         "ADD_RULE": "Add rule",
         "VALIDATION": "Validation",
