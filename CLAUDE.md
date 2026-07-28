@@ -96,11 +96,21 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **A suíte nunca terminou de rodar, nenhuma vez.** Ela trava: cerca de 10-11 min
-  depois do início do rspec o processo para de escrever no log e fica vivo, parado,
-  até o `timeout-minutes: 90` matar o job. Reproduzido em dois runs, com a mesma
-  última linha nos dois. Qualquer estimativa de "a suíte leva X minutos" é chute —
-  não existe medição. Diagnóstico aberto desde 28/07.
+- **A suíte termina: ~18-19 min de rspec** (medição real de 28/07: 8028 exemplos).
+  O "travamento eterno" era o autoBuild do Vite disparando DENTRO de um spec de
+  request (`vite_javascript_tag` sem manifest) num job sem Node — o vite_ruby
+  captura a saída do build, então o processo ficava mudo esperando stdin até o
+  timeout de 90 min. Por isso o job de rspec instala pnpm, roda `vite build` em
+  passo próprio (falha de asset aparece vermelha no lugar certo; precisa de
+  `NODE_OPTIONS=--max-old-space-size=4096`, como o Dockerfile) e roda o rspec
+  com `< /dev/null`.
+- **O banco de teste precisa nascer limpo de `installation_configs`.** O
+  `db:migrate` roda `ConfigLoader.new.process` de carona
+  (`lib/tasks/db_enhancements.rake`) e semeia ~106 configs; a linha semeada
+  vence o stub de ENV em `GlobalConfigService.load` (lê o DB primeiro) e
+  derruba ~70 exemplos em cascata. O workflow trunca a tabela depois do migrate.
+- **`spec/enterprise` não roda** (`--exclude-pattern`): cobre código que a
+  licença proíbe em produção/revenda; a Fase 3 do de-chatwoot deleta o diretório.
 - **`concurrency: cancel-in-progress: true`** — todo push na `main` executa o run
   anterior. Um `cancelled` no histórico quase sempre é isso, não falha de teste;
   a exceção é o run que morre exatamente em 90 min, que é o timeout. Olhar a

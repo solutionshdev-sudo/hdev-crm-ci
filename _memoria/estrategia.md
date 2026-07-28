@@ -20,6 +20,15 @@ era o deploy. Agora o Ruby é verificado antes, e o JS roda direto nesta máquin
 O CI também é o que regenera o `db/schema.rb` — `db:migrate` em `RAILS_ENV=test`
 redumpa o schema e publica como artifact, sem gastar janela de deploy.
 
+**28/07 (noite): a suíte rspec executa de ponta a ponta pela primeira vez** —
+18min19s, 8028 exemplos. O travamento crônico (90 min mudo até o timeout) era o
+autoBuild do Vite dentro de spec de request num job sem Node; atrás dele, um OOM
+de heap e o seed do ConfigLoader no banco de teste. Conserto no PR #1
+(`ci/rspec-vite-autobuild-hang`). As 340 falhas viraram dívida mapeada:
+239 em `spec/enterprise` (excluído do run — Fase 3 deleta) e ~102 no core,
+~70 delas com causa única (seed) já tratada no CI; o resíduo está em triagem.
+Detalhes operacionais no `CLAUDE.md` (seção CI).
+
 ## Prioridade principal
 
 **Desvincular o Hdev CRM do Chatwoot.** Status detalhado, decisões e armadilhas
