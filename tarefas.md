@@ -6,8 +6,12 @@
 
 ## Agora
 
-- 🔴 **Rodar o deploy com `b0e0ed5`** — o 1º build do redesign falhou no
-  `assets:precompile` (SassCompressor × `rgb(var())`); o fix já está na `main`
+- 🔴 **Rebuild da imagem** pro rename da superfície do widget (Fase 5, 28/07) —
+  restart não basta, o `assets:precompile` só roda no build. Depois: abrir
+  `/widget_tests`, conferir `hdev:ready` no console e a bolha **abrir E fechar**
+  (se abrir e ficar inerte, o prefixo postMessage dessincronizou)
+- ~~Rodar o deploy com `b0e0ed5`~~ — feito em 28/07 (as 9 migrations rodaram,
+  `needs_migration?` → `false`, e o menu Copiloto apareceu)
 - Depois do deploy: testar o console super admin **nos dois temas**, página a
   página (Painel, Contas, Agências, Usuários, Robôs, Apps, Configurações,
   forms de editar/criar, login) — dark tem que valer em tudo, sem string em inglês
@@ -17,16 +21,22 @@
   auto-provisão
 - Rodar no container os specs novos do Baileys (`baileys_session_service_spec`,
   `baileys_controller_spec`) + `vitest` do helper — nada foi executado aqui
-- Definir `DEFAULT_LOCALE=pt_BR` no EasyPanel — sem isso as telas de auth abrem
-  em inglês mesmo com a tradução pronta
+- ~~Definir `DEFAULT_LOCALE=pt_BR` no EasyPanel~~ — desnecessário desde 27/07,
+  `pt_BR` virou o default no código (`application.rb`); o painel abriu em
+  português em 28/07, confirmado
 - Conferir se `INSTALLATION_NAME` continua "Hdev CRM" — prova de que o job de reversão morreu
 
 ## Em espera
 
 - Fase 3: remover `enterprise/` e `spec/enterprise/`, deletar telemetria e banner de update (após 48h estável)
 - Fase 3b: textos e links visíveis (precisa antes: publicar páginas de Termos e Privacidade próprias)
-- Fase 5: rename da superfície do widget (`chatwootSDK`, classes `woot-`, cookies `cw_`)
+- ~~Fase 5: rename da superfície do widget~~ — **feita em 28/07** (globais, eventos,
+  postMessage, localStorage). Classes `woot-` e cookies `cw_` ficaram de fora por
+  decisão: não soletram "chatwoot". Falta rebuild + teste em `/widget_tests`
 - Fase 6: rename dos identificadores internos Ruby + `db:chatwoot_prepare` + feature flags
+  (inclui `window.chatwootConfig`, global do dashboard que a Fase 5 não tocou)
+- Corrigir os dois azuis remanescentes: `Website.vue:21` (`#009CE0`, inbox de site
+  nasce azul) e o default de `Label` (`#1f93ff`)
 - DNS `crm.hdev.online` (registro A no Cloudflare, nuvem cinza) + domínio no EasyPanel
 - SMTP (convites e recuperação de senha não funcionam sem isso)
 - Rotina de backup diário do Postgres (cron no host)

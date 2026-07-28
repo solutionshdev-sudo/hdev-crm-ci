@@ -206,13 +206,55 @@ IA própria. Só `CaptainFeaturable` e o `captain_v2_assistant_model` hardcoded 
 está **fora** de `enterprise/`, então é MIT e reutilizável — cards, playground,
 empty states e gerenciador de documentos. Não redesenhar do zero.
 
+### ✅ Fase 5 — superfície JS do widget (28/07, não deployada)
+
+O gatilho: a tela "Sua caixa de entrada está pronta" mostrava
+`window.chatwootSDK.run(...)` no snippet que a agência cola no site do cliente
+dela. Era o vazamento mais público que restava.
+
+Renomeado sem retrocompatibilidade (o banco tinha zero `Channel::WebWidget`, então
+nenhum widget instalado quebrou): `chatwootSDK`→`hdevSDK`, `$chatwoot`→`$hdev`,
+`chatwootSettings`→`hdevSettings`, `chatwootWebChannel`/`chatwootPubsubToken`,
+prefixo postMessage `chatwoot-widget:`→`hdev-widget:`, eventos `chatwoot:*`→`hdev:*`,
+as 7 constantes `CHATWOOT_*` do `sdkEvents.js`, id do DOM
+`chatwoot_live_chat_widget`, chaves de localStorage `chatwoot_*`, e
+`chatwoot_bot.png`→`hdev_bot.png`. 49 arquivos de código + 57 locales.
+
+**Três coisas que quase passaram e valem lembrar:**
+
+1. **O `WOOT_PREFIX` só era usado pra ler.** As escritas do postMessage eram
+   literais hardcoded em `widget/helpers/utils.js` e nos 3 pontos do
+   `sdk/IFrameHelper.js`. Trocar só a constante faria o widget escrever num
+   prefixo e ler noutro — o iframe abre e nunca responde, sem erro no console.
+2. **`dashboard/routes/dashboard/suspended/Index.vue`** escutava
+   `chatwoot:on-message` do widget de suporte embutido no próprio dashboard —
+   fora do escopo de `sdk/widget/entrypoints`, só apareceu no grep final.
+   Mesma história com `ContactNoteItem.vue`, que referenciava o PNG do bot.
+3. **`sed 's/$chatwoot/.../'` não casa nada** — `$` é âncora de regex e o sed
+   não reclama. Precisa de `\$`.
+
+**Fora de escopo por decisão:** classes `woot-*` (617 refs), cookies `cw_*`, ids
+`cw-widget-holder`/`cw-bubble-holder`/`cw-widget-styles`. Não dizem "chatwoot"
+pra ninguém — churn sem ganho de marca. E `window.chatwootConfig` (global do
+**dashboard**, não do widget) fica pra Fase 6.
+
+**Verificação:** 3.762 testes vitest verdes; as 18 falhas em 6 arquivos
+(`timeHelper`, `availabilityHelpers`, `snoozeHelpers`, `ReportsDataHelper`,
+`useReportMetrics`, `filterHelpers`) são **pré-existentes** — confirmado rodando
+a mesma lista com as mudanças no stash. São testes dependentes de data.
+
+**Falta:** rebuild da imagem no EasyPanel (restart não basta) e o teste manual em
+`/widget_tests` — console deve logar `hdev:ready`, a bolha tem que abrir E fechar
+(se abrir e ficar inerte, o prefixo postMessage dessincronizou), e o avatar do bot
+deve buscar `/assets/images/hdev_bot.png` com 200.
+
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 
 | Fase | O que é | Pré-requisito |
 |---|---|---|
 | **3** | Remover `enterprise/` e `spec/enterprise/` de vez; deletar `lib/chatwoot_hub.rb` e toda a telemetria; remover `UpdateBanner`, changelog card, testimonials | 48h estável com `DISABLE_ENTERPRISE` + o 500 resolvido |
 | **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
-| **5** | Superfície do widget: `window.chatwootSDK`→`hdevSDK`, `$chatwoot`→`$hdev`, classes `woot-*`→`hdev-*` (617 refs), cookies `cw_`→`hd_`, eventos, postMessage, headers `X-Chatwoot-*` | Fases 3 e 4 |
+| **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
 | **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
 
 Plano detalhado com comandos, armadilhas e verificação por fase:

@@ -66,14 +66,41 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 
 - [x] node 24
 - [x] git 2.55 — repo `solutionshdev-sudo/hdev-crm` no GitHub, `main` sincronizada
-- [ ] gh (GitHub CLI) — opcional
+- [x] gh (GitHub CLI) — autenticado; é como se acompanha o CI daqui
+- [x] pnpm 10.2 — via `corepack pnpm` (não está no PATH direto)
 - [ ] playwright — só quando for usar render de carrossel
 - [ ] **ruby / bundler — NÃO instalados nesta máquina**
 - [ ] **docker — NÃO instalado nesta máquina**
 
-**Consequência prática:** nada de Rails roda localmente — nem `rspec`, nem
-`db:migrate`, nem inspecionar o código de uma gem instalada. Tudo que precisa
-executar vai pro terminal do container no EasyPanel. Ao planejar trabalho no
-`hdevCRM/`, assumir que o código sai daqui **sem execução** e que a verificação
-acontece no servidor, depois do deploy. Quando precisar da API de uma gem, ler a
-documentação oficial (WebFetch) em vez de chutar a assinatura.
+**Consequência prática — a verificação tem três níveis, não um:**
+
+1. **JS roda aqui.** `corepack pnpm exec vitest run <caminho>` e
+   `corepack pnpm exec eslint --fix <caminho>` fecham o ciclo em segundos. Use
+   isso antes de empurrar — não gaste rodada de CI com erro de formatação.
+   Instalar as dependências exige `corepack pnpm install --ignore-scripts`: o
+   `prepare` do `package.json` roda `husky install`, herdado do upstream onde o
+   app era a raiz do repo, e aqui o `.git` fica um nível acima de `hdevCRM/`.
+2. **Ruby roda no CI.** Nada de Rails executa localmente — nem `rspec`, nem
+   `db:migrate`, nem inspecionar o código de uma gem instalada. O GitHub Actions
+   é o interpretador Ruby do projeto (ver seção abaixo).
+3. **O produto se verifica no servidor.** Migration aplicada, integração com o
+   WhatsApp, chave da Anthropic: só o terminal do container no EasyPanel responde.
+
+Quando precisar da API de uma gem, ler a documentação oficial (WebFetch) em vez
+de chutar a assinatura.
+
+## CI (`.github/workflows/ci.yml`)
+
+Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
+(rubocop + eslint) e `vitest`. Roda em push na `main`, em PR e sob demanda.
+
+- **É o único interpretador Ruby do projeto.** A imagem de produção apaga
+  `spec/`, então rodar rspec no EasyPanel não é opção.
+- **`workflow_dispatch` aceita um `spec_path`** — use pra iterar num arquivo só
+  em vez de esperar os 813 specs (~45 min a suíte inteira).
+- **Regenera o `db/schema.rb` de graça:** `dump_schema_after_migration` só está
+  desligado em production/staging, então o `db:migrate` em `RAILS_ENV=test`
+  redumpa o schema, publicado como artifact `schema`. Baixar e commitar a mão
+  depois de cada lote de migration — o workflow não escreve na `main`.
+- **`.rubocop_todo.yml`** congela a dívida de estilo herdada (67 ofensas, 33
+  autocorrigíveis com `rubocop -a` no container). O gate vale pra código novo.

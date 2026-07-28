@@ -9,6 +9,17 @@
 Produto no ar (EasyPanel, 26/07/2026) — em processo de desvinculação total do
 Chatwoot antes de abrir pra agências.
 
+## Infra de desenvolvimento (28/07)
+
+**Existe CI**: `.github/workflows/ci.yml`, na raiz do repo. Três jobs — `rspec`,
+`lint` (rubocop + eslint) e `vitest`. Isso muda como o trabalho é planejado:
+antes o código saía daqui sem nunca ter sido executado e a primeira verificação
+era o deploy. Agora o Ruby é verificado antes, e o JS roda direto nesta máquina
+(`corepack pnpm`). Detalhes de uso no `CLAUDE.md`.
+
+O CI também é o que regenera o `db/schema.rb` — `db:migrate` em `RAILS_ENV=test`
+redumpa o schema e publica como artifact, sem gastar janela de deploy.
+
 ## Prioridade principal
 
 **Desvincular o Hdev CRM do Chatwoot.** Status detalhado, decisões e armadilhas
@@ -58,10 +69,28 @@ enterprise (é o que renderiza — view path prepended); installation_config.yml
 fechada (preChat no idioma da conta, links de termos → hdev.online, {min} na
 senha). Pendente: precompile+specs no Docker, teste visual.
 
+**Feito (28/07, Fase 5 antecipada):** rename da superfície JS do widget —
+`chatwootSDK`→`hdevSDK`, `$chatwoot`→`$hdev`, `chatwootSettings`, os globais do
+iframe, o prefixo postMessage, os eventos `chatwoot:*` e as chaves de
+localStorage. 49 arquivos + 57 locales. O gatilho foi o snippet de instalação
+(o que a agência cola no site do cliente dela) ainda dizer `window.chatwootSDK`.
+Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_*` — não
+soletram "chatwoot". Detalhes e armadilhas em `_memoria/de-chatwoot.md`.
+**Pendente:** rebuild + teste manual em `/widget_tests` (o SDK não tem nenhum
+teste unitário; o rename está verificado por grep, não por execução).
+
 **Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
 textos/links visíveis (parte adiantada em 27/07: links de termos do signup e
-remetente de e-mail já apontam pra hdev.online), depois o rename do widget e
-dos identificadores internos.
+remetente de e-mail já apontam pra hdev.online), depois os identificadores
+internos Ruby (Fase 6).
+
+**Dois azuis que sobraram, achados em 28/07 (não corrigidos):**
+- `app/javascript/.../inbox/channels/Website.vue:21` — `channelWidgetColor: '#009CE0'`
+  cravado no estado do componente e sempre enviado no payload, então **inbox de
+  site criada pela UI nasce azul**, ignorando o default verde da coluna. Não é o
+  `#1f93ff` que a migration caçava; é outro azul do Chatwoot.
+- `app/models/label.rb:6` e `app/services/ai/tools/create_labels.rb:57` —
+  etiqueta nova nasce `#1f93ff`.
 
 ## Segunda trilha: features de venda (27/07 — deployadas e validadas)
 
@@ -85,7 +114,7 @@ impede até salvar a regra à mão — `create_deal` fora do `noParamActions` do
 `validations.js`) e o rename "Negócios" → "Kanban". Plano em
 `~/.claude/plans/snug-munching-peach.md`.
 
-**Feito (27/07, sem commit):** a parte de conexão da Rodada 2 — a inbox Baileys
+**Feito (27/07, commit `38ec4fd`):** a parte de conexão da Rodada 2 — a inbox Baileys
 agora mostra e reconecta a sessão **sem recriar a caixa de entrada**. Aba
 própria "Conexão" (a `configuration`, gateada em `isAWhatsAppCloudChannel`,
 mantinha o `<BaileysSession>` inalcançável), polling que não para ao conectar,
@@ -96,6 +125,18 @@ na lista de inboxes e banner acima do campo de resposta pro agente. No backend,
 painel. Plano em `~/.claude/plans/aqui-no-painel-super-bright-hollerith.md`.
 **Pendente:** deploy, teste com chip real (derrubar o container `baileys` e ver
 o selo cair) e rodar os specs novos no container.
+
+**Conserto (28/07):** a feature acima não entregava o que prometia. O `#status`
+do `BaileysSessionService` — que o polling da aba Conexão chama a cada 3-15s —
+**nunca persistia** o `connection_state`; só o webhook e o `logout!` gravavam.
+Consequência: o selo da lista de inboxes e o banner da caixa de resposta ficavam
+no último valor visto pelo webhook — verde para sempre numa inbox cuja instância
+morreu. Agora o polling sincroniza, escrevendo só quando o estado muda. Junto:
+tooltip da lista usa `STATUS_SINCE` (o campo é quando o estado *mudou*, não
+quando foi lido), refetch de inboxes com freio de 30s e o comentário do
+`MAX_POLL_FAILURES` corrigido (~75s em repouso, não ~15s). **O teste que
+importa** é derrubar a sessão pelo celular e conferir que o selo da *lista*
+também fica vermelho.
 
 **Feito (27/07, commit `096daf3`):** polish UX do canvas do chatbot estilo Make —
 duplo-clique abre config, drag threshold, snap-to-grid, arestas animadas,
@@ -132,10 +173,27 @@ super admin. **Nada foi executado** — sem Ruby nem Docker na máquina.
 - Override de chave por agência **descartado**: `Agency#global_config_overrides`
   é hash hardcoded de branding, não store livre. O rateio é por quota.
 
-**Próximo:** copiloto admin (item 5 — configurar CRM por linguagem natural com
-preview do diff antes de aplicar), depois multi-provider, depois remover
-`enterprise/`. RAG só quando um cliente reclamar que o bot não conhece o produto
-dele — pgvector já está habilitado.
+**Feito (28/07, commits `0bb5c2c`+`e90bcd1`):** o copiloto admin (item 5).
+`POST /copilot` roda o `ToolLoop` com savepoint por chamada — as ferramentas
+rodam de verdade e o banco é desfeito, então a validação do preview é a real e
+nenhuma tool precisa saber que está em preview. `POST /copilot/apply` reexecuta
+os changes numa transação única (tudo ou nada), sem passar pelo modelo de novo.
+Quatro tools novas no `SETS[:copilot]`: `criar_funil`, `criar_etiquetas`,
+`definir_horario_atendimento`, `vincular_chatbot_a_inbox`. Modelo `claude-opus-5`
+(thinking ligado por padrão divide o `max_tokens` com a resposta — daí o teto de
+8192). Tela em Configurações → Copiloto, com `meta.permissions: administrator`.
+
+**Decisão que mudou na implementação:** não há componente de renderização de
+diff. O backend já devolve `result` como frase pronta em português
+(`Funil "X" com as etapas: A → B → C.`), então o preview é uma `<ul>` de strings
+— e o próprio preview é a confirmação, sem modal, porque o backend garante que
+nada foi gravado. **Deployado em 28/07** — o item "Copiloto" já aparece no menu
+de Configurações. **Pendente:** o teste ponta a ponta (é o único ponto que valida
+o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
+
+**Próximo:** multi-provider, depois remover `enterprise/`. RAG só quando um
+cliente reclamar que o bot não conhece o produto dele — pgvector já está
+habilitado.
 
 ## O que pode esperar
 
@@ -154,15 +212,15 @@ dele — pgvector já está habilitado.
   links de e-mail saem quebrados até criar o registro A no Cloudflare.
 - SMTP não configurado: convites de agente e recuperação de senha não saem.
 - Backup do Postgres feito manualmente uma vez; falta a rotina de cron.
-- `db/schema.rb` do repo desatualizado (parou em `2026_07_21_000003`, sem as
-  tabelas de chatbot/kanban) — **9 migrations pendentes** nunca rodadas:
-  `20260726120000` (única que escreve em dado existente: troca widgets do azul
-  Chatwoot pro verde HDEV, e o `down` não reverte os registros) e
-  `20260727000001..8` (tabelas de chatbot e deal, puramente aditivas). O deploy
-  roda tudo sozinho (`db:chatwoot_prepare` → `db:migrate`, que está *enhanced*
-  pra chamar o `ConfigLoader` logo depois), mas **fazer backup do Postgres
-  antes**. Depois regenerar o `schema.rb` no container web e comitar — sem isso
-  os specs de IA não rodam, porque carregam do schema.
+- ~~9 migrations pendentes em produção~~ — **aplicadas em 28/07**. Confirmado no
+  container: `needs_migration?` → `false` e as 8 tabelas de chatbot/deal existem.
+  O `db/schema.rb` já tinha sido regenerado pelo CI e commitado
+  (`2026_07_21_000003` → `2026_07_27_000008`) — era o que travava a suíte, porque
+  `maintain_test_schema!` dá `exit 1` com migration pendente.
+  **Detalhe que a verificação revelou:** `Channel::WebWidget.group(:widget_color).count`
+  voltou `{}` — não existia **nenhum** widget no banco, então o backfill da
+  `20260726120000` não tocou em linha alguma. É o que autorizou o rename da
+  superfície JS sem retrocompatibilidade (nada instalado pra quebrar).
 - 2 instâncias zumbis do baileys no volume (`0ed2d284-…` e `685e21f5-…`, de
   canais deletados) ficam martelando registro no WhatsApp — limpar via
   `DELETE /instances/:id` (comandos na memória da sessão).

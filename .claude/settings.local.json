@@ -43,7 +43,19 @@
       "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" diff --stat)",
       "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" log --oneline -3)",
       "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" status -sb)",
-      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" diff -- hdevCRM/app/javascript/dashboard/routes/dashboard/settings/inbox/Settings.vue)"
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" diff -- hdevCRM/app/javascript/dashboard/routes/dashboard/settings/inbox/Settings.vue)",
+      "Bash(gh api *)",
+      "Bash(xargs sed -i -e s/CHATWOOT_ERROR/HDEV_ERROR/g -e s/CHATWOOT_ON_MESSAGE/HDEV_ON_MESSAGE/g -e s/CHATWOOT_ON_START_CONVERSATION/HDEV_ON_START_CONVERSATION/g -e s/CHATWOOT_POSTBACK/HDEV_POSTBACK/g -e s/CHATWOOT_READY/HDEV_READY/g -e s/CHATWOOT_OPENED/HDEV_OPENED/g -e s/CHATWOOT_CLOSED/HDEV_CLOSED/g)",
+      "Bash(xargs sed -i 's/chatwoot-widget:/hdev-widget:/g')",
+      "Bash(xargs sed -i 's/\\\\$chatwoot/$hdev/g')",
+      "Bash(tee /dev/stderr)",
+      "Bash(xargs sed -i 's/chatwootSettings/hdevSettings/g')",
+      "Bash(xargs sed -i 's/chatwootSDK/hdevSDK/g')",
+      "Bash(xargs sed -i -e 's/chatwootWebChannel/hdevWebChannel/g' -e 's/chatwootPubsubToken/hdevPubsubToken/g')",
+      "Bash(xargs sed -i 's/initializeChatwootEvents/initializeHdevEvents/g')",
+      "Bash(xargs sed -i 's/chatwoot_/hdev_/g')",
+      "Bash(git mv *)",
+      "Bash(corepack pnpm *)"
     ]
   },
   "hooks": {

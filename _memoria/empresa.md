@@ -9,7 +9,7 @@
 **Perfil:** Solopreneur / dev solo
 **Atende clientes:** Agências (o comprador é a agência; o usuário final é o cliente da agência)
 **Equipe:** Toca sozinho
-**Ferramentas:** node 24 ✓, git 2.55 ✓ (repo `solutionshdev-sudo/hdev-crm` no GitHub, branch main), gh ✗ (opcional), playwright não checado
+**Ferramentas:** node 24 ✓, git 2.55 ✓ (repo `solutionshdev-sudo/hdev-crm` no GitHub, branch main), gh ✓ (autenticado — é como se acompanha o CI), pnpm 10.2 ✓ (via corepack), playwright não checado. Ruby e Docker ✗ — o GitHub Actions faz o papel de interpretador Ruby
 **Infra:** EasyPanel (VPS 8 GB) — instância no ar em `hdev-crm-app-crm.jz4bvz.easypanel.host` desde 26/07/2026; domínio próprio `crm.hdev.online` ainda pendente de DNS. Segundo serviço no compose: `baileys-service` (Node, WhatsApp não-oficial, rede interna, env `BAILEYS_API_KEY`)
 **Principais entregas:** A plataforma HDEV CRM (fork do Chatwoot em `hdevCRM/`) e os planos de revenda pras agências. Diferenciais em produção desde 27/07: WhatsApp não-oficial via QR (Baileys 7, proxy por instância) **funcionando ponta a ponta** (recebe/envia, validado com chip real), construtor visual de chatbot e kanban de Negócios (card automático chega na rodada 2 — regra de fábrica planejada)
 
@@ -19,4 +19,4 @@
 - O núcleo do Chatwoot é MIT (pode ser vendido); o diretório `enterprise/` tem licença que proíbe revenda — por isso o produto roda em modo Community, e as features enterprise que importarem serão reconstruídas com código próprio.
 - Modelo de negócio inicial: white-label pra agências. Estrutura de planos ainda em definição.
 - Existe no fork um modelo `Agency` (feature própria, não do Chatwoot) que já aplica marca e cor por agência via domínio customizado.
-- **IA própria (commitada em 27/07, ainda NÃO deployada):** substituta MIT do Captain em `app/services/ai/` — agente de atendimento, tool calling e geração de fluxo de chatbot por linguagem natural, com quota de tokens por conta e por agência (base do rateio nos planos de revenda). Vira diferencial de venda quando o deploy confirmar. Detalhes na terceira trilha do `_memoria/estrategia.md`.
+- **IA própria (deployada em 28/07, ainda não validada em uso):** substituta MIT do Captain em `app/services/ai/` — agente de atendimento, tool calling e geração de fluxo de chatbot por linguagem natural, com quota de tokens por conta e por agência (base do rateio nos planos de revenda). O copiloto admin já aparece em Configurações → Copiloto (só pra administrador). Falta o teste ponta a ponta, que é o único ponto que valida o id do modelo `claude-opus-5` — os specs stubam o `Ai::AnthropicService` inteiro. Detalhes na terceira trilha do `_memoria/estrategia.md`.
