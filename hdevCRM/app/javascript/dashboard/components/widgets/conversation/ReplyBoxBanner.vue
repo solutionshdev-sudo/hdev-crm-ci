@@ -40,7 +40,8 @@ const currentInbox = computed(() =>
 // aviso o agente só descobre quando a mensagem falha.
 const showWhatsappDisconnectedBanner = computed(
   () =>
-    isBaileysInbox(currentInbox.value) && !isBaileysConnected(currentInbox.value)
+    isBaileysInbox(currentInbox.value) &&
+    !isBaileysConnected(currentInbox.value)
 );
 
 const goToInboxSettings = () => {

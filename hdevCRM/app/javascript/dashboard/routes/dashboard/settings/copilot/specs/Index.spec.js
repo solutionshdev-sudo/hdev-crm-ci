@@ -29,7 +29,11 @@ describe('Copilot Index', () => {
       data: {
         reply: 'Confirma?',
         changes: [
-          { name: 'create_deal_pipeline', input: {}, result: 'Funil "Vendas".' },
+          {
+            name: 'create_deal_pipeline',
+            input: {},
+            result: 'Funil "Vendas".',
+          },
           { name: 'create_labels', input: {}, result: 'Etiquetas: novo.' },
         ],
       },
@@ -59,6 +63,8 @@ describe('Copilot Index', () => {
     await flushPromises();
 
     expect(CopilotAPI.apply).toHaveBeenCalledWith(changes);
-    expect(wrapper.find('[data-test-id="copilot-change"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test-id="copilot-change"]').exists()).toBe(
+      false
+    );
   });
 });

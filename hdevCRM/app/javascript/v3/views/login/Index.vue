@@ -397,7 +397,10 @@ export default {
           />
         </form>
 
-        <p v-if="showSignupLink" class="mt-6 text-sm text-center text-n-slate-11">
+        <p
+          v-if="showSignupLink"
+          class="mt-6 text-sm text-center text-n-slate-11"
+        >
           {{ $t('LOGIN.NO_ACCOUNT') }}
           <router-link
             to="auth/signup"

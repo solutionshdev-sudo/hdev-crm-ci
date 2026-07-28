@@ -15,6 +15,7 @@
       "INSTALLATION_NAME": "Nome do painel",
       "PRIMARY_COLOR": "Cor primária",
       "CUSTOM_DOMAIN": "Domínio do painel",
+      "CUSTOM_DOMAIN_PLACEHOLDER": "painel.suaagencia.com",
       "BRAND_URL": "URL do site",
       "TERMS_URL": "URL dos termos de uso",
       "PRIVACY_URL": "URL da política de privacidade",

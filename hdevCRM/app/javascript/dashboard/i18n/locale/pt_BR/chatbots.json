@@ -86,6 +86,7 @@
         "TEAM": "Equipe",
         "AGENT": "Agente",
         "TAGS_ADD": "Adicionar etiquetas (separadas por vírgula)",
+        "TAGS_ADD_PLACEHOLDER": "vip, lead-quente",
         "TAGS_REMOVE": "Remover etiquetas",
         "METHOD": "Método",
         "AI_PROMPT": "Instruções para a IA",

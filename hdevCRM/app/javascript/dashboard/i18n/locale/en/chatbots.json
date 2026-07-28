@@ -86,6 +86,7 @@
         "TEAM": "Team",
         "AGENT": "Agent",
         "TAGS_ADD": "Add labels (comma separated)",
+        "TAGS_ADD_PLACEHOLDER": "vip, hot-lead",
         "TAGS_REMOVE": "Remove labels",
         "METHOD": "Method",
         "AI_PROMPT": "AI instructions",

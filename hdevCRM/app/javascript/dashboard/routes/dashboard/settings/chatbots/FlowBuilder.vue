@@ -12,7 +12,12 @@ import { Background } from '@vue-flow/background';
 import '@vue-flow/core/dist/style.css';
 import FlowNode from './flow/FlowNode.vue';
 import FlowInspector from './flow/FlowInspector.vue';
-import { NODE_TYPES, PALETTE_TYPES, emptyFlow, newNodeId } from './flow/nodeTypes';
+import {
+  NODE_TYPES,
+  PALETTE_TYPES,
+  emptyFlow,
+  newNodeId,
+} from './flow/nodeTypes';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 
 const store = useStore();

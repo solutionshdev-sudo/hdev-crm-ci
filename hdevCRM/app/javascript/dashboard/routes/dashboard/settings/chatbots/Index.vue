@@ -32,7 +32,11 @@ const createChatbot = async () => {
   if (!name.value.trim()) return;
   try {
     const chatbot = await store.dispatch('chatbots/create', {
-      chatbot: { name: name.value.trim(), description: description.value, flow: emptyFlow() },
+      chatbot: {
+        name: name.value.trim(),
+        description: description.value,
+        flow: emptyFlow(),
+      },
       inbox_ids: inboxIds.value,
     });
     showModal.value = false;
@@ -140,7 +144,12 @@ onMounted(() => {
           @click="toggle(chatbot)"
         />
         <NextButton ghost slate icon="i-lucide-copy" @click="clone(chatbot)" />
-        <NextButton ghost ruby icon="i-lucide-trash-2" @click="remove(chatbot)" />
+        <NextButton
+          ghost
+          ruby
+          icon="i-lucide-trash-2"
+          @click="remove(chatbot)"
+        />
       </div>
     </div>
 
@@ -171,7 +180,12 @@ onMounted(() => {
             :label="t('CHATBOTS.FORM.CANCEL')"
             @click="showModal = false"
           />
-          <NextButton type="submit" solid blue :label="t('CHATBOTS.FORM.CREATE')" />
+          <NextButton
+            type="submit"
+            solid
+            blue
+            :label="t('CHATBOTS.FORM.CREATE')"
+          />
         </div>
       </form>
     </woot-modal>

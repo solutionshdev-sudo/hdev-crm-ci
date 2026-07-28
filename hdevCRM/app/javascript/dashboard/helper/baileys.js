@@ -25,8 +25,7 @@ export const isBaileysInbox = inbox =>
 
 export const baileysStatus = inbox => inbox?.connection_state || DEFAULT_STATUS;
 
-export const isBaileysConnected = inbox =>
-  baileysStatus(inbox) === 'connected';
+export const isBaileysConnected = inbox => baileysStatus(inbox) === 'connected';
 
 export const baileysStatusLabelKey = (status = DEFAULT_STATUS) =>
   `INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.STATUS.${(

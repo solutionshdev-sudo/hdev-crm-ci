@@ -63,7 +63,13 @@ export const NODE_TYPES = {
     icon: 'i-lucide-user-round',
     color: '#E5484D',
     handles: [],
-    data: () => ({ message: '', note: '', assign_to: 'none', team_id: null, agent_id: null }),
+    data: () => ({
+      message: '',
+      note: '',
+      assign_to: 'none',
+      team_id: null,
+      agent_id: null,
+    }),
   },
   tag: {
     icon: 'i-lucide-tags',
@@ -87,7 +93,12 @@ export const NODE_TYPES = {
     icon: 'i-lucide-circle-dollar-sign',
     color: '#00875A',
     handles: ['out'],
-    data: () => ({ pipeline_id: null, stage_id: null, title_template: '', value_template: '' }),
+    data: () => ({
+      pipeline_id: null,
+      stage_id: null,
+      title_template: '',
+      value_template: '',
+    }),
   },
   end: {
     icon: 'i-lucide-flag',

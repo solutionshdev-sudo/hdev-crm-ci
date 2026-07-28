@@ -16,6 +16,10 @@ const emit = defineEmits(['remove']);
 
 const { t } = useI18n();
 
+// Sintaxe de interpolação do próprio chatbot, não texto de UI — fica no script
+// pra não ser confundido com string traduzível dentro do template.
+const TITLE_TEMPLATE_EXAMPLE = '{{contact.name}}';
+
 const teams = useMapGetter('teams/getTeams');
 const agents = useMapGetter('agents/getAgents');
 const pipelines = useMapGetter('dealPipelines/getPipelines');
@@ -70,7 +74,16 @@ const OPERATORS = [
   'matches_regex',
 ];
 
-const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 'regex'];
+const VALIDATIONS = [
+  'none',
+  'email',
+  'phone',
+  'number',
+  'date',
+  'cpf',
+  'cnpj',
+  'regex',
+];
 </script>
 
 <template>
@@ -153,8 +166,12 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.MODE') }}
         <select v-model="data.mode">
-          <option value="all">{{ t('CHATBOTS.BUILDER.FIELDS.MODE_ALL') }}</option>
-          <option value="any">{{ t('CHATBOTS.BUILDER.FIELDS.MODE_ANY') }}</option>
+          <option value="all">
+            {{ t('CHATBOTS.BUILDER.FIELDS.MODE_ALL') }}
+          </option>
+          <option value="any">
+            {{ t('CHATBOTS.BUILDER.FIELDS.MODE_ANY') }}
+          </option>
         </select>
       </label>
       <div class="flex flex-col gap-2">
@@ -170,7 +187,11 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
             :placeholder="t('CHATBOTS.BUILDER.FIELDS.RULE_LEFT')"
           />
           <select v-model="rule.operator" class="!mb-0">
-            <option v-for="operator in OPERATORS" :key="operator" :value="operator">
+            <option
+              v-for="operator in OPERATORS"
+              :key="operator"
+              :value="operator"
+            >
               {{ t(`CHATBOTS.BUILDER.OPERATORS.${operator.toUpperCase()}`) }}
             </option>
           </select>
@@ -206,7 +227,11 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.VALIDATION') }}
         <select v-model="data.validation">
-          <option v-for="validation in VALIDATIONS" :key="validation" :value="validation">
+          <option
+            v-for="validation in VALIDATIONS"
+            :key="validation"
+            :value="validation"
+          >
             {{ t(`CHATBOTS.BUILDER.VALIDATIONS.${validation.toUpperCase()}`) }}
           </option>
         </select>
@@ -218,9 +243,15 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO') }}
         <select v-model="data.map_to">
-          <option value="">{{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_NONE') }}</option>
-          <option value="contact.name">{{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_NAME') }}</option>
-          <option value="contact.email">{{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_EMAIL') }}</option>
+          <option value="">
+            {{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_NONE') }}
+          </option>
+          <option value="contact.name">
+            {{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_NAME') }}
+          </option>
+          <option value="contact.email">
+            {{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_EMAIL') }}
+          </option>
           <option value="contact.phone_number">
             {{ t('CHATBOTS.BUILDER.FIELDS.MAP_TO_PHONE') }}
           </option>
@@ -257,9 +288,15 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_TO') }}
         <select v-model="data.assign_to">
-          <option value="none">{{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_NONE') }}</option>
-          <option value="team">{{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_TEAM') }}</option>
-          <option value="agent">{{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_AGENT') }}</option>
+          <option value="none">
+            {{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_NONE') }}
+          </option>
+          <option value="team">
+            {{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_TEAM') }}
+          </option>
+          <option value="agent">
+            {{ t('CHATBOTS.BUILDER.FIELDS.ASSIGN_AGENT') }}
+          </option>
         </select>
       </label>
       <label v-if="data.assign_to === 'team'">
@@ -284,7 +321,11 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
     <template v-if="node.type === 'tag'">
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.TAGS_ADD') }}
-        <input v-model="addTags" type="text" placeholder="vip, lead-quente" />
+        <input
+          v-model="addTags"
+          type="text"
+          :placeholder="t('CHATBOTS.BUILDER.FIELDS.TAGS_ADD_PLACEHOLDER')"
+        />
       </label>
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.TAGS_REMOVE') }}
@@ -324,7 +365,11 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.PIPELINE') }}
         <select v-model="data.pipeline_id">
-          <option v-for="pipeline in pipelines" :key="pipeline.id" :value="pipeline.id">
+          <option
+            v-for="pipeline in pipelines"
+            :key="pipeline.id"
+            :value="pipeline.id"
+          >
             {{ pipeline.name }}
           </option>
         </select>
@@ -332,14 +377,22 @@ const VALIDATIONS = ['none', 'email', 'phone', 'number', 'date', 'cpf', 'cnpj', 
       <label v-if="selectedPipeline">
         {{ t('CHATBOTS.BUILDER.FIELDS.STAGE') }}
         <select v-model="data.stage_id">
-          <option v-for="stage in selectedPipeline.stages" :key="stage.id" :value="stage.id">
+          <option
+            v-for="stage in selectedPipeline.stages"
+            :key="stage.id"
+            :value="stage.id"
+          >
             {{ stage.name }}
           </option>
         </select>
       </label>
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.DEAL_TITLE') }}
-        <input v-model="data.title_template" type="text" placeholder="{{contact.name}}" />
+        <input
+          v-model="data.title_template"
+          type="text"
+          :placeholder="TITLE_TEMPLATE_EXAMPLE"
+        />
       </label>
       <label>
         {{ t('CHATBOTS.BUILDER.FIELDS.DEAL_VALUE') }}

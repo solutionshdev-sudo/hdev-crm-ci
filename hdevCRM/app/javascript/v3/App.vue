@@ -79,7 +79,9 @@ body {
    reads as active. */
 .auth-cta:not(:disabled) {
   box-shadow: 0 10px 28px -12px rgb(var(--blue-9) / 0.75);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 .auth-cta:not(:disabled):hover {
   box-shadow: 0 12px 32px -12px rgb(var(--blue-9) / 0.9);

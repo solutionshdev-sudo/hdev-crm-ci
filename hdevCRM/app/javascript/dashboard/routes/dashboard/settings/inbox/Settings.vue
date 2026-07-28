@@ -849,7 +849,9 @@ export default {
             $t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_BANNER')
           "
           :action-label="
-            $t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_BANNER_ACTION')
+            $t(
+              'INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_BANNER_ACTION'
+            )
           "
           @reauthorize="openWhatsAppSessionTab"
         />

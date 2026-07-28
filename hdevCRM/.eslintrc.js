@@ -117,6 +117,15 @@ module.exports = {
           '\u2014',
           '\u2212',
           '|',
+          // Tokens t\u00e9cnicos e s\u00edmbolos que n\u00e3o se traduzem: verbos HTTP, o
+          // r\u00f3tulo "URL", exemplos de placeholder que s\u00e3o sintaxe, e o cifr\u00e3o.
+          '\u00a9',
+          'US$',
+          'POST',
+          'GET',
+          'URL',
+          'https://...',
+          '0',
         ],
         attributes: {
           '/.+/': [

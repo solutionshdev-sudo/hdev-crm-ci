@@ -92,8 +92,7 @@ const brandLogo = computed(
      top-right, and a sheen along the top edge to keep the panel from going
      flat where the logo sits. */
   background-color: #0f172a;
-  background-image:
-    radial-gradient(
+  background-image: radial-gradient(
       68% 52% at 6% 76%,
       rgb(var(--blue-9) / 0.6) 0%,
       transparent 62%

@@ -46,6 +46,9 @@ describe('useAutomation', () => {
         'labels/getLabels': labels,
         'teams/getTeams': teams,
         'sla/getSLA': slaPolicies,
+        // move_deal_stage entrou nas automações depois deste mock; sem a chave
+        // o dealStages recebe undefined e o flatMap estoura.
+        'dealPipelines/getPipelines': [],
       };
       return { value: getterMap[getter] };
     });

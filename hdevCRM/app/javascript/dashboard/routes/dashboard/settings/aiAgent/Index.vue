@@ -9,7 +9,11 @@ import NextButton from 'dashboard/components-next/button/Button.vue';
 const { t } = useI18n();
 
 const DEFAULT_MODEL = 'claude-opus-4-8';
-const MODEL_OPTIONS = ['claude-opus-4-8', 'claude-sonnet-5', 'claude-haiku-4-5'];
+const MODEL_OPTIONS = [
+  'claude-opus-4-8',
+  'claude-sonnet-5',
+  'claude-haiku-4-5',
+];
 
 const config = reactive({
   ai_agent_enabled: false,

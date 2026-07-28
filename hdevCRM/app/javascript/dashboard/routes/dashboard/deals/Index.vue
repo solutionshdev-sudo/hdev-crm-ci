@@ -149,10 +149,7 @@ onMounted(async () => {
       />
     </woot-modal>
 
-    <woot-modal
-      :show="Boolean(openDeal)"
-      :on-close="() => (openDeal = null)"
-    >
+    <woot-modal :show="Boolean(openDeal)" :on-close="() => (openDeal = null)">
       <template v-if="openDeal">
         <woot-modal-header :header-title="openDeal.title" />
         <DealForm

@@ -5,6 +5,9 @@ import { Handle, Position } from '@vue-flow/core';
 import { NODE_TYPES, outputHandles } from './nodeTypes';
 
 const props = defineProps({
+  // Declarado só pra não cair em $attrs e virar atributo id no DOM — o VueFlow
+  // passa a prop pra todo node, usada ou não.
+  // eslint-disable-next-line vue/no-unused-properties
   id: {
     type: String,
     required: true,
@@ -33,9 +36,7 @@ const handles = computed(() =>
 
 const handleLabel = handle => {
   if (props.type === 'question') {
-    const option = (props.data.options || []).find(
-      item => item.id === handle
-    );
+    const option = (props.data.options || []).find(item => item.id === handle);
     if (option) return option.title;
   }
   const key = `CHATBOTS.BUILDER.HANDLES.${handle.toUpperCase()}`;
@@ -74,7 +75,11 @@ const summary = computed(() => {
       class="flex items-center gap-2 px-3 py-2 rounded-t-xl"
       :style="{ backgroundColor: `${config.color}22` }"
     >
-      <span :class="config.icon" class="size-4" :style="{ color: config.color }" />
+      <span
+        :class="config.icon"
+        class="size-4"
+        :style="{ color: config.color }"
+      />
       <span class="text-xs font-semibold text-n-slate-12">
         {{ t(`CHATBOTS.BUILDER.NODES.${type.toUpperCase()}`) }}
       </span>
@@ -98,8 +103,7 @@ const summary = computed(() => {
           :id="handle"
           type="source"
           :position="Position.Right"
-          class="!bg-n-slate-9 !w-3.5 !h-3.5 after:absolute after:-inset-2 after:content-['']"
-          :style="{ right: '-16px' }"
+          class="!-right-4 !bg-n-slate-9 !w-3.5 !h-3.5 after:absolute after:-inset-2 after:content-['']"
         />
       </div>
     </div>

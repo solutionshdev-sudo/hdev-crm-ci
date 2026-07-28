@@ -21,7 +21,9 @@ export default {
     {
       // Builder em tela cheia, fora do SettingsWrapper — o canvas precisa da
       // área toda. Lazy: o chunk do @vue-flow só carrega aqui.
-      path: frontendURL('accounts/:accountId/settings/chatbots/:chatbotId/builder'),
+      path: frontendURL(
+        'accounts/:accountId/settings/chatbots/:chatbotId/builder'
+      ),
       name: 'chatbots_builder',
       meta: {
         permissions: ['administrator'],

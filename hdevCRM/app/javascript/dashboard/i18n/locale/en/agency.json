@@ -15,6 +15,7 @@
       "INSTALLATION_NAME": "Panel name",
       "PRIMARY_COLOR": "Primary color",
       "CUSTOM_DOMAIN": "Panel domain",
+      "CUSTOM_DOMAIN_PLACEHOLDER": "panel.youragency.com",
       "BRAND_URL": "Website URL",
       "TERMS_URL": "Terms of service URL",
       "PRIVACY_URL": "Privacy policy URL",

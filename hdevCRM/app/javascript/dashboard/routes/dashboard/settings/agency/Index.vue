@@ -127,7 +127,10 @@ onMounted(fetchAll);
       </p>
     </div>
 
-    <div v-if="loaded && !agency" class="p-6 text-sm border rounded-xl border-n-weak text-n-slate-11">
+    <div
+      v-if="loaded && !agency"
+      class="p-6 text-sm border rounded-xl border-n-weak text-n-slate-11"
+    >
       {{ t('AGENCY_SETTINGS.EMPTY_STATE') }}
     </div>
 
@@ -213,7 +216,9 @@ onMounted(fetchAll);
             </span>
             <input
               v-model="branding.custom_domain"
-              placeholder="painel.suaagencia.com"
+              :placeholder="
+                t('AGENCY_SETTINGS.BRANDING.CUSTOM_DOMAIN_PLACEHOLDER')
+              "
               class="w-full px-3 py-2 text-sm border rounded-lg outline-none border-n-weak bg-n-background text-n-slate-12"
             />
           </label>

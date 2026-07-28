@@ -31,7 +31,9 @@ const rules = {
 };
 const v$ = useVuelidate(rules, { inboxName, phoneNumber });
 
-const canSubmit = computed(() => riskAccepted.value && !uiFlags.value.isCreating);
+const canSubmit = computed(
+  () => riskAccepted.value && !uiFlags.value.isCreating
+);
 
 const createChannel = async () => {
   v$.value.$touch();
@@ -54,9 +56,7 @@ const createChannel = async () => {
     });
     createdInbox.value = inbox;
   } catch (error) {
-    useAlert(
-      error.message || t('INBOX_MGMT.ADD.WHATSAPP.API.ERROR_MESSAGE')
-    );
+    useAlert(error.message || t('INBOX_MGMT.ADD.WHATSAPP.API.ERROR_MESSAGE'));
   }
 };
 
@@ -136,7 +136,9 @@ const finishWizard = () => {
           <input
             v-model="proxyUrl"
             type="text"
-            :placeholder="t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.PROXY.PLACEHOLDER')"
+            :placeholder="
+              t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.PROXY.PLACEHOLDER')
+            "
           />
           <span class="text-xs text-n-slate-11">
             {{ t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.PROXY.HELP') }}

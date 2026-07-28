@@ -19,11 +19,6 @@ defaults:
   run:
     working-directory: hdevCRM
 
-env:
-  # O `prepare` do package.json roda `husky install`, que precisa do .git no cwd
-  # — e o cwd aqui é hdevCRM/, não a raiz. Hook de commit não serve pra nada no CI.
-  HUSKY: '0'
-
 jobs:
   backend:
     name: rspec
@@ -118,7 +113,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: hdevCRM/pnpm-lock.yaml
 
-      - run: pnpm install --frozen-lockfile
+      # --ignore-scripts: o "prepare" do package.json roda "husky install", herdado
+      # do upstream onde o app era a raiz do repo. Aqui o .git fica um nivel acima
+      # de hdevCRM/ e o husky aborta. Os hooks nao servem pra nada no CI mesmo.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: eslint
         run: pnpm run eslint
@@ -140,7 +138,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: hdevCRM/pnpm-lock.yaml
 
-      - run: pnpm install --frozen-lockfile
+      # --ignore-scripts: o "prepare" do package.json roda "husky install", herdado
+      # do upstream onde o app era a raiz do repo. Aqui o .git fica um nivel acima
+      # de hdevCRM/ e o husky aborta. Os hooks nao servem pra nada no CI mesmo.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: vitest
         run: pnpm test
