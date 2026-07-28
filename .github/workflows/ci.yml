@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      spec_path:
+        description: 'Caminho do spec a rodar (vazio = suite inteira). Ex: spec/services/ai/copilot_service_spec.rb:42'
+        required: false
+        default: ''
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: hdevCRM
+
+jobs:
+  backend:
+    name: rspec
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    services:
+      postgres:
+        # pgvector, nao postgres puro: schema.rb tem enable_extension "vector"
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: chatwoot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      RAILS_ENV: test
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: '5432'
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: chatwoot_test
+      REDIS_URL: redis://localhost:6379
+      SECRET_KEY_BASE: ci-secret-key-base-not-a-real-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: hdevCRM
+          bundler-cache: true
+
+      # db:schema:load ANTES do migrate: migrar do zero rodaria ~800 migrations
+      # desde 2019, varias referenciando modelos que nao existem mais.
+      - name: Preparar banco
+        run: bundle exec rake db:create db:schema:load db:migrate
+
+      # dump_schema_after_migration so esta desligado em production/staging,
+      # entao o migrate acima regenera o schema.rb. Baixar e commitar a mao.
+      - name: Publicar schema.rb regenerado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema
+          path: hdevCRM/db/schema.rb
+
+      - name: rspec
+        env:
+          SPEC_PATH: ${{ github.event.inputs.spec_path }}
+        # sem aspas de proposito: vazio precisa sumir e virar "suite inteira"
+        run: bundle exec rspec $SPEC_PATH --tag '~opensearch'
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: hdevCRM
+          bundler-cache: true
+
+      - name: rubocop
+        run: bundle exec rubocop --parallel
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.2.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+          cache-dependency-path: hdevCRM/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: eslint
+        run: pnpm run eslint
+
+  frontend:
+    name: vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.2.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+          cache-dependency-path: hdevCRM/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: vitest
+        run: pnpm test
