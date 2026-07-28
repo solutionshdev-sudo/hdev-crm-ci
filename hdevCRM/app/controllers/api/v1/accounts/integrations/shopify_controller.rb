@@ -6,7 +6,7 @@ class Api::V1::Accounts::Integrations::ShopifyController < Api::V1::Accounts::Ba
 
   def auth
     shop_domain = params[:shop_domain]
-    return render json: { error: 'Shop domain is required' }, status: :unprocessable_entity if shop_domain.blank?
+    return render json: { error: I18n.t('errors.api.integrations.shopify.domain_required') }, status: :unprocessable_entity if shop_domain.blank?
 
     state = generate_shopify_token(Current.account.id)
 
@@ -105,7 +105,7 @@ class Api::V1::Accounts::Integrations::ShopifyController < Api::V1::Accounts::Ba
   def validate_contact
     return unless contact.blank? || (contact.email.blank? && contact.phone_number.blank?)
 
-    render json: { error: 'Contact information missing' },
+    render json: { error: I18n.t('errors.api.integrations.shopify.contact_missing') },
            status: :unprocessable_entity
   end
 end

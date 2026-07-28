@@ -17,13 +17,13 @@ class DataImports::Intercom::CredentialsValidator
   private
 
   def validate_parameters!
-    raise ArgumentError, 'Intercom access key is required.' if @access_token.blank?
-    raise ArgumentError, 'Select at least one data type to import.' if @import_types.blank?
+    raise ArgumentError, I18n.t('errors.api.data_import.access_key_required') if @access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.data_import.import_type_required') if @import_types.blank?
 
     invalid_types = @import_types - DataImport::IMPORT_TYPES
     return if invalid_types.blank?
 
-    raise ArgumentError, "Unsupported import types: #{invalid_types.join(', ')}"
+    raise ArgumentError, I18n.t('errors.api.data_import.unsupported_types', types: invalid_types.join(', '))
   end
 
   def client

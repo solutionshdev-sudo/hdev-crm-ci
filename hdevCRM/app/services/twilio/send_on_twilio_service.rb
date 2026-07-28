@@ -42,7 +42,7 @@ class Twilio::SendOnTwilioService < Base::SendOnChannelService
     content_sid, content_variables = process_template_params
 
     if content_sid.blank?
-      message.update!(status: :failed, external_error: 'Template not found')
+      message.update!(status: :failed, external_error: I18n.t('errors.api.template.not_found'))
       return nil
     end
 

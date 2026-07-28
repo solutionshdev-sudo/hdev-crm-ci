@@ -14,7 +14,7 @@ export default {
         >
           <img
             src="assets/images/typing.gif"
-            alt="Agent is typing a message"
+            :alt="$t('COMPONENTS.AGENT_TYPING_BUBBLE.ALT')"
             class="!w-full"
           />
         </div>

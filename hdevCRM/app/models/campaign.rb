@@ -104,8 +104,9 @@ class Campaign < ApplicationRecord
 
   def validate_campaign_inbox
     return unless inbox
+    return if ['Website', 'Twilio SMS', 'Sms', 'Whatsapp'].include?(inbox.inbox_type)
 
-    errors.add :inbox, 'Unsupported Inbox type' unless ['Website', 'Twilio SMS', 'Sms', 'Whatsapp'].include? inbox.inbox_type
+    errors.add :inbox, I18n.t('errors.models.campaign.unsupported_inbox_type')
   end
 
   # TO-DO we clean up with better validations when campaigns evolve into more inboxes
@@ -125,7 +126,7 @@ class Campaign < ApplicationRecord
     return unless trigger_rules['url']
 
     use_http_protocol = trigger_rules['url'].starts_with?('http://') || trigger_rules['url'].starts_with?('https://')
-    errors.add(:url, 'invalid') if inbox.inbox_type == 'Website' && !use_http_protocol
+    errors.add(:url, I18n.t('errors.models.campaign.invalid_url')) if inbox.inbox_type == 'Website' && !use_http_protocol
   end
 
   def inbox_must_belong_to_account
@@ -133,7 +134,7 @@ class Campaign < ApplicationRecord
 
     return if inbox.account_id == account_id
 
-    errors.add(:inbox_id, 'must belong to the same account as the campaign')
+    errors.add(:inbox_id, I18n.t('errors.models.campaign.must_belong_to_account'))
   end
 
   def sender_must_belong_to_account
@@ -141,11 +142,11 @@ class Campaign < ApplicationRecord
 
     return if account.users.exists?(id: sender.id)
 
-    errors.add(:sender_id, 'must belong to the same account as the campaign')
+    errors.add(:sender_id, I18n.t('errors.models.campaign.must_belong_to_account'))
   end
 
   def prevent_completed_campaign_from_update
-    errors.add :status, 'The campaign is already completed' if !campaign_status_changed? && completed?
+    errors.add :status, I18n.t('errors.models.campaign.already_completed') if !campaign_status_changed? && completed?
   end
 
   # creating db triggers

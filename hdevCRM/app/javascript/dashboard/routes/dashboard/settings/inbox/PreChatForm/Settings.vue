@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useAlert } from 'dashboard/composables';
+import { useAccount } from 'dashboard/composables/useAccount';
 import PreChatFields from './PreChatFields.vue';
 import { getPreChatFields } from 'dashboard/helper/preChat';
 import WootMessageEditor from 'dashboard/components/widgets/WootWriter/Editor.vue';
@@ -22,6 +23,7 @@ const store = useStore();
 
 const uiFlags = useMapGetter('inboxes/getUIFlags');
 const customAttributes = useMapGetter('attributes/getAttributes');
+const { currentAccount } = useAccount();
 
 const preChatFormEnabled = ref(false);
 const preChatMessage = ref('');
@@ -32,6 +34,7 @@ const preChatFieldOptions = computed(() => {
   return getPreChatFields({
     preChatFormOptions,
     customAttributes: customAttributes.value,
+    locale: currentAccount.value?.locale,
   });
 });
 

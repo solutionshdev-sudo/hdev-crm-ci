@@ -112,6 +112,6 @@ class DataImport < ApplicationRecord
     invalid_types = import_types - IMPORT_TYPES
     return if invalid_types.blank?
 
-    errors.add(:import_types, "contains unsupported values: #{invalid_types.join(', ')}")
+    errors.add(:import_types, I18n.t('errors.models.data_import.unsupported_import_types', invalid_types: invalid_types.join(', ')))
   end
 end

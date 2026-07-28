@@ -42,7 +42,7 @@ class DashboardController < ActionController::Base
   private
 
   def ensure_html_format
-    render json: { error: 'Please use API routes instead of dashboard routes for JSON requests' }, status: :not_acceptable if request.format.json?
+    render json: { error: I18n.t('errors.api.dashboard.json_not_supported') }, status: :not_acceptable if request.format.json?
   end
 
   # White-label: an agency's custom domain identifies the tenant before any

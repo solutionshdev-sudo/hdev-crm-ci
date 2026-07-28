@@ -18,10 +18,10 @@ module RequestExceptionHandler
     yield
   rescue ActiveRecord::RecordNotFound => e
     log_handled_error(e)
-    render_not_found_error('Resource could not be found')
+    render_not_found_error(I18n.t('errors.api.common.resource_not_found'))
   rescue Pundit::NotAuthorizedError => e
     log_handled_error(e)
-    render_unauthorized('You are not authorized to do this action')
+    render_unauthorized(I18n.t('errors.api.common.action_not_authorized'))
   rescue ActionController::ParameterMissing => e
     log_handled_error(e)
     render_could_not_create_error(e.message)

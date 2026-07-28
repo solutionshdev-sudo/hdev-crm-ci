@@ -1,0 +1,47 @@
+en:
+  mailers:
+    account_notification_mailer:
+      account_deletion_user_initiated:
+        subject: 'Your Hdev CRM account deletion has been scheduled'
+      account_deletion_for_inactivity:
+        subject: 'Your Hdev CRM account is scheduled for deletion due to inactivity'
+      contact_import_complete:
+        subject: 'Contact Import Completed'
+      contact_import_failed:
+        subject: 'Contact Import Failed'
+      contact_export_complete:
+        subject: "Your contact's export file is available to download."
+      automation_rule_disabled:
+        subject: 'Automation rule disabled due to validation errors.'
+    channel_notifications_mailer:
+      facebook_disconnect:
+        subject: 'Your Facebook page connection has expired'
+      instagram_disconnect:
+        subject: 'Your Instagram connection has expired'
+      tiktok_disconnect:
+        subject: 'Your TikTok connection has expired'
+      whatsapp_disconnect:
+        subject: 'Your Whatsapp connection has expired'
+      email_disconnect:
+        subject: 'Your email inbox has been disconnected. Please update the credentials for SMTP/IMAP'
+    integrations_notification_mailer:
+      slack_disconnect:
+        subject: 'Your Slack integration has expired'
+      dialogflow_disconnect:
+        subject: 'Your Dialogflow integration was disconnected'
+      openai_disconnect:
+        subject: 'Your OpenAI integration was disconnected'
+    conversation_notifications_mailer:
+      conversation_creation:
+        subject: '%{agent_name}, A new conversation [ID - %{display_id}] has been created in %{inbox_name}.'
+      conversation_assignment:
+        subject: '%{agent_name}, A new conversation [ID - %{display_id}] has been assigned to you.'
+      conversation_mention:
+        subject: '%{agent_name}, You have been mentioned in conversation [ID - %{display_id}]'
+      assigned_conversation_new_message:
+        subject: '%{agent_name}, New message in your assigned conversation [ID - %{display_id}].'
+      participating_conversation_new_message:
+        subject: '%{agent_name}, New message in your participating conversation [ID - %{display_id}].'
+    automation_notification_mailer:
+      default:
+        subject: 'This email has been sent via automation rule actions.'

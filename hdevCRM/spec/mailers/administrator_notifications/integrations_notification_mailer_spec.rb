@@ -20,7 +20,7 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     end
 
     it 'includes reconnect instructions in the body' do
-      expect(mail.body.encoded).to include('To continue receiving messages on Slack, please delete the integration and connect your workspace again')
+      expect(mail.body.decoded).to include('Para continuar recebendo mensagens no Slack')
     end
   end
 
@@ -32,7 +32,7 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     end
 
     it 'renders the content' do
-      expect(mail.body.encoded).to include('Your Dialogflow integration was disconnected because of permission issues')
+      expect(mail.body.decoded).to include('com o Dialogflow foi desconectada por problemas de')
     end
 
     it 'renders the receiver email' do
@@ -48,7 +48,7 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     end
 
     it 'renders the content' do
-      expect(mail.body.encoded).to include('the configured API key is invalid or revoked')
+      expect(mail.body.decoded).to include('a chave de API configurada')
     end
 
     it 'renders the receiver email' do

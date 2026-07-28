@@ -10,6 +10,12 @@
     "MESSAGE_BUBBLE": {
       "RETRY": "Enviar mensagem novamente",
       "ERROR_MESSAGE": "Não foi possível enviar, tente novamente"
+    },
+    "AGENT_TYPING_BUBBLE": {
+      "ALT": "O agente está digitando uma mensagem"
+    },
+    "IMAGE_BUBBLE": {
+      "ALT": "Mensagem de imagem"
     }
   },
   "THUMBNAIL": {

@@ -60,7 +60,7 @@ class Api::V1::Widget::ContactsController < Api::V1::Widget::BaseController
   def validate_hmac
     return unless should_verify_hmac?
 
-    render json: { error: 'HMAC failed: Invalid Identifier Hash Provided' }, status: :unauthorized unless valid_hmac?
+    render json: { error: I18n.t('errors.api.widget.invalid_hmac') }, status: :unauthorized unless valid_hmac?
   end
 
   def should_verify_hmac?

@@ -133,7 +133,7 @@ class Crm::Leadsquared::ProcessorService < Crm::BaseProcessorService
 
   def get_activity_code(key)
     activity_code = @hook.settings[key]
-    raise StandardError, "LeadSquared #{key} activity code not found for hook ##{@hook.id}." if activity_code.blank?
+    raise StandardError, I18n.t('errors.api.crm.activity_code_not_found', key: key, hook_id: @hook.id) if activity_code.blank?
 
     activity_code
   end

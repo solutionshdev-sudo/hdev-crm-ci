@@ -7,7 +7,9 @@ class Api::V1::Accounts::OnboardingsController < Api::V1::Accounts::BaseControll
   ONBOARDING_STEPS = [STEP_ACCOUNT_DETAILS, STEP_INBOX_SETUP].freeze
 
   def update
-    return render json: { error: 'Invalid onboarding step' }, status: :unprocessable_entity unless ONBOARDING_STEPS.include?(params[:onboarding_step])
+    unless ONBOARDING_STEPS.include?(params[:onboarding_step])
+      return render json: { error: I18n.t('errors.api.onboarding.invalid_step') }, status: :unprocessable_entity
+    end
 
     @account = Current.account
     # The client declares the step it is completing; `account_details` runs

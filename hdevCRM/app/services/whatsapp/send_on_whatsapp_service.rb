@@ -24,7 +24,7 @@ class Whatsapp::SendOnWhatsappService < Base::SendOnChannelService
     name, namespace, lang_code, processed_parameters = processor.call
 
     if name.blank?
-      message.update!(status: :failed, external_error: 'Template not found or invalid template name')
+      message.update!(status: :failed, external_error: I18n.t('errors.api.template.not_found_or_invalid'))
       return
     end
 

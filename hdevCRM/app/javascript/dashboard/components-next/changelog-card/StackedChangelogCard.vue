@@ -82,7 +82,7 @@ const handleImgClick = () => {
 
     <div class="flex justify-between items-center mt-1">
       <Button
-        label="Read more"
+        :label="$t('COMPONENTS.CHANGELOG_CARD.READ_MORE')"
         color="slate"
         link
         sm
@@ -90,7 +90,7 @@ const handleImgClick = () => {
         @click.stop="handleReadMore"
       />
       <Button
-        label="Dismiss"
+        :label="$t('COMPONENTS.CHANGELOG_CARD.DISMISS')"
         color="slate"
         link
         sm

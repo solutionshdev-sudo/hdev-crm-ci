@@ -21,8 +21,15 @@ pt_BR:
       has_many:
         more: 'Mostrando %{count} de %{total_count}'
         none: Nenhum
+      has_one:
+        none: Nenhum
       polymorphic:
         none: Nenhum
+      # Gem administrate-field-active_storage (botões do campo de anexo)
+      active_storage:
+        add: Adicionar
+        replace: Substituir
+        remove: Remover
     form:
       error: erro
       errors: '%{pluralized_errors} impediram que este(a) %{resource_name} fosse salvo(a):'
@@ -46,6 +53,18 @@ pt_BR:
     sidebar:
       collapse: Recolher menu
       expand: Expandir menu
+    # Valores de selects/enums dos dashboards (consultados via lambda em runtime)
+    values:
+      status:
+        active: Ativa
+        suspended: Suspensa
+      banner_type:
+        info: Informativo
+        warning: Aviso
+        error: Erro
+      role:
+        agent: Agente
+        administrator: Administrador
   helpers:
     submit:
       create: 'Criar %{model}'
@@ -63,9 +82,13 @@ pt_BR:
         conversations: Conversas
         status: Status
         agency: Agência
+        agency_id: Agência
         account_users: Vínculos de conta
         custom_attributes: Atributos personalizados
         limits: Limites
+        all_features: Todos os recursos
+        captain_models: Modelos do Captain
+        manually_managed_features: Recursos gerenciados manualmente
         created_at: Criado em
         updated_at: Atualizado em
       user:
@@ -93,6 +116,7 @@ pt_BR:
         confirmation_token: Token de confirmação
         confirmed_at: Confirmado em
         confirmation_sent_at: Confirmação enviada em
+        mfa_enabled: MFA
         created_at: Criado em
         updated_at: Atualizado em
       agency:
@@ -121,6 +145,7 @@ pt_BR:
         avatar: Avatar
         name: Nome
         account: Conta
+        account_id: Conta
         description: Descrição
         outgoing_url: URL de saída
         access_token: Token de acesso
@@ -135,7 +160,9 @@ pt_BR:
       account_user:
         id: ID
         account: Conta
+        account_id: Conta
         user: Usuário
+        user_id: Usuário
         inviter: Convidado por
         role: Papel
         created_at: Criado em
@@ -143,7 +170,9 @@ pt_BR:
       agency_user:
         id: ID
         agency: Agência
+        agency_id: Agência
         user: Usuário
+        user_id: Usuário
         role: Papel
         created_at: Criado em
         updated_at: Atualizado em
@@ -152,6 +181,18 @@ pt_BR:
         banner_message: Mensagem do banner
         banner_type: Tipo do banner
         active: Ativo
+        created_at: Criado em
+        updated_at: Atualizado em
+      access_token:
+        id: ID
+        owner: Dono
+        token: Token
+        created_at: Criado em
+        updated_at: Atualizado em
+      installation_config:
+        id: ID
+        name: Nome
+        value: Valor
         created_at: Criado em
         updated_at: Atualizado em
   activerecord:
@@ -180,9 +221,16 @@ pt_BR:
       platform_banner:
         one: Banner da plataforma
         other: Banners da plataforma
+      access_token:
+        one: Token de acesso
+        other: Tokens de acesso
+      installation_config:
+        one: Configuração da instalação
+        other: Configurações da instalação
   # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
   # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
   attributes:
+    id: ID
     name: Nome
     display_name: Nome de exibição
     email: E-mail
@@ -191,13 +239,58 @@ pt_BR:
     account: Conta
     user: Usuário
     agency: Agência
+    owner: Dono
     locale: Idioma
     domain: Domínio
+    custom_domain: Domínio customizado
+    slug: Slug
     support_email: E-mail de suporte
     status: Status
+    type: Tipo
+    uid: UID
+    provider: Provedor
     feature_flags: Recursos
     limits: Limites
     custom_attributes: Atributos personalizados
+    all_features: Todos os recursos
+    captain_models: Modelos do Captain
+    manually_managed_features: Recursos gerenciados manualmente
+    token: Token
+    tokens: Tokens
+    value: Valor
+    access_token: Token de acesso
+    pubsub_token: Token pub/sub
+    confirmation_token: Token de confirmação
+    confirmation_sent_at: Confirmação enviada em
+    unconfirmed_email: E-mail não confirmado
+    sign_in_count: Total de logins
+    current_sign_in_at: Login atual em
+    last_sign_in_at: Último login em
+    current_sign_in_ip: IP do login atual
+    last_sign_in_ip: IP do último login
+    avatar: Avatar
+    avatar_url: Avatar
+    logo: Logo
+    logo_dark: Logo (tema escuro)
+    logo_thumbnail: Ícone do logo
+    installation_name: Nome da instalação
+    brand_name: Nome da marca
+    brand_url: URL da marca
+    widget_brand_url: URL da marca no widget
+    terms_url: URL dos termos de uso
+    privacy_url: URL de privacidade
+    primary_color: Cor primária
+    description: Descrição
+    outgoing_url: URL de saída
+    banner_message: Mensagem do banner
+    banner_type: Tipo do banner
+    active: Ativo
+    inviter: Convidado por
+    accounts: Contas
+    users: Usuários
+    conversations: Conversas
+    account_users: Vínculos de conta
+    agency_users: Vínculos de agência
     confirmed_at: Confirmado em
     active_at: Ativo em
     created_at: Criado em

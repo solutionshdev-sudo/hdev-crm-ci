@@ -94,6 +94,6 @@ class Channel::Sms < ApplicationRecord
       basic_auth: bandwidth_auth,
       headers: { 'Content-Type': 'application/json' }
     )
-    errors.add(:provider_config, 'error setting up') unless response.success?
+    errors.add(:provider_config, I18n.t('errors.models.channel_sms.setup_error')) unless response.success?
   end
 end

@@ -22,7 +22,7 @@ class Api::V1::Accounts::ContactsController < Api::V1::Accounts::BaseController
   end
 
   def search
-    render json: { error: 'Specify search string with parameter q' }, status: :unprocessable_entity if params[:q].blank? && return
+    render json: { error: I18n.t('errors.api.common.query_param_missing') }, status: :unprocessable_entity if params[:q].blank? && return
 
     contacts = Current.account.contacts.where(
       'name ILIKE :search OR email ILIKE :search OR phone_number ILIKE :search OR contacts.identifier LIKE :search',

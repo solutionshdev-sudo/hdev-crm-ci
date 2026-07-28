@@ -25,10 +25,10 @@ class Whatsapp::WebhookSetupService
   private
 
   def validate_parameters!
-    raise ArgumentError, 'Channel is required' if @channel.blank?
-    raise ArgumentError, 'WABA ID is required' if @waba_id.blank?
-    raise ArgumentError, 'Access token is required' if @access_token.blank?
-    raise ArgumentError, 'Phone number ID is required' if @channel.provider_config['phone_number_id'].blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.channel_required') if @channel.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.waba_id_required') if @waba_id.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.access_token_required') if @access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.phone_number_id_required') if @channel.provider_config['phone_number_id'].blank?
   end
 
   def register_phone_number
@@ -64,7 +64,7 @@ class Whatsapp::WebhookSetupService
     @api_client.subscribe_phone_number_webhook(@waba_id, phone_number_id, callback_url, verify_token, subscribed_fields: subscribed_fields)
   rescue StandardError => e
     Rails.logger.error("[WHATSAPP] Webhook setup failed: #{e.message}")
-    raise "Webhook setup failed: #{e.message}"
+    raise I18n.t('errors.api.whatsapp.webhook_setup_failed', message: e.message)
   end
 
   # Subscribe to `calls` only when voice calling is enabled on the inbox

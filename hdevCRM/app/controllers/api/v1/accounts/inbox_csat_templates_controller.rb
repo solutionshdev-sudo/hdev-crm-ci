@@ -22,7 +22,7 @@ class Api::V1::Accounts::InboxCsatTemplatesController < Api::V1::Accounts::BaseC
     result = service.create_template(template_params)
     render_template_creation_result(result)
   rescue ActionController::ParameterMissing
-    render json: { error: 'Template parameters are required' }, status: :unprocessable_entity
+    render json: { error: I18n.t('errors.api.csat.template_params_required') }, status: :unprocessable_entity
   end
 
   def analyze
@@ -39,7 +39,7 @@ class Api::V1::Accounts::InboxCsatTemplatesController < Api::V1::Accounts::BaseC
 
     render json: result
   rescue ActionController::ParameterMissing
-    render json: { error: 'Template parameters are required' }, status: :unprocessable_entity
+    render json: { error: I18n.t('errors.api.csat.template_params_required') }, status: :unprocessable_entity
   end
 
   private
@@ -52,7 +52,7 @@ class Api::V1::Accounts::InboxCsatTemplatesController < Api::V1::Accounts::BaseC
   def validate_whatsapp_channel
     return if @inbox.whatsapp? || @inbox.twilio_whatsapp?
 
-    render json: { error: 'CSAT template operations only available for WhatsApp and Twilio WhatsApp channels' },
+    render json: { error: I18n.t('errors.api.csat.channel_not_supported') },
            status: :bad_request
   end
 
@@ -61,13 +61,13 @@ class Api::V1::Accounts::InboxCsatTemplatesController < Api::V1::Accounts::BaseC
   end
 
   def render_missing_message_error
-    render json: { error: 'Message is required' }, status: :unprocessable_entity
+    render json: { error: I18n.t('errors.api.csat.message_required') }, status: :unprocessable_entity
   end
 
   def validate_captain_enabled
     return if Current.account.feature_enabled?('captain_integration')
 
-    render json: { error: 'Captain is required for template analysis' }, status: :forbidden
+    render json: { error: I18n.t('errors.api.csat.captain_required') }, status: :forbidden
   end
 
   def render_template_creation_result(result)

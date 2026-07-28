@@ -30,8 +30,8 @@ module Avatarable
   def acceptable_avatar
     return unless avatar.attached?
 
-    errors.add(:avatar, 'is too big') if avatar.byte_size > 15.megabytes
+    errors.add(:avatar, :too_big) if avatar.byte_size > 15.megabytes
 
-    errors.add(:avatar, 'filetype not supported') unless ALLOWED_AVATAR_CONTENT_TYPES.include?(avatar.content_type)
+    errors.add(:avatar, :filetype_not_supported) unless ALLOWED_AVATAR_CONTENT_TYPES.include?(avatar.content_type)
   end
 end

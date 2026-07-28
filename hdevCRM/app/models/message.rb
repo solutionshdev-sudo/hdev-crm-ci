@@ -294,7 +294,7 @@ class Message < ApplicationRecord
     # there are cases where automations can result in message loops, we need to prevent such cases.
     if conversation.messages.where('created_at >= ?', 1.minute.ago).count >= Limits.conversation_message_per_minute_limit
       Rails.logger.error "Too many message: Account Id - #{account_id} : Conversation id - #{conversation_id}"
-      errors.add(:base, 'Too many messages')
+      errors.add(:base, I18n.t('errors.models.message.too_many_messages'))
     end
   end
 
@@ -443,7 +443,9 @@ class Message < ApplicationRecord
   end
 
   def validate_attachments_limit(_attachment)
-    errors.add(:attachments, message: 'exceeded maximum allowed') if attachments.size >= NUMBER_OF_PERMITTED_ATTACHMENTS
+    return if attachments.size < NUMBER_OF_PERMITTED_ATTACHMENTS
+
+    errors.add(:attachments, message: I18n.t('errors.models.message.attachments_limit_exceeded'))
   end
 
   def set_conversation_activity

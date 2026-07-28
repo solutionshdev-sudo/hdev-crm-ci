@@ -103,18 +103,18 @@ class EmailTemplate < ApplicationRecord
     return if inbox.blank? || account.blank?
     return if inbox.account_id == account_id
 
-    errors.add(:account, 'must match inbox account')
+    errors.add(:account, I18n.t('errors.models.email_template.account_mismatch'))
   end
 
   def validate_liquid_body
     Liquid::Template.parse(body.to_s)
   rescue Liquid::Error => e
-    errors.add(:body, "has invalid Liquid syntax: #{e.message}")
+    errors.add(:body, I18n.t('errors.models.email_template.invalid_liquid', message: e.message))
   end
 
   def validate_layout_slot
     return if body.to_s.match?(CONTENT_FOR_LAYOUT_PATTERN)
 
-    errors.add(:body, 'must include {{ content_for_layout }}')
+    errors.add(:body, I18n.t('errors.models.email_template.missing_layout_slot'))
   end
 end

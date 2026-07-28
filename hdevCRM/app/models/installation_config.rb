@@ -69,6 +69,6 @@ class InstallationConfig < ApplicationRecord
     return unless value == false || value == 'false'
     return unless User.exists?(provider: 'saml')
 
-    errors.add(:base, 'Cannot disable SAML SSO login while users are using SAML authentication')
+    errors.add(:base, I18n.t('errors.models.installation_config.saml_sso_in_use'))
   end
 end

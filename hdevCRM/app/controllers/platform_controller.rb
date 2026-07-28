@@ -21,7 +21,7 @@ class PlatformController < ActionController::API
 
   def set_platform_app
     @platform_app = @access_token.owner if @access_token && @access_token.owner.is_a?(PlatformApp)
-    render json: { error: 'Invalid access_token' }, status: :unauthorized if @platform_app.blank?
+    render json: { error: I18n.t('errors.api.platform.invalid_access_token') }, status: :unauthorized if @platform_app.blank?
   end
 
   def set_resource
@@ -32,6 +32,6 @@ class PlatformController < ActionController::API
   def validate_platform_app_permissible
     return if @platform_app.platform_app_permissibles.find_by(permissible: @resource)
 
-    render json: { error: 'Non permissible resource' }, status: :unauthorized
+    render json: { error: I18n.t('errors.api.platform.non_permissible_resource') }, status: :unauthorized
   end
 end

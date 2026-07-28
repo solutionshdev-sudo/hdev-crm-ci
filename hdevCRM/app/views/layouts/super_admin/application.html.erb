@@ -19,7 +19,8 @@ By default, it renders:
   <meta name="ROBOTS" content="NOODP">
   <meta name="viewport" content="initial-scale=1">
   <title>
-    <%= content_for(:title) %> - <%= application_title %>
+    <%# application_title da gem derivaria do módulo Rails ("Chatwoot") — marca fixa aqui %>
+    <%= content_for(:title) %> - Hdev CRM
   </title>
   <script>
     // Tailwind's dark: variants only fire when `.dark` sits on the root

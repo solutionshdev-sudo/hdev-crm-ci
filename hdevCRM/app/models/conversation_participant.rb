@@ -37,7 +37,9 @@ class ConversationParticipant < ApplicationRecord
   end
 
   def ensure_inbox_access
-    errors.add(:user, 'must have inbox access') if conversation && conversation.inbox.assignable_agents.exclude?(user)
+    return unless conversation && conversation.inbox.assignable_agents.exclude?(user)
+
+    errors.add(:user, I18n.t('errors.models.conversation_participant.inbox_access_required'))
   end
 
   def invalidate_filtered_unread_count_visibility

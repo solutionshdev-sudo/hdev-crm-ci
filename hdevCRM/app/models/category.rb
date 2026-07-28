@@ -97,6 +97,6 @@ class Category < ApplicationRecord
 
     return true if allowed_locales.include?(locale)
 
-    errors.add(:locale, "#{locale} of category is not part of portal's #{allowed_locales}.")
+    errors.add(:locale, I18n.t('errors.models.category.locale_not_allowed', category_locale: locale, allowed_locales: allowed_locales))
   end
 end

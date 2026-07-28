@@ -73,7 +73,7 @@ class WorkingHour < ApplicationRecord
   def close_after_open
     return unless open_hour.hours + open_minutes.minutes >= close_hour.hours + close_minutes.minutes
 
-    errors.add(:close_hour, 'Closing time cannot be before opening time')
+    errors.add(:close_hour, I18n.t('errors.models.working_hour.close_before_open'))
   end
 
   def ensure_open_all_day_hours
@@ -88,6 +88,6 @@ class WorkingHour < ApplicationRecord
   def open_all_day_and_closed_all_day
     return unless open_all_day? && closed_all_day?
 
-    errors.add(:base, 'open_all_day and closed_all_day cannot be true at the same time')
+    errors.add(:base, I18n.t('errors.models.working_hour.open_and_closed_all_day'))
   end
 end

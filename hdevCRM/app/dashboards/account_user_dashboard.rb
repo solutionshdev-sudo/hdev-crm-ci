@@ -12,7 +12,9 @@ class AccountUserDashboard < Administrate::BaseDashboard
     user: Field::BelongsToSearch.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
     inviter: Field::BelongsToSearch.with_options(class_name: 'User', searchable: true, searchable_field: [:name, :email, :id], order: 'id DESC'),
     id: Field::Number,
-    role: Field::Select.with_options(collection: AccountUser.roles.keys),
+    role: Field::Select.with_options(collection: lambda { |_field|
+      AccountUser.roles.keys.map { |role| [I18n.t("administrate.values.role.#{role}", default: role.titleize), role] }
+    }),
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -66,6 +68,6 @@ class AccountUserDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
   def display_resource(account_user)
-    "AccountUser ##{account_user.id}"
+    "#{AccountUser.model_name.human} ##{account_user.id}"
   end
 end

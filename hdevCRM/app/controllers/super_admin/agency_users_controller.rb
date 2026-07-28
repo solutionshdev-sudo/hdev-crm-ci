@@ -8,8 +8,11 @@ class SuperAdmin::AgencyUsersController < SuperAdmin::ApplicationController
     resource = resource_class.new(resource_params)
     authorize_resource(resource)
 
-    notice = resource.save ? translate_with_resource('create.success') : resource.errors.full_messages.first
-    redirect_back(fallback_location: [namespace, resource.agency], notice: notice)
+    if resource.save
+      redirect_back(fallback_location: [namespace, resource.agency], notice: translate_with_resource('create.success'))
+    else
+      redirect_back(fallback_location: [namespace, resource.agency], flash: { error: resource.errors.full_messages.first })
+    end
   end
 
   def destroy

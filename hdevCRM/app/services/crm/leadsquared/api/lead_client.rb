@@ -1,7 +1,7 @@
 class Crm::Leadsquared::Api::LeadClient < Crm::Leadsquared::Api::BaseClient
   # https://apidocs.leadsquared.com/quick-search/#api
   def search_lead(key)
-    raise ArgumentError, 'Search key is required' if key.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.search_key_required') if key.blank?
 
     path = 'LeadManagement.svc/Leads.GetByQuickSearch'
     params = { key: key }
@@ -15,7 +15,7 @@ class Crm::Leadsquared::Api::LeadClient < Crm::Leadsquared::Api::BaseClient
   # We pass the "SearchBy" attribute with value "Phone" when a MXDuplicateEntryException
   # occurs, indicating a duplicate mobile number match that the default search missed.
   def create_or_update_lead(lead_data)
-    raise ArgumentError, 'Lead data is required' if lead_data.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.lead_data_required') if lead_data.blank?
 
     path = 'LeadManagement.svc/Lead.CreateOrUpdate'
     formatted_data = format_lead_data(lead_data)
@@ -31,8 +31,8 @@ class Crm::Leadsquared::Api::LeadClient < Crm::Leadsquared::Api::BaseClient
   end
 
   def update_lead(lead_data, lead_id)
-    raise ArgumentError, 'Lead ID is required' if lead_id.blank?
-    raise ArgumentError, 'Lead data is required' if lead_data.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.lead_id_required') if lead_id.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.lead_data_required') if lead_data.blank?
 
     path = "LeadManagement.svc/Lead.Update?leadId=#{lead_id}"
     formatted_data = format_lead_data(lead_data)

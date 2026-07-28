@@ -85,7 +85,7 @@ class Channel::Telegram < ApplicationRecord
   def ensure_valid_bot_token
     response = HTTParty.get("#{telegram_api_url}/getMe")
     unless response.success?
-      errors.add(:bot_token, 'invalid token')
+      errors.add(:bot_token, I18n.t('errors.models.channel_telegram.invalid_token'))
       return
     end
 
@@ -98,7 +98,7 @@ class Channel::Telegram < ApplicationRecord
                              body: {
                                url: "#{ENV.fetch('FRONTEND_URL', nil)}/webhooks/telegram/#{bot_token}"
                              })
-    errors.add(:bot_token, 'error setting up the webook') unless response.success?
+    errors.add(:bot_token, I18n.t('errors.models.channel_telegram.webhook_setup_error')) unless response.success?
   end
 
   def send_message(message)

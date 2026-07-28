@@ -1,0 +1,86 @@
+pt_BR:
+  activerecord:
+    errors:
+      messages:
+        too_big: 'é grande demais'
+        filetype_not_supported: 'tipo de arquivo não suportado'
+        type_not_supported: 'tipo não suportado'
+        size_too_big: 'tamanho grande demais'
+  errors:
+    models:
+      automation_rule:
+        conditions_not_supported: 'Condições de automação %{conditions} não suportadas.'
+        actions_not_supported: 'Ações de automação %{actions} não suportadas.'
+        query_operator_required: 'Condições de automação precisam de um operador de consulta.'
+        invalid_query_operator: 'O operador de consulta deve ser "AND" ou "OR"'
+      campaign:
+        unsupported_inbox_type: 'Tipo de caixa de entrada não suportado'
+        invalid_url: 'inválida'
+        must_belong_to_account: 'deve pertencer à mesma conta da campanha'
+        already_completed: 'A campanha já foi concluída'
+      category:
+        locale_not_allowed: '%{category_locale} da categoria não faz parte de %{allowed_locales} do portal.'
+      channel_api:
+        invalid_agent_reply_time_window: 'agent_reply_time_window deve ser maior que 0'
+      channel_sms:
+        setup_error: 'erro na configuração'
+      channel_telegram:
+        invalid_token: 'token inválido'
+        webhook_setup_error: 'erro ao configurar o webhook'
+      channel_whatsapp:
+        invalid_credentials: 'Credenciais inválidas'
+      chatbot_inbox:
+        active_chatbot_exists: 'já tem um chatbot ativo'
+      contact_inbox:
+        invalid_twilio_sms_source_id: 'source id inválido para caixa de entrada Twilio SMS. Regex válido %{regex}'
+        invalid_twilio_whatsapp_source_id: 'source id inválido para caixa de entrada Twilio WhatsApp. Regex válido %{regex}'
+        invalid_whatsapp_source_id: 'source id inválido para caixa de entrada WhatsApp. Regex válido %{regex}'
+      content_attributes:
+        items_required: 'Pelo menos um item é obrigatório.'
+        items_type: 'Os itens devem ser um hash.'
+        invalid_item_keys: 'contém chaves inválidas para os itens: %{invalid_keys}'
+        missing_item_actions: 'contém itens sem ações'
+        invalid_action_keys: 'contém chaves inválidas para as ações: %{invalid_keys}'
+      conversation_participant:
+        inbox_access_required: 'precisa ter acesso à caixa de entrada'
+      dashboard_app:
+        invalid_data: ': Dados inválidos'
+      data_import:
+        unsupported_import_types: 'contém valores não suportados: %{invalid_types}'
+      deal:
+        stage_not_in_pipeline: 'deve pertencer ao pipeline do negócio'
+      email_template:
+        account_mismatch: 'deve corresponder à conta da caixa de entrada'
+        invalid_liquid: 'tem sintaxe Liquid inválida: %{message}'
+        missing_layout_slot: 'deve incluir {{ content_for_layout }}'
+      installation_config:
+        saml_sso_in_use: 'Não é possível desativar o login SAML SSO enquanto houver usuários usando autenticação SAML'
+      integrations_hook:
+        feature_not_enabled: 'Recurso não habilitado'
+        invalid_settings: ': Dados de configuração inválidos'
+      json_schema:
+        required: 'é obrigatório'
+        type: 'deve ser do tipo %{type}'
+        minimum: 'deve ser maior ou igual a %{minimum}'
+        maximum: 'deve ser menor ou igual a %{maximum}'
+      jsonb_attributes:
+        key_length: '%{key} deve ter menos de 1500 caracteres'
+        key_value: '%{key} deve ser menor que 9999999999'
+      macro:
+        actions_not_supported: 'Ações de execução de macro %{actions} não suportadas.'
+      message:
+        too_many_messages: 'Mensagens demais'
+        attachments_limit_exceeded: 'excedeu o máximo permitido'
+      portal:
+        config_not_supported: 'no portal em %{denied_keys} não é suportado.'
+        default_locale_drafted: 'o idioma padrão não pode ficar em rascunho.'
+      working_hour:
+        close_before_open: 'O horário de fechamento não pode ser antes do horário de abertura'
+        open_and_closed_all_day: 'open_all_day e closed_all_day não podem ser verdadeiros ao mesmo tempo'
+  channels:
+    web_widget:
+      default_pre_chat_form:
+        pre_chat_message: 'Compartilhe suas dúvidas ou comentários aqui.'
+        email: 'E-mail'
+        full_name: 'Nome completo'
+        phone_number: 'Telefone'

@@ -23,8 +23,8 @@ RSpec.describe 'Devise::Mailer' do
     end
 
     it 'uses the user\'s name' do
-      expect(mail.body.to_s).to include("Hi #{CGI.escapeHTML(confirmable_user.name)},")
-      expect(mail_body).to include("Hi #{confirmable_user.name},")
+      expect(mail.body.to_s).to include("Olá #{CGI.escapeHTML(confirmable_user.name)},")
+      expect(mail_body).to include("Olá #{confirmable_user.name},")
     end
 
     context 'when the user name contains HTML' do
@@ -33,16 +33,16 @@ RSpec.describe 'Devise::Mailer' do
       end
 
       it 'escapes the name in the rendered email body' do
-        expect(mail.body.to_s).to include("Hi #{CGI.escapeHTML(confirmable_user.name)},")
-        expect(mail.body.to_s).not_to include("Hi #{confirmable_user.name},")
+        expect(mail.body.to_s).to include("Olá #{CGI.escapeHTML(confirmable_user.name)},")
+        expect(mail.body.to_s).not_to include("Olá #{confirmable_user.name},")
       end
     end
 
     it 'shows the default confirmation state' do
-      expect(mail_body).to include('Confirm your email to get started')
-      expect(mail_body).to include('Welcome to Chatwoot. We just need to verify your email address before you can start using your account.')
-      expect(mail_body).to include('Confirm my account')
-      expect(mail_body).not_to include('Workspace invitation')
+      expect(mail_body).to include('Confirme seu e-mail para começar')
+      expect(mail_body).to include('Só precisamos verificar seu endereço de e-mail antes de você começar a usar sua conta.')
+      expect(mail_body).to include('Confirmar minha conta')
+      expect(mail_body).not_to include('Convite para o espaço de trabalho')
     end
 
     it 'sends a confirmation link' do
@@ -54,10 +54,10 @@ RSpec.describe 'Devise::Mailer' do
       let(:inviter_val) { create(:user, :administrator, skip_confirmation: true, account: account) }
 
       it 'refers to the inviter and their account' do
-        expect(mail_body).to include("You're invited to join #{account.name}")
-        expect(mail_body).to include("#{inviter_val.name} invited you to join the #{account.name} workspace on Chatwoot.")
-        expect(mail_body).to include('Accept invitation')
-        expect(mail_body).not_to include('Confirm your email to get started')
+        expect(mail_body).to include("Você foi convidado para entrar em #{account.name}")
+        expect(mail_body).to include("#{inviter_val.name} convidou você para entrar no espaço de trabalho #{account.name}")
+        expect(mail_body).to include('Aceitar convite')
+        expect(mail_body).not_to include('Confirme seu e-mail para começar')
       end
 
       it 'sends a password reset link' do
@@ -75,8 +75,8 @@ RSpec.describe 'Devise::Mailer' do
         confirmation_mail = Devise::Mailer.confirmation_instructions(confirmable_user.reload, nil, {})
         confirmation_body = CGI.unescapeHTML(confirmation_mail.body.to_s)
 
-        expect(confirmation_body).to include('Confirm your new email address')
-        expect(confirmation_body).to include('New email')
+        expect(confirmation_body).to include('Confirme seu novo endereço de e-mail')
+        expect(confirmation_body).to include('Novo e-mail')
         expect(confirmation_mail.body).to include('app/auth/confirmation?confirmation_token')
         expect(confirmation_mail.body).not_to include('app/auth/password/edit')
         expect(confirmable_user.unconfirmed_email.blank?).to be false
@@ -93,7 +93,7 @@ RSpec.describe 'Devise::Mailer' do
         confirmation_mail = Devise::Mailer.confirmation_instructions(confirmable_user.reload, nil, {})
         confirmation_body = CGI.unescapeHTML(confirmation_mail.body.to_s)
 
-        expect(confirmation_body).to include('Confirm your new email address')
+        expect(confirmation_body).to include('Confirme seu novo endereço de e-mail')
         expect(confirmation_mail.body).to include('app/auth/confirmation?confirmation_token')
         expect(confirmation_mail.body).not_to include('app/auth/password/edit')
         expect(confirmable_user.unconfirmed_email.blank?).to be false
@@ -110,8 +110,8 @@ RSpec.describe 'Devise::Mailer' do
         confirmation_mail = Devise::Mailer.confirmation_instructions(confirmable_user.reload, nil, {})
         confirmation_body = CGI.unescapeHTML(confirmation_mail.body.to_s)
 
-        expect(confirmation_body).to include('Your account is ready')
-        expect(confirmation_body).to include('Open my account')
+        expect(confirmation_body).to include('Sua conta está pronta')
+        expect(confirmation_body).to include('Abrir minha conta')
         expect(confirmation_mail.body).to include('/auth/sign_in')
       end
     end

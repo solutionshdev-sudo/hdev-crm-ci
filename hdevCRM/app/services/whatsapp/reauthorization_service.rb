@@ -12,7 +12,7 @@ class Whatsapp::ReauthorizationService
 
     # Validate phone number matches for reauthorization
     if phone_info[:phone_number] != channel.phone_number
-      raise StandardError, "Phone number mismatch. Expected #{channel.phone_number}, got #{phone_info[:phone_number]}"
+      raise StandardError, I18n.t('errors.api.whatsapp.phone_number_mismatch', expected: channel.phone_number, actual: phone_info[:phone_number])
     end
 
     # Update channel configuration

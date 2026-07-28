@@ -68,7 +68,7 @@ class AutomationRule < ApplicationRecord
     attributes = conditions.map { |obj, _| obj['attribute_key'] }
     conditions = attributes - conditions_attributes
     conditions -= account.custom_attribute_definitions.pluck(:attribute_key)
-    errors.add(:conditions, "Automation conditions #{conditions.join(',')} not supported.") if conditions.any?
+    errors.add(:conditions, I18n.t('errors.models.automation_rule.conditions_not_supported', conditions: conditions.join(','))) if conditions.any?
   end
 
   def json_actions_format
@@ -77,14 +77,14 @@ class AutomationRule < ApplicationRecord
     attributes = actions.map { |obj, _| obj['action_name'] }
     actions = attributes - actions_attributes
 
-    errors.add(:actions, "Automation actions #{actions.join(',')} not supported.") if actions.any?
+    errors.add(:actions, I18n.t('errors.models.automation_rule.actions_not_supported', actions: actions.join(','))) if actions.any?
   end
 
   def query_operator_presence
     return if conditions.blank?
 
     operators = conditions.select { |obj, _| obj['query_operator'].nil? }
-    errors.add(:conditions, 'Automation conditions should have query operator.') if operators.length > 1
+    errors.add(:conditions, I18n.t('errors.models.automation_rule.query_operator_required')) if operators.length > 1
   end
 
   # This validation ensures logical operators are being used correctly in automation conditions.
@@ -102,7 +102,7 @@ class AutomationRule < ApplicationRecord
     return if query_operator.empty?
 
     operator = query_operator.upcase
-    errors.add(:conditions, 'Query operator must be either "AND" or "OR"') unless %w[AND OR].include?(operator)
+    errors.add(:conditions, I18n.t('errors.models.automation_rule.invalid_query_operator')) unless %w[AND OR].include?(operator)
   end
 end
 

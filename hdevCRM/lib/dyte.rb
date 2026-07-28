@@ -9,7 +9,7 @@ class Dyte
     @app_id = app_id
     @api_token = api_token
 
-    raise ArgumentError, 'Missing Credentials' if @account_id.blank? || @app_id.blank? || @api_token.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.dyte.missing_credentials') if @account_id.blank? || @app_id.blank? || @api_token.blank?
   end
 
   def create_a_meeting(title)
@@ -22,7 +22,8 @@ class Dyte
   end
 
   def add_participant_to_meeting(meeting_id, client_id, name, avatar_url)
-    raise ArgumentError, 'Missing information' if meeting_id.blank? || client_id.blank? || name.blank? || avatar_url.blank?
+    missing_info = meeting_id.blank? || client_id.blank? || name.blank? || avatar_url.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.dyte.missing_information') if missing_info
 
     payload = {
       'custom_participant_id': client_id.to_s,
@@ -39,7 +40,7 @@ class Dyte
   end
 
   def refresh_participant_token(meeting_id, participant_id)
-    raise ArgumentError, 'Missing information' if meeting_id.blank? || participant_id.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.dyte.missing_information') if meeting_id.blank? || participant_id.blank?
 
     path = "meetings/#{meeting_id}/participants/#{participant_id}/token"
     response = post(path)
@@ -47,7 +48,7 @@ class Dyte
   end
 
   def fetch_participants(meeting_id)
-    raise ArgumentError, 'Missing information' if meeting_id.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.dyte.missing_information') if meeting_id.blank?
 
     response = get("meetings/#{meeting_id}/participants")
     process_response(response)

@@ -26,19 +26,23 @@ class ContentAttributeValidator < ActiveModel::Validator
   private
 
   def validate_items!(record)
-    record.errors.add(:content_attributes, 'At least one item is required.') if record.items.blank?
-    record.errors.add(:content_attributes, 'Items should be a hash.') if record.items.reject { |item| item.is_a?(Hash) }.present?
+    record.errors.add(:content_attributes, I18n.t('errors.models.content_attributes.items_required')) if record.items.blank?
+    return if record.items.reject { |item| item.is_a?(Hash) }.blank?
+
+    record.errors.add(:content_attributes, I18n.t('errors.models.content_attributes.items_type'))
   end
 
   def validate_item_attributes!(record, valid_keys)
     item_keys = record.items.collect(&:keys).flatten.filter_map(&:to_sym)
     invalid_keys = item_keys - valid_keys
-    record.errors.add(:content_attributes, "contains invalid keys for items : #{invalid_keys}") if invalid_keys.present?
+    return if invalid_keys.blank?
+
+    record.errors.add(:content_attributes, I18n.t('errors.models.content_attributes.invalid_item_keys', invalid_keys: invalid_keys))
   end
 
   def validate_item_actions!(record)
     if record.items.select { |item| item[:actions].blank? }.present?
-      record.errors.add(:content_attributes, 'contains items missing actions') && return
+      record.errors.add(:content_attributes, I18n.t('errors.models.content_attributes.missing_item_actions')) && return
     end
 
     validate_item_action_attributes!(record)
@@ -47,6 +51,8 @@ class ContentAttributeValidator < ActiveModel::Validator
   def validate_item_action_attributes!(record)
     item_action_keys = record.items.collect { |item| item[:actions].collect(&:keys) }
     invalid_keys = item_action_keys.flatten.compact.map(&:to_sym) - ALLOWED_CARD_ITEM_ACTION_KEYS
-    record.errors.add(:content_attributes, "contains invalid keys for actions:  #{invalid_keys}") if invalid_keys.present?
+    return if invalid_keys.blank?
+
+    record.errors.add(:content_attributes, I18n.t('errors.models.content_attributes.invalid_action_keys', invalid_keys: invalid_keys))
   end
 end

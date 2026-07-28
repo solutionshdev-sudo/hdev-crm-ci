@@ -192,7 +192,8 @@
         "REQUEST_PUSH": "Enable push notifications",
         "SLA_MISSED_FIRST_RESPONSE": "Send push notifications when a conversation misses first response SLA",
         "SLA_MISSED_NEXT_RESPONSE": "Send push notifications when a conversation misses next response SLA",
-        "SLA_MISSED_RESOLUTION": "Send push notifications when a conversation misses resolution SLA"
+        "SLA_MISSED_RESOLUTION": "Send push notifications when a conversation misses resolution SLA",
+        "NOT_SUPPORTED": "This browser does not support desktop notification"
       },
       "PROFILE_IMAGE": {
         "LABEL": "Profile Image"
@@ -298,6 +299,10 @@
     "MEDIA": {
       "IMAGE_UNAVAILABLE": "This image is no longer available.",
       "LOADING_FAILED": "Loading failed"
+    },
+    "CHANGELOG_CARD": {
+      "READ_MORE": "Read more",
+      "DISMISS": "Dismiss"
     }
   },
   "CONFIRM_EMAIL": "Verifying...",

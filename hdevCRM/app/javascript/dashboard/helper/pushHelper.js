@@ -71,7 +71,10 @@ export const registerSubscription = (onSuccess = () => {}) => {
     .catch(error => {
       // eslint-disable-next-line no-console
       console.error('Push subscription registration failed:', error);
-      useAlert('This browser does not support desktop notification');
+      useAlert(
+        'PROFILE_SETTINGS.FORM.PUSH_NOTIFICATIONS_SECTION.NOT_SUPPORTED',
+        { usei18n: true }
+      );
     });
 };
 

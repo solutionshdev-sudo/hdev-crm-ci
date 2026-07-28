@@ -92,7 +92,7 @@ class Integrations::Hook < ApplicationRecord
   private
 
   def ensure_feature_enabled
-    errors.add(:feature_flag, 'Feature not enabled') unless feature_allowed?
+    errors.add(:feature_flag, I18n.t('errors.models.integrations_hook.feature_not_enabled')) unless feature_allowed?
   end
 
   def ensure_hook_type
@@ -102,8 +102,9 @@ class Integrations::Hook < ApplicationRecord
   def validate_settings_json_schema
     return if app.blank? || app.params[:settings_json_schema].blank?
     return if legacy_dyte_settings_unchanged?
+    return if JSONSchemer.schema(app.params[:settings_json_schema]).valid?(settings)
 
-    errors.add(:settings, ': Invalid settings data') unless JSONSchemer.schema(app.params[:settings_json_schema]).valid?(settings)
+    errors.add(:settings, I18n.t('errors.models.integrations_hook.invalid_settings'))
   end
 
   # TODO: When adding credential validation for other integrations (dialogflow, dyte, etc.),

@@ -22,9 +22,9 @@ class Api::V1::Accounts::DataImportsController < Api::V1::Accounts::BaseControll
     totals = validate_intercom_source
     render json: { valid: true, totals: totals }
   rescue DataImports::Intercom::Client::AuthenticationError
-    render_source_validation_error('We could not validate this Intercom access key. Check the key and its permissions.')
+    render_source_validation_error(I18n.t('errors.api.data_import.invalid_intercom_key'))
   rescue DataImports::Intercom::Client::Error
-    render_source_validation_error('Intercom could not be reached. Please try again.')
+    render_source_validation_error(I18n.t('errors.api.data_import.intercom_unreachable'))
   rescue ArgumentError => e
     render_source_validation_error(e.message)
   end
@@ -32,16 +32,16 @@ class Api::V1::Accounts::DataImportsController < Api::V1::Accounts::BaseControll
   def create
     @data_import = creation_service.perform
     unless @data_import
-      render json: { message: 'Another data import is already in progress.' }, status: :unprocessable_entity
+      render json: { message: I18n.t('errors.api.data_import.in_progress') }, status: :unprocessable_entity
       return
     end
 
     DataImports::Intercom::ImportJob.perform_later(@data_import, @data_import.active_intercom_import_run_id)
     render_show
   rescue DataImports::Intercom::Client::AuthenticationError
-    render_source_validation_error('We could not validate this Intercom access key. Check the key and its permissions.')
+    render_source_validation_error(I18n.t('errors.api.data_import.invalid_intercom_key'))
   rescue DataImports::Intercom::Client::Error
-    render_source_validation_error('Intercom could not be reached. Please try again.')
+    render_source_validation_error(I18n.t('errors.api.data_import.intercom_unreachable'))
   rescue ArgumentError => e
     render_source_validation_error(e.message)
   end
@@ -51,7 +51,7 @@ class Api::V1::Accounts::DataImportsController < Api::V1::Accounts::BaseControll
     restart_result = restart_service.perform
     @data_import = restart_service.data_import
     if restart_result == :access_token_missing
-      render json: { message: 'The Intercom access key for this import is unavailable.' }, status: :unprocessable_entity
+      render json: { message: I18n.t('errors.api.data_import.access_key_unavailable') }, status: :unprocessable_entity
       return
     end
 
@@ -113,7 +113,7 @@ class Api::V1::Accounts::DataImportsController < Api::V1::Accounts::BaseControll
   end
 
   def validate_intercom_source
-    raise ArgumentError, 'Unsupported import source.' unless permitted_params[:source_provider] == 'intercom'
+    raise ArgumentError, I18n.t('errors.api.data_import.unsupported_source') unless permitted_params[:source_provider] == 'intercom'
 
     DataImports::Intercom::CredentialsValidator.new(
       access_token: permitted_params[:access_token],

@@ -202,14 +202,14 @@ class Attachment < ApplicationRecord
     return if media_file?(file_content_type) || ACCEPTABLE_FILE_TYPES.include?(file_content_type)
     return if generic_file_content_type?(file_content_type) && ACCEPTABLE_FILE_EXTENSIONS.include?(file_extension)
 
-    errors.add(:file, 'type not supported')
+    errors.add(:file, :type_not_supported)
   end
 
   def validate_file_size(byte_size)
     limit_mb = GlobalConfigService.load('MAXIMUM_FILE_UPLOAD_SIZE', 40).to_i
     limit_mb = 40 if limit_mb <= 0
 
-    errors.add(:file, 'size is too big') if byte_size > limit_mb.megabytes
+    errors.add(:file, :size_too_big) if byte_size > limit_mb.megabytes
   end
 
   def media_file?(file_content_type)

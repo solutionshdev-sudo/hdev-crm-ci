@@ -22,7 +22,11 @@ export default {
     class="image"
   >
     <div class="wrap">
-      <img :src="thumb" alt="Picture message" @error="onImgError" />
+      <img
+        :src="thumb"
+        :alt="$t('COMPONENTS.IMAGE_BUBBLE.ALT')"
+        @error="onImgError"
+      />
       <span class="time">{{ readableTime }}</span>
     </div>
   </a>

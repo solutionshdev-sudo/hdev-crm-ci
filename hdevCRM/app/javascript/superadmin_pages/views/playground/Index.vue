@@ -124,7 +124,7 @@ export default {
         v-model="messageContent"
         :rows="4"
         class="resize-none block p-2.5 w-full text-sm text-n-slate-12 bg-n-slate-1 rounded-lg border !outline-2 border-n-slate-7 placeholder:text-n-slate-10 focus:ring-n-blue-8 focus:border-n-blue-8"
-        placeholder="Type a message... [CMD/CTRL + Enter to send]"
+        placeholder="Digite uma mensagem... [CMD/CTRL + Enter para enviar]"
         autofocus
         autocomplete="off"
         @keydown.meta.enter="onMessageSend"

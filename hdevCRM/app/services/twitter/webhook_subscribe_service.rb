@@ -7,7 +7,7 @@ class Twitter::WebhookSubscribeService
     ensure_webhook
     unless subscription?
       subscribe_response = twitter_client.create_subscription
-      raise StandardError, 'Twitter Subscription Failed' unless subscribe_response.status == '204'
+      raise StandardError, I18n.t('errors.api.integrations.twitter.subscription_failed') unless subscribe_response.status == '204'
     end
 
     true

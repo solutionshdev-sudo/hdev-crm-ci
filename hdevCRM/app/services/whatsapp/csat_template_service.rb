@@ -40,7 +40,7 @@ class Whatsapp::CsatTemplateService
         }
       }
     else
-      { success: false, error: 'Template not found' }
+      { success: false, error: I18n.t('errors.api.template.not_found') }
     end
   rescue StandardError => e
     Rails.logger.error "Error fetching template status: #{e.message}"
@@ -116,7 +116,7 @@ class Whatsapp::CsatTemplateService
       Rails.logger.error "WhatsApp template creation failed: #{response.code} - #{response.body}"
       {
         success: false,
-        error: 'Template creation failed',
+        error: I18n.t('errors.api.template.creation_failed'),
         response_body: response.body
       }
     end

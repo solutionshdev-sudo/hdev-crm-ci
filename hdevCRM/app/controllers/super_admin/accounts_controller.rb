@@ -46,25 +46,19 @@ class SuperAdmin::AccountsController < SuperAdmin::ApplicationController
 
   def seed
     Internal::SeedAccountJob.perform_later(requested_resource)
-    # rubocop:disable Rails/I18nLocaleTexts
-    redirect_back(fallback_location: [namespace, requested_resource], notice: 'Account seeding triggered')
-    # rubocop:enable Rails/I18nLocaleTexts
+    redirect_back(fallback_location: [namespace, requested_resource], notice: I18n.t('super_admin.flash.seeding_triggered'))
   end
 
   def reset_cache
     requested_resource.reset_cache_keys
-    # rubocop:disable Rails/I18nLocaleTexts
-    redirect_back(fallback_location: [namespace, requested_resource], notice: 'Cache keys cleared')
-    # rubocop:enable Rails/I18nLocaleTexts
+    redirect_back(fallback_location: [namespace, requested_resource], notice: I18n.t('super_admin.flash.cache_cleared'))
   end
 
   def destroy
     account = Account.find(params[:id])
 
     DeleteObjectJob.perform_later(account) if account.present?
-    # rubocop:disable Rails/I18nLocaleTexts
-    redirect_back(fallback_location: [namespace, requested_resource], notice: 'Account deletion is in progress.')
-    # rubocop:enable Rails/I18nLocaleTexts
+    redirect_back(fallback_location: [namespace, requested_resource], notice: I18n.t('super_admin.flash.account_deletion_in_progress'))
   end
 end
 

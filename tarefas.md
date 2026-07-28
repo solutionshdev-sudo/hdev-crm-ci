@@ -6,13 +6,13 @@
 
 ## Agora
 
-- 🔴 **Rebuild da imagem no EasyPanel** — destrava duas coisas de uma vez: o fix
-  do 500 do `/super_admin` (commit `161ee71`, já no remoto) e as telas de auth
-  novas. Restart não basta: o Dockerfile roda `assets:precompile` no build
-- Depois do rebuild: abrir `/super_admin` e navegar por Accounts, Agencies, Users
-  e Settings, pra garantir que não há outro recurso sem rota `index`
-- Comitar o redesign das telas de auth (5 telas + `AuthSplitLayout.vue` + os dois
-  consertos de white-label em `vueapp.html.erb` e `agency.rb`)
+- 🔴 **Rodar o deploy com `b0e0ed5`** — o 1º build do redesign falhou no
+  `assets:precompile` (SassCompressor × `rgb(var())`); o fix já está na `main`
+- Depois do deploy: testar o console super admin **nos dois temas**, página a
+  página (Painel, Contas, Agências, Usuários, Robôs, Apps, Configurações,
+  forms de editar/criar, login) — dark tem que valer em tudo, sem string em inglês
+- Comitar o polish UX do canvas do chatbot (estilo Make, 8 arquivos — feito
+  27/07, ainda sem commit)
 - Definir `DEFAULT_LOCALE=pt_BR` no EasyPanel — sem isso as telas de auth abrem
   em inglês mesmo com a tradução pronta
 - Conferir se `INSTALLATION_NAME` continua "Hdev CRM" — prova de que o job de reversão morreu
@@ -29,6 +29,8 @@
 
 ## Concluídas recentes
 
+- 2026-07-27 — Redesign do console super admin comitado e pushed (`426385d` + fix do precompile `b0e0ed5`): dark global, tradução completa, switch de tema, visual do app
+- 2026-07-27 — Rebuild do `161ee71` + telas de auth: deployado; 500 do `/super_admin` confirmado resolvido (console navegável em produção)
 - 2026-07-26 — Paleta verde completa + 30 favicons regerados + `/swagger` fechado (commit `5d1208e`)
 - 2026-07-26 — `DISABLE_ENTERPRISE` ativo, marca restaurada no banco, alerta do Redis limpo
 - 2026-07-26 — Instância acessível no ar (container web reimplantado + rota do domínio corrigida)

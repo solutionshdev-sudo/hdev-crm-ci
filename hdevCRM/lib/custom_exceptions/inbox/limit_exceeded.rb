@@ -2,7 +2,7 @@
 
 class CustomExceptions::Inbox::LimitExceeded < CustomExceptions::Base
   def message
-    'Account limit exceeded. Upgrade to a higher plan'
+    I18n.t('errors.api.inbox.limit_exceeded')
   end
 
   def to_hash

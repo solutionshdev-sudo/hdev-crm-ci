@@ -12,14 +12,14 @@ class Whatsapp::TokenExchangeService
   private
 
   def validate_code!
-    raise ArgumentError, 'Authorization code is required' if @code.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.authorization_code_required') if @code.blank?
   end
 
   def exchange_token
     response = @api_client.exchange_code_for_token(@code)
     access_token = response['access_token']
 
-    raise "No access token in response: #{response}" if access_token.blank?
+    raise I18n.t('errors.api.whatsapp.no_access_token', response: response) if access_token.blank?
 
     access_token
   end

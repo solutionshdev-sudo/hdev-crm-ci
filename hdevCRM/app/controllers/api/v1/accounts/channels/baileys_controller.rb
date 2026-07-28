@@ -34,7 +34,7 @@ class Api::V1::Accounts::Channels::BaileysController < Api::V1::Accounts::BaseCo
   def validate_baileys_channel
     return if @inbox.channel.is_a?(Channel::Whatsapp) && @inbox.channel.baileys?
 
-    render json: { error: 'Not a baileys WhatsApp inbox' }, status: :unprocessable_entity
+    render json: { error: I18n.t('errors.api.inbox.not_baileys') }, status: :unprocessable_entity
   end
 
   def session_service

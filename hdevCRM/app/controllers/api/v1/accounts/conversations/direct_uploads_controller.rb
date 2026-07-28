@@ -29,7 +29,7 @@ class Api::V1::Accounts::Conversations::DirectUploadsController < ActiveStorage:
   def validate_token_api_access
     return if Current.account.api_and_webhooks_enabled?
 
-    render json: { error: 'API access is not enabled for this account' }, status: :forbidden
+    render json: { error: I18n.t('errors.api.common.api_access_disabled') }, status: :forbidden
   end
 
   def conversation

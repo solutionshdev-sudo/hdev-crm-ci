@@ -23,7 +23,7 @@ class DataImports::Intercom::CreationService
   private
 
   def validate_source
-    raise ArgumentError, 'Unsupported import source.' unless @source_params[:source_provider] == 'intercom'
+    raise ArgumentError, I18n.t('errors.api.data_import.unsupported_source') unless @source_params[:source_provider] == 'intercom'
 
     DataImports::Intercom::CredentialsValidator.new(
       access_token: @access_token,

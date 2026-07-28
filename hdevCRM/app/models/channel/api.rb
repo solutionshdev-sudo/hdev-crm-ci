@@ -41,6 +41,6 @@ class Channel::Api < ApplicationRecord
     return if additional_attributes['agent_reply_time_window'].blank?
     return if additional_attributes['agent_reply_time_window'].to_i.positive?
 
-    errors.add(:agent_reply_time_window, 'agent_reply_time_window must be greater than 0')
+    errors.add(:agent_reply_time_window, I18n.t('errors.models.channel_api.invalid_agent_reply_time_window'))
   end
 end

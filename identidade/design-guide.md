@@ -84,6 +84,9 @@ do Hdev CRM), não o contrário.
 - A paleta do produto vive em `hdevCRM/app/javascript/dashboard/assets/scss/_next-colors.scss`
   (tokens `--blue-*`, que apesar do nome legado valem VERDE) e em `hdevCRM/theme/colors.js`
   (`brand` / `brandVivid`). Mudou a marca? Mudar lá e aqui juntos.
+- O design system do **produto** (pra código: componentes, regras nomeadas,
+  claro/escuro) está documentado em `DESIGN.md` na raiz do workspace — as
+  skills de código leem de lá. Mudou a marca? Atualizar os três juntos.
 
 ### Regra de acento no white-label (não esquecer)
 

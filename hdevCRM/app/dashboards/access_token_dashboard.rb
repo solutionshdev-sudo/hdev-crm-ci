@@ -60,7 +60,7 @@ class AccessTokenDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how access tokens are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(access_token)
-  #   "AccessToken ##{access_token.id}"
-  # end
+  def display_resource(access_token)
+    "#{AccessToken.model_name.human} ##{access_token.id}"
+  end
 end

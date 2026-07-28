@@ -75,7 +75,7 @@ class AgentBotDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how agent bots are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(agent_bot)
-  #   "AgentBot ##{agent_bot.id}"
-  # end
+  def display_resource(agent_bot)
+    "#{AgentBot.model_name.human} ##{agent_bot.id}"
+  end
 end

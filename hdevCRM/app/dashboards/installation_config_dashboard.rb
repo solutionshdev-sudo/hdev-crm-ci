@@ -60,7 +60,7 @@ class InstallationConfigDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how installation configs are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(installation_config)
-  #   "InstallationConfig ##{installation_config.id}"
-  # end
+  def display_resource(installation_config)
+    "#{InstallationConfig.model_name.human} ##{installation_config.id}"
+  end
 end

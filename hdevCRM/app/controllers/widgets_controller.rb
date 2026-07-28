@@ -29,7 +29,7 @@ class WidgetsController < ActionController::Base
     @web_widget = ::Channel::WebWidget.find_by!(website_token: permitted_params[:website_token])
   rescue ActiveRecord::RecordNotFound
     Rails.logger.error('web widget does not exist')
-    render json: { error: 'web widget does not exist' }, status: :not_found
+    render json: { error: I18n.t('errors.api.widget.not_found') }, status: :not_found
   end
 
   def apply_agency_branding
@@ -65,7 +65,7 @@ class WidgetsController < ActionController::Base
   end
 
   def ensure_account_is_active
-    render json: { error: 'Account is suspended' }, status: :unauthorized unless @web_widget.inbox.account.active?
+    render json: { error: I18n.t('errors.api.account.suspended') }, status: :unauthorized unless @web_widget.inbox.account.active?
   end
 
   def ensure_location_is_supported; end

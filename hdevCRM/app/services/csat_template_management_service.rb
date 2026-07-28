@@ -31,7 +31,7 @@ class CsatTemplateManagementService
     result
   rescue StandardError => e
     Rails.logger.error "Error creating CSAT template: #{e.message}"
-    { success: false, service_error: 'Template creation failed' }
+    { success: false, service_error: I18n.t('errors.api.template.creation_failed') }
   end
 
   private
@@ -110,7 +110,7 @@ class CsatTemplateManagementService
 
     template_service = Twilio::CsatTemplateService.new(@inbox.channel)
     status_result = template_service.get_template_status(content_sid)
-    return { template_exists: false, error: 'Template not found' } unless status_result.is_a?(Hash)
+    return { template_exists: false, error: I18n.t('errors.api.template.not_found') } unless status_result.is_a?(Hash)
 
     if status_result[:success]
       {
@@ -123,7 +123,7 @@ class CsatTemplateManagementService
     else
       {
         template_exists: false,
-        error: 'Template not found'
+        error: I18n.t('errors.api.template.not_found')
       }
     end
   end
@@ -131,7 +131,7 @@ class CsatTemplateManagementService
   def get_whatsapp_template_status(template)
     template_name = template['name'] || CsatTemplateNameService.csat_template_name(@inbox.id)
     status_result = Whatsapp::CsatTemplateService.new(@inbox.channel).get_template_status(template_name)
-    return { template_exists: false, error: 'Template not found' } unless status_result.is_a?(Hash)
+    return { template_exists: false, error: I18n.t('errors.api.template.not_found') } unless status_result.is_a?(Hash)
 
     if status_result[:success]
       {
@@ -143,7 +143,7 @@ class CsatTemplateManagementService
     else
       {
         template_exists: false,
-        error: 'Template not found'
+        error: I18n.t('errors.api.template.not_found')
       }
     end
   end

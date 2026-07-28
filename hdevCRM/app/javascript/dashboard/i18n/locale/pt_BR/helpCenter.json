@@ -818,6 +818,7 @@
       "EDIT_ARTICLE": {
         "MORE_PROPERTIES": "Mais propriedades",
         "UNCATEGORIZED": "Não categorizado",
+        "TITLE_PLACEHOLDER": "Título",
         "EDITOR_PLACEHOLDER": "Escreva seu conteúdo aqui. Digite '/' para opções de formatação."
       },
       "ARTICLE_PROPERTIES": {

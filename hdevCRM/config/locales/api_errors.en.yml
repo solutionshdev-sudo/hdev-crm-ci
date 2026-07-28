@@ -1,0 +1,137 @@
+en:
+  errors:
+    api:
+      common:
+        resource_not_found: 'Resource could not be found'
+        action_not_authorized: 'You are not authorized to do this action'
+        unauthorized: 'Unauthorized'
+        api_access_disabled: 'API access is not enabled for this account'
+        query_param_missing: 'Specify search string with parameter q'
+      auth:
+        invalid_access_token: 'Invalid Access Token'
+        bot_endpoint_not_allowed: 'Access to this endpoint is not authorized for bots'
+        invalid_current_password: 'Invalid current password'
+      account:
+        suspended: 'Account is suspended'
+        bot_not_authorized: 'Bot is not authorized to access this account'
+        agent_limit_exceeded: 'Account limit exceeded. Please purchase more licenses'
+      widget:
+        not_found: 'web widget does not exist'
+        invalid_hmac: 'HMAC failed: Invalid Identifier Hash Provided'
+      form:
+        field_required: 'Please fill this field'
+        alphabets_only: 'Only alphabets are allowed'
+      csat:
+        locked: 'You cannot update the CSAT survey after 14 days'
+        template_params_required: 'Template parameters are required'
+        channel_not_supported: 'CSAT template operations only available for WhatsApp and Twilio WhatsApp channels'
+        message_required: 'Message is required'
+        captain_required: 'Captain is required for template analysis'
+        no_template_to_delete: 'No template to delete'
+        no_content_sid: 'No content SID provided'
+      template:
+        not_found: 'Template not found'
+        creation_failed: 'Template creation failed'
+        not_found_or_invalid: 'Template not found or invalid template name'
+        sync_unavailable: 'Template sync is only available for WhatsApp channels'
+        sync_initiated: 'Template sync initiated successfully'
+      conversation:
+        email_param_missing: 'email param missing'
+        transcript_not_available: 'Email transcript is not available on your plan'
+        source_id_not_unique: 'source_id should be unique'
+        status_update_api_only: 'Message status update is only allowed for API inboxes'
+      inbox:
+        limit_exceeded: 'Account limit exceeded. Upgrade to a higher plan'
+        branded_email_disabled: 'Branded email templates feature is not enabled'
+        branded_email_only_email: 'Branded email layout is only supported for email inboxes'
+        not_baileys: 'Not a baileys WhatsApp inbox'
+      whatsapp:
+        health_unavailable: 'Health data only available for WhatsApp Cloud API channels'
+        webhook_registered: 'Webhook registered successfully'
+        account_required: 'Account is required'
+        waba_info_required: 'WABA info is required'
+        phone_info_required: 'Phone info is required'
+        access_token_required: 'Access token is required'
+        missing_params: 'Required parameters are missing: %{params}'
+        channel_required: 'Channel is required'
+        api_key_missing: 'API key is missing'
+        phone_number_id_missing: 'Phone number ID is missing'
+        phone_number_id_required: 'Phone number ID is required'
+        waba_id_required: 'WABA ID is required'
+        no_phone_numbers: 'No phone numbers found for WABA %{waba_id}'
+        coupon_code_blank: 'Coupon code cannot be empty'
+        coupon_code_too_long: 'Coupon code cannot exceed 15 characters'
+        unsupported_media_type: 'Unsupported media type: %{media_type}'
+        invalid_url_scheme: 'Invalid URL scheme: %{scheme}. Only http and https are allowed'
+        url_too_long: 'URL too long (max 2000 characters)'
+        invalid_url_format: 'Invalid URL format: %{message}. Please enter a valid URL like https://example.com/document.pdf'
+        phone_number_mismatch: 'Phone number mismatch. Expected %{expected}, got %{actual}'
+        unknown_legacy_format: 'Unknown legacy format: %{format}'
+        authorization_code_required: 'Authorization code is required'
+        no_access_token: 'No access token in response: %{response}'
+        webhook_setup_failed: 'Webhook setup failed: %{message}'
+      data_import:
+        in_progress: 'Another data import is already in progress.'
+        access_key_unavailable: 'The Intercom access key for this import is unavailable.'
+        invalid_intercom_key: 'We could not validate this Intercom access key. Check the key and its permissions.'
+        intercom_unreachable: 'Intercom could not be reached. Please try again.'
+        unsupported_source: 'Unsupported import source.'
+        access_key_required: 'Intercom access key is required.'
+        import_type_required: 'Select at least one data type to import.'
+        unsupported_types: 'Unsupported import types: %{types}'
+      integrations:
+        shopify:
+          domain_required: 'Shop domain is required'
+          contact_missing: 'Contact information missing'
+        linear:
+          missing_credentials: 'Missing Credentials'
+          missing_team_id: 'Missing team id'
+          missing_search_term: 'Missing search term'
+          missing_link: 'Missing link'
+          missing_issue_id: 'Missing issue id'
+          missing_link_id: 'Missing  link id'
+          missing_title: 'Missing title'
+          invalid_priority: 'Invalid priority value. Priority must be 0, 1, 2, 3, or 4.'
+          invalid_label_ids: 'label_ids must be an array of strings.'
+          missing_access_token: 'Missing access token in Linear token response'
+        dyte:
+          missing_credentials: 'Missing Credentials'
+          missing_information: 'Missing information'
+        twitter:
+          subscription_failed: 'Twitter Subscription Failed'
+      imap:
+        invalid_mechanism: 'Invalid IMAP authentication mechanism. Allowed values: %{allowed_values}'
+      crm:
+        unsupported_event: 'Unsupported event: %{event_name}'
+        prospect_id_required: 'Prospect ID is required'
+        activity_code_required: 'Activity event code is required'
+        activity_name_required: 'Activity name is required'
+        search_key_required: 'Search key is required'
+        lead_data_required: 'Lead data is required'
+        lead_id_required: 'Lead ID is required'
+        lead_creation_failed: 'Failed to create lead - no ID returned'
+        activity_code_not_found: 'LeadSquared %{key} activity code not found for hook #%{hook_id}.'
+      mailer:
+        email_domain_missing: 'Channel email domain not present.'
+      pdf:
+        upload_failed: 'PDF upload failed'
+        validation_failed: 'PDF validation failed'
+        faq_generation_failed: 'PDF FAQ generation failed'
+      platform:
+        invalid_access_token: 'Invalid access_token'
+        non_permissible_resource: 'Non permissible resource'
+        email_migration_disabled: 'Email channel migration is not enabled'
+        missing_migrations: 'Missing migrations parameter'
+        too_many_migrations: 'Too many migrations (max %{max})'
+      devise:
+        invalid_token: 'Invalid token'
+        already_confirmed: 'Already confirmed'
+        failure: 'Failure'
+      dashboard:
+        json_not_supported: 'Please use API routes instead of dashboard routes for JSON requests'
+      report:
+        invalid_group_by: 'invalid group_by'
+      onboarding:
+        invalid_step: 'Invalid onboarding step'
+      team:
+        invalid_user_ids: 'Invalid User IDs'

@@ -17,6 +17,6 @@ module EnsureAgencyAccess
 
   def ensure_agency_admin
     @agency_user = AgencyUser.find_by(agency_id: @agency.id, user_id: current_user.id, role: :administrator)
-    render json: { error: 'Unauthorized' }, status: :unauthorized if @agency_user.blank?
+    render json: { error: I18n.t('errors.api.common.unauthorized') }, status: :unauthorized if @agency_user.blank?
   end
 end

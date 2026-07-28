@@ -115,6 +115,6 @@ module ConversationReplyMailerHelper
     return @account.inbound_email_domain if @account.inbound_email_domain.present?
 
     email = @inbox.channel.try(:email)
-    email.present? ? email.split('@').last : raise(StandardError, 'Channel email domain not present.')
+    email.present? ? email.split('@').last : raise(StandardError, I18n.t('errors.api.mailer.email_domain_missing'))
   end
 end

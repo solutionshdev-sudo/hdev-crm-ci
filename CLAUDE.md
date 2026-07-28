@@ -23,6 +23,10 @@ negócio e as skills do HDEV.
 - `baileys-service/` — microserviço Node do WhatsApp não-oficial (Baileys); conversa com o Rails por HTTP interno + webhook HMAC
 - `_sistema/` — núcleo de regras do HDEV (não sobrescrever)
 - `templates/`, `.claude/skills/` — moldes e skills do sistema
+- `PRODUCT.md` / `DESIGN.md` (raiz) — contexto de produto e design system
+  oficial da plataforma (tokens `n-*`, regras de acento white-label). Toda tela
+  nova do produto segue o `DESIGN.md`; a skill `impeccable` (com detector de
+  design via hook) usa os dois como fonte de verdade
 
 ## Quem sou
 
@@ -51,6 +55,12 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
   modelo de negócio. O núcleo é MIT e pode ser vendido; nunca alterar
   o arquivo `LICENSE`.
 - Nunca comitar `.env` nem chaves/tokens (ver seção Segurança nas regras).
+- **Idioma:** o locale padrão do app é `pt_BR` (`config.i18n.default_locale`
+  no `application.rb`); os specs rodam em `:en` (fixado no `test.rb`). Texto
+  novo visível ao usuário nunca é hardcoded — sempre chave I18n com valor em
+  `en` E `pt_BR` (o inglês dos arquivos `*_errors`/`mailers` precisa ficar
+  idêntico ao que os specs assertam). Exceção: corpos de e-mail `.liquid`
+  são pt-BR direto (Liquid não acessa I18n).
 
 ## Ferramentas / ambiente
 

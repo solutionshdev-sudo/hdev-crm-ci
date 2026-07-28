@@ -18,10 +18,10 @@ class Whatsapp::ChannelCreationService
   private
 
   def validate_parameters!
-    raise ArgumentError, 'Account is required' if @account.blank?
-    raise ArgumentError, 'WABA info is required' if @waba_info.blank?
-    raise ArgumentError, 'Phone info is required' if @phone_info.blank?
-    raise ArgumentError, 'Access token is required' if @access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.account_required') if @account.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.waba_info_required') if @waba_info.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.phone_info_required') if @phone_info.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.access_token_required') if @access_token.blank?
   end
 
   def find_existing_channel

@@ -71,6 +71,7 @@
         "NORTH_AMERICA_WARNING": "As conexões com o TikTok para contas da América do Norte estão temporariamente indisponíveis enquanto aguardamos uma atualização da equipe do TikTok."
       },
       "TWITTER": {
+        "SIGN_IN_BUTTON": "Entrar com o Twitter",
         "HELP": "Para adicionar seu perfil do Twitter como um canal, você precisa autenticar seu perfil do Twitter clicando em 'Entrar com o Twitter' ",
         "ERROR_MESSAGE": "Houve um erro ao conectar com o Twitter, por favor, tente novamente",
         "TWEETS": {

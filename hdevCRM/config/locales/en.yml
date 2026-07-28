@@ -610,6 +610,14 @@ en:
     invalid_option: "Sorry, I didn't understand. Please pick one of the options (you can reply with the number)."
     invalid_answer: "That doesn't look valid. Could you try again?"
   super_admin:
+    flash:
+      seeding_triggered: 'Account seeding triggered'
+      cache_cleared: 'Cache keys cleared'
+      account_deletion_in_progress: 'Account deletion is in progress.'
+      instance_status_refreshed: 'Instance status refreshed'
+      config_updated: '%{config} settings updated successfully'
+      restart_required: 'Restart the Hdev CRM web and worker processes to apply this change everywhere.'
+      invalid_credentials: 'Invalid credentials. Please try again.'
     login:
       headline: 'Welcome back to'
       subtitle: 'Admin console — manage accounts, agencies, users and platform settings.'

@@ -168,7 +168,9 @@ const handleCreateArticle = event => {
           min-height="4rem"
           custom-text-area-class="!text-[32px] !leading-[48px] !font-medium !tracking-[0.2px]"
           custom-text-area-wrapper-class="border-0 !bg-transparent dark:!bg-transparent !py-0 !px-0"
-          placeholder="Title"
+          :placeholder="
+            t('HELP_CENTER.EDIT_ARTICLE_PAGE.EDIT_ARTICLE.TITLE_PLACEHOLDER')
+          "
           :autofocus="isNewArticle"
           @blur="handleCreateArticle"
         />

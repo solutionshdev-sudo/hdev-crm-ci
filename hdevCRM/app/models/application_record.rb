@@ -43,7 +43,7 @@ class ApplicationRecord < ActiveRecord::Base
     max_length = column.type == :text ? MAX_TEXT_COLUMN_LENGTH : MAX_STRING_COLUMN_LENGTH
     return if self[column.name].nil? || self[column.name].length <= max_length
 
-    errors.add(column.name.to_sym, "is too long (maximum is #{max_length} characters)")
+    errors.add(column.name.to_sym, :too_long, count: max_length)
   end
 
   def normalize_empty_string_to_nil(attrs = [])

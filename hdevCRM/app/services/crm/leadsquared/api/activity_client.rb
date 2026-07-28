@@ -1,8 +1,8 @@
 class Crm::Leadsquared::Api::ActivityClient < Crm::Leadsquared::Api::BaseClient
   # https://apidocs.leadsquared.com/post-an-activity-to-lead/#api
   def post_activity(prospect_id, activity_event, activity_note)
-    raise ArgumentError, 'Prospect ID is required' if prospect_id.blank?
-    raise ArgumentError, 'Activity event code is required' if activity_event.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.prospect_id_required') if prospect_id.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.activity_code_required') if activity_event.blank?
 
     path = 'ProspectActivity.svc/Create'
 
@@ -17,7 +17,7 @@ class Crm::Leadsquared::Api::ActivityClient < Crm::Leadsquared::Api::BaseClient
   end
 
   def create_activity_type(name:, score:, direction: 0)
-    raise ArgumentError, 'Activity name is required' if name.blank?
+    raise ArgumentError, I18n.t('errors.api.crm.activity_name_required') if name.blank?
 
     path = 'ProspectActivity.svc/CreateType'
     body = {

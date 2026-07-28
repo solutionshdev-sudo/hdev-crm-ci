@@ -25,7 +25,7 @@ class Crm::BaseProcessorService
     when 'conversation.updated'
       handle_conversation_updated(event_data)
     else
-      { success: false, error: "Unsupported event: #{event_name}" }
+      { success: false, error: I18n.t('errors.api.crm.unsupported_event', event_name: event_name) }
     end
   rescue StandardError => e
     Rails.logger.error "#{crm_name} Processor Error: #{e.message}"

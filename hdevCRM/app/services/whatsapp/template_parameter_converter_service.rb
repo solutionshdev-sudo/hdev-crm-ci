@@ -90,7 +90,7 @@ class Whatsapp::TemplateParameterConverterService
       # Templates without parameters (nil processed_params)
       # Return empty enhanced structure
     else
-      raise ArgumentError, "Unknown legacy format: #{legacy_params.class}"
+      raise ArgumentError, I18n.t('errors.api.whatsapp.unknown_legacy_format', format: legacy_params.class)
     end
 
     enhanced

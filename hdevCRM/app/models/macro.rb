@@ -71,7 +71,7 @@ class Macro < ApplicationRecord
     attributes = actions.map { |obj, _| obj['action_name'] }
     actions = attributes - ACTIONS_ATTRS
 
-    errors.add(:actions, "Macro execution actions #{actions.join(',')} not supported.") if actions.any?
+    errors.add(:actions, I18n.t('errors.models.macro.actions_not_supported', actions: actions.join(','))) if actions.any?
   end
 end
 

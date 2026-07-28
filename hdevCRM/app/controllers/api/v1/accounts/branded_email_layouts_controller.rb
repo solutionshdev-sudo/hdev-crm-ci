@@ -7,7 +7,7 @@ class Api::V1::Accounts::BrandedEmailLayoutsController < Api::V1::Accounts::Base
 
   def update
     unless Current.account.feature_enabled?(:branded_email_templates)
-      render_could_not_create_error('Branded email templates feature is not enabled')
+      render_could_not_create_error(I18n.t('errors.api.inbox.branded_email_disabled'))
       return
     end
 

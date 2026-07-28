@@ -32,8 +32,10 @@ class AccountDashboard < Administrate::BaseDashboard
     updated_at: Field::DateTime,
     users: CountField,
     conversations: CountField,
-    locale: Field::Select.with_options(collection: LANGUAGES_CONFIG.map { |_x, y| y[:iso_639_1_code] }),
-    status: Field::Select.with_options(collection: [%w[Active active], %w[Suspended suspended]]),
+    locale: Field::Select.with_options(collection: LANGUAGES_CONFIG.map { |_x, y| [y[:name], y[:iso_639_1_code]] }),
+    status: Field::Select.with_options(collection: lambda { |_field|
+      [[I18n.t('administrate.values.status.active'), 'active'], [I18n.t('administrate.values.status.suspended'), 'suspended']]
+    }),
     agency: Field::BelongsTo.with_options(searchable: true, searchable_field: 'name', order: 'id DESC', include_blank: true),
     account_users: Field::HasMany,
     custom_attributes: Field::String

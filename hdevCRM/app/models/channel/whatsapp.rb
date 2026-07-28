@@ -166,7 +166,7 @@ class Channel::Whatsapp < ApplicationRecord
   end
 
   def validate_provider_config
-    errors.add(:provider_config, 'Invalid Credentials') unless provider_service.validate_provider_config?
+    errors.add(:provider_config, I18n.t('errors.models.channel_whatsapp.invalid_credentials')) unless provider_service.validate_provider_config?
   end
 
   # Logs only the embedded signup → manual migration (the save drops the

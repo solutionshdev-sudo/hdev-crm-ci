@@ -8,10 +8,10 @@ module Api::V1::Accounts::Concerns::WhatsappHealthManagement
   end
 
   def sync_templates
-    return render status: :unprocessable_entity, json: { error: 'Template sync is only available for WhatsApp channels' } unless whatsapp_channel?
+    return render status: :unprocessable_entity, json: { error: I18n.t('errors.api.template.sync_unavailable') } unless whatsapp_channel?
 
     trigger_template_sync
-    render status: :ok, json: { message: 'Template sync initiated successfully' }
+    render status: :ok, json: { message: I18n.t('errors.api.template.sync_initiated') }
   rescue StandardError => e
     render status: :internal_server_error, json: { error: e.message }
   end
@@ -27,7 +27,7 @@ module Api::V1::Accounts::Concerns::WhatsappHealthManagement
   def register_webhook
     Whatsapp::WebhookSetupService.new(@inbox.channel).register_callback
 
-    render json: { message: 'Webhook registered successfully' }, status: :ok
+    render json: { message: I18n.t('errors.api.whatsapp.webhook_registered') }, status: :ok
   rescue StandardError => e
     Rails.logger.error "[INBOX WEBHOOK] Webhook registration failed: #{e.message}"
     render json: { error: e.message }, status: :unprocessable_entity
@@ -38,7 +38,7 @@ module Api::V1::Accounts::Concerns::WhatsappHealthManagement
   def validate_whatsapp_cloud_channel
     return if @inbox.channel.is_a?(Channel::Whatsapp) && @inbox.channel.provider == 'whatsapp_cloud'
 
-    render json: { error: 'Health data only available for WhatsApp Cloud API channels' }, status: :bad_request
+    render json: { error: I18n.t('errors.api.whatsapp.health_unavailable') }, status: :bad_request
   end
 
   def whatsapp_channel?

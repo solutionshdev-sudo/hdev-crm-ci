@@ -143,8 +143,8 @@ class Portal < ApplicationRecord
 
   def validate_config
     denied_keys = config.keys - CONFIG_JSON_KEYS
-    errors.add(:config, "in portal on #{denied_keys.join(',')} is not supported.") if denied_keys.any?
-    errors.add(:config, 'default locale cannot be drafted.') if draft_locale?(default_locale)
+    errors.add(:config, I18n.t('errors.models.portal.config_not_supported', denied_keys: denied_keys.join(','))) if denied_keys.any?
+    errors.add(:config, I18n.t('errors.models.portal.default_locale_drafted')) if draft_locale?(default_locale)
   end
 
   def normalize_locale_codes(locale_codes)

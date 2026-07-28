@@ -81,6 +81,6 @@ class Whatsapp::EmbeddedSignupService
 
     return if missing_params.empty?
 
-    raise ArgumentError, "Required parameters are missing: #{missing_params.join(', ')}"
+    raise ArgumentError, I18n.t('errors.api.whatsapp.missing_params', params: missing_params.join(', '))
   end
 end

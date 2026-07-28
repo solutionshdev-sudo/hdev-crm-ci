@@ -192,7 +192,8 @@
         "REQUEST_PUSH": "Habilitar notificações push",
         "SLA_MISSED_FIRST_RESPONSE": "Enviar notificações quando uma conversa perder a primeira resposta SLA",
         "SLA_MISSED_NEXT_RESPONSE": "Enviar notificações quando uma conversa perder a próxima resposta SLA",
-        "SLA_MISSED_RESOLUTION": "Enviar notificações quando uma conversa perder resolução de resolução SLA"
+        "SLA_MISSED_RESOLUTION": "Enviar notificações quando uma conversa perder resolução de resolução SLA",
+        "NOT_SUPPORTED": "Este navegador não oferece suporte a notificações na área de trabalho"
       },
       "PROFILE_IMAGE": {
         "LABEL": "Imagem do Perfil"
@@ -298,6 +299,10 @@
     "MEDIA": {
       "IMAGE_UNAVAILABLE": "Esta imagem não está mais disponível.",
       "LOADING_FAILED": "Falha no carregamento"
+    },
+    "CHANGELOG_CARD": {
+      "READ_MORE": "Ler mais",
+      "DISMISS": "Dispensar"
     }
   },
   "CONFIRM_EMAIL": "Verificando...",

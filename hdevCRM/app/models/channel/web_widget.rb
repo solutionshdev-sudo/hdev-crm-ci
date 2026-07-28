@@ -85,16 +85,19 @@ class Channel::WebWidget < ApplicationRecord
     return if pre_chat_form_options.with_indifferent_access['pre_chat_fields'].present?
 
     self.pre_chat_form_options = {
-      pre_chat_message: 'Share your queries or comments here.',
+      pre_chat_message: I18n.t('channels.web_widget.default_pre_chat_form.pre_chat_message'),
       pre_chat_fields: [
         {
-          'field_type': 'standard', 'label': 'Email Id', 'name': 'emailAddress', 'type': 'email', 'required': true, 'enabled': false
+          'field_type': 'standard', 'label': I18n.t('channels.web_widget.default_pre_chat_form.email'), 'name': 'emailAddress',
+          'type': 'email', 'required': true, 'enabled': false
         },
         {
-          'field_type': 'standard', 'label': 'Full name', 'name': 'fullName', 'type': 'text', 'required': false, 'enabled': false
+          'field_type': 'standard', 'label': I18n.t('channels.web_widget.default_pre_chat_form.full_name'), 'name': 'fullName',
+          'type': 'text', 'required': false, 'enabled': false
         },
         {
-          'field_type': 'standard', 'label': 'Phone number', 'name': 'phoneNumber', 'type': 'text', 'required': false, 'enabled': false
+          'field_type': 'standard', 'label': I18n.t('channels.web_widget.default_pre_chat_form.phone_number'), 'name': 'phoneNumber',
+          'type': 'text', 'required': false, 'enabled': false
         }
       ]
     }

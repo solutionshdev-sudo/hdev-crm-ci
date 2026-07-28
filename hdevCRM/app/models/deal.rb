@@ -26,7 +26,7 @@ class Deal < ApplicationRecord
     return if deal_stage.blank? || deal_pipeline.blank?
     return if deal_stage.deal_pipeline_id == deal_pipeline_id
 
-    errors.add(:deal_stage, 'must belong to the deal pipeline')
+    errors.add(:deal_stage, I18n.t('errors.models.deal.stage_not_in_pipeline'))
   end
 
   # Entrar em etapa ganha/perdida fecha o negócio; voltar pra etapa aberta reabre.

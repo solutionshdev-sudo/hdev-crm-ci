@@ -16,8 +16,8 @@ class Whatsapp::PopulateTemplateParametersService
     case button['type']
     when 'copy_code'
       coupon_code = button['parameter'].to_s.strip
-      raise ArgumentError, 'Coupon code cannot be empty' if coupon_code.blank?
-      raise ArgumentError, 'Coupon code cannot exceed 15 characters' if coupon_code.length > 15
+      raise ArgumentError, I18n.t('errors.api.whatsapp.coupon_code_blank') if coupon_code.blank?
+      raise ArgumentError, I18n.t('errors.api.whatsapp.coupon_code_too_long') if coupon_code.length > 15
 
       {
         type: 'coupon_code',
@@ -99,7 +99,7 @@ class Whatsapp::PopulateTemplateParametersService
     when 'document'
       build_document_parameter(sanitized_url, media_name)
     else
-      raise ArgumentError, "Unsupported media type: #{media_type}"
+      raise ArgumentError, I18n.t('errors.api.whatsapp.unsupported_media_type', media_type: media_type)
     end
   end
 
@@ -154,10 +154,10 @@ class Whatsapp::PopulateTemplateParametersService
     # url is already normalized by the caller
 
     uri = URI.parse(url)
-    raise ArgumentError, "Invalid URL scheme: #{uri.scheme}. Only http and https are allowed" unless %w[http https].include?(uri.scheme)
-    raise ArgumentError, 'URL too long (max 2000 characters)' if url.length > 2000
+    raise ArgumentError, I18n.t('errors.api.whatsapp.invalid_url_scheme', scheme: uri.scheme) unless %w[http https].include?(uri.scheme)
+    raise ArgumentError, I18n.t('errors.api.whatsapp.url_too_long') if url.length > 2000
 
   rescue URI::InvalidURIError => e
-    raise ArgumentError, "Invalid URL format: #{e.message}. Please enter a valid URL like https://example.com/document.pdf"
+    raise ArgumentError, I18n.t('errors.api.whatsapp.invalid_url_format', message: e.message)
   end
 end

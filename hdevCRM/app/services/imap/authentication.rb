@@ -13,7 +13,7 @@ module Imap::Authentication
     return normalized_mechanism if USER_CONFIGURABLE_MECHANISMS.include?(normalized_mechanism)
 
     allowed_values = USER_CONFIGURABLE_MECHANISMS.join(', ')
-    raise StandardError, "Invalid IMAP authentication mechanism. Allowed values: #{allowed_values}"
+    raise StandardError, I18n.t('errors.api.imap.invalid_mechanism', allowed_values: allowed_values)
   end
 
   def authenticate!(imap, mechanism, username, password)

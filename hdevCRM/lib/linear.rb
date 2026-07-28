@@ -6,7 +6,7 @@ class Linear
   def initialize(access_token, refresh_token: nil)
     @access_token = access_token
     @refresh_token = refresh_token
-    raise ArgumentError, 'Missing Credentials' if access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_credentials') if access_token.blank?
   end
 
   def teams
@@ -18,7 +18,7 @@ class Linear
   end
 
   def team_entities(team_id)
-    raise ArgumentError, 'Missing team id' if team_id.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_team_id') if team_id.blank?
 
     query = {
       query: Linear::Queries.team_entities_query(team_id)
@@ -28,7 +28,7 @@ class Linear
   end
 
   def search_issue(term)
-    raise ArgumentError, 'Missing search term' if term.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_search_term') if term.blank?
 
     query = {
       query: Linear::Queries.search_issue(term)
@@ -38,7 +38,7 @@ class Linear
   end
 
   def linked_issues(url)
-    raise ArgumentError, 'Missing link' if url.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_link') if url.blank?
 
     query = {
       query: Linear::Queries.linked_issues(url)
@@ -59,8 +59,8 @@ class Linear
   end
 
   def link_issue(link, issue_id, title, user = nil)
-    raise ArgumentError, 'Missing link' if link.blank?
-    raise ArgumentError, 'Missing issue id' if issue_id.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_link') if link.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_issue_id') if issue_id.blank?
 
     link_params = build_link_params(issue_id, link, title, user)
     payload = { query: Linear::Mutations.issue_link(link_params) }
@@ -70,7 +70,7 @@ class Linear
   end
 
   def unlink_issue(link_id)
-    raise ArgumentError, 'Missing  link id' if link_id.blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_link_id') if link_id.blank?
 
     payload = {
       query: Linear::Mutations.unlink_issue(link_id)
@@ -130,21 +130,21 @@ class Linear
   end
 
   def validate_team_and_title(params)
-    raise ArgumentError, 'Missing team id' if params[:team_id].blank?
-    raise ArgumentError, 'Missing title' if params[:title].blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_team_id') if params[:team_id].blank?
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.missing_title') if params[:title].blank?
   end
 
   def validate_priority(priority)
     return if priority.nil? || PRIORITY_LEVELS.include?(priority)
 
-    raise ArgumentError, 'Invalid priority value. Priority must be 0, 1, 2, 3, or 4.'
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.invalid_priority')
   end
 
   def validate_label_ids(label_ids)
     return if label_ids.nil?
     return if label_ids.is_a?(Array) && label_ids.all?(String)
 
-    raise ArgumentError, 'label_ids must be an array of strings.'
+    raise ArgumentError, I18n.t('errors.api.integrations.linear.invalid_label_ids')
   end
 
   def post(payload)

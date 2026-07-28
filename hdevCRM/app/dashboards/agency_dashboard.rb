@@ -6,7 +6,9 @@ class AgencyDashboard < Administrate::BaseDashboard
     name: Field::String.with_options(searchable: true),
     slug: Field::String.with_options(searchable: true),
     custom_domain: Field::String.with_options(searchable: true),
-    status: Field::Select.with_options(collection: [%w[Active active], %w[Suspended suspended]]),
+    status: Field::Select.with_options(collection: lambda { |_field|
+      [[I18n.t('administrate.values.status.active'), 'active'], [I18n.t('administrate.values.status.suspended'), 'suspended']]
+    }),
     installation_name: Field::String,
     brand_name: Field::String,
     brand_url: Field::String,

@@ -78,6 +78,6 @@ class Api::V1::Accounts::Conversations::MessagesController < Api::V1::Accounts::
   # API inbox check
   def ensure_api_inbox
     # Only API inboxes can update messages
-    render json: { error: 'Message status update is only allowed for API inboxes' }, status: :forbidden unless @conversation.inbox.api?
+    render json: { error: I18n.t('errors.api.conversation.status_update_api_only') }, status: :forbidden unless @conversation.inbox.api?
   end
 end

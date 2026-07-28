@@ -19,7 +19,7 @@ By default, the relationship is rendered as a link to the associated object.
 <% if field.data %>
   <% if field.data.is_a? User %>
     <%= link_to(
-      "User ##{field.data.id}",
+      "#{User.model_name.human} ##{field.data.id}",
       super_admin_user_path(field.data)
     ) %>
   <% else %>

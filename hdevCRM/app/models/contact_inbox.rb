@@ -60,16 +60,16 @@ class ContactInbox < ApplicationRecord
   def validate_twilio_source_id
     # https://www.twilio.com/docs/glossary/what-e164#regex-matching-for-e164
     if inbox.channel.medium == 'sms' && !TWILIO_CHANNEL_SMS_REGEX.match?(source_id)
-      errors.add(:source_id, "invalid source id for twilio sms inbox. valid Regex #{TWILIO_CHANNEL_SMS_REGEX}")
+      errors.add(:source_id, I18n.t('errors.models.contact_inbox.invalid_twilio_sms_source_id', regex: TWILIO_CHANNEL_SMS_REGEX))
     elsif inbox.channel.medium == 'whatsapp' && !TWILIO_CHANNEL_WHATSAPP_REGEX.match?(source_id)
-      errors.add(:source_id, "invalid source id for twilio whatsapp inbox. valid Regex #{TWILIO_CHANNEL_WHATSAPP_REGEX}")
+      errors.add(:source_id, I18n.t('errors.models.contact_inbox.invalid_twilio_whatsapp_source_id', regex: TWILIO_CHANNEL_WHATSAPP_REGEX))
     end
   end
 
   def validate_whatsapp_source_id
     return if WHATSAPP_CHANNEL_REGEX.match?(source_id)
 
-    errors.add(:source_id, "invalid source id for whatsapp inbox. valid Regex #{WHATSAPP_CHANNEL_REGEX}")
+    errors.add(:source_id, I18n.t('errors.models.contact_inbox.invalid_whatsapp_source_id', regex: WHATSAPP_CHANNEL_REGEX))
   end
 
   def valid_source_id_format?

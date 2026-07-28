@@ -57,7 +57,7 @@ class PlatformAppDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how platform apps are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(platform_app)
-  #   "PlatformApp ##{platform_app.id}"
-  # end
+  def display_resource(platform_app)
+    "#{PlatformApp.model_name.human} ##{platform_app.id}"
+  end
 end

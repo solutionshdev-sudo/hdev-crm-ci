@@ -14,8 +14,8 @@ class Whatsapp::PhoneInfoService
   private
 
   def validate_parameters!
-    raise ArgumentError, 'WABA ID is required' if @waba_id.blank?
-    raise ArgumentError, 'Access token is required' if @access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.waba_id_required') if @waba_id.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.access_token_required') if @access_token.blank?
   end
 
   def fetch_and_process_phone_info
@@ -23,7 +23,7 @@ class Whatsapp::PhoneInfoService
     phone_numbers = response['data']
 
     phone_data = find_phone_data(phone_numbers)
-    raise "No phone numbers found for WABA #{@waba_id}" if phone_data.nil?
+    raise I18n.t('errors.api.whatsapp.no_phone_numbers', waba_id: @waba_id) if phone_data.nil?
 
     build_phone_info(phone_data)
   end

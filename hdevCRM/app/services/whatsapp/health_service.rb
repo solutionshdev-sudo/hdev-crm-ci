@@ -15,9 +15,9 @@ class Whatsapp::HealthService
   private
 
   def validate_channel!
-    raise ArgumentError, 'Channel is required' if @channel.blank?
-    raise ArgumentError, 'API key is missing' if @access_token.blank?
-    raise ArgumentError, 'Phone number ID is missing' if @channel.provider_config['phone_number_id'].blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.channel_required') if @channel.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.api_key_missing') if @access_token.blank?
+    raise ArgumentError, I18n.t('errors.api.whatsapp.phone_number_id_missing') if @channel.provider_config['phone_number_id'].blank?
   end
 
   def fetch_phone_health_data

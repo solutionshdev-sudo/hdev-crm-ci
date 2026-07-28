@@ -49,7 +49,7 @@ class Crm::Leadsquared::LeadFinderService
     lead_data = Crm::Leadsquared::Mappers::ContactMapper.map(contact)
     lead_id = @lead_client.create_or_update_lead(lead_data)
 
-    raise StandardError, 'Failed to create lead - no ID returned' if lead_id.blank?
+    raise StandardError, I18n.t('errors.api.crm.lead_creation_failed') if lead_id.blank?
 
     lead_id
   end

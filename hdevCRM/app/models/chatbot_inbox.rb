@@ -15,6 +15,6 @@ class ChatbotInbox < ApplicationRecord
                            .where.not(chatbot_id: chatbot_id)
                            .joins(:chatbot)
                            .exists?(chatbots: { status: :active })
-    errors.add(:inbox_id, 'already has an active chatbot') if conflict
+    errors.add(:inbox_id, I18n.t('errors.models.chatbot_inbox.active_chatbot_exists')) if conflict
   end
 end

@@ -37,14 +37,14 @@ class Twilio::CsatTemplateService
 
   def delete_template(_template_name = nil, content_sid = nil)
     content_sid ||= current_template_sid_from_config
-    return { success: false, error: 'No template to delete' } unless content_sid
+    return { success: false, error: I18n.t('errors.api.csat.no_template_to_delete') } unless content_sid
 
     response = @api_client.delete_template(content_sid)
     { success: response.success?, response_body: response.body }
   end
 
   def get_template_status(content_sid)
-    return { success: false, error: 'No content SID provided' } unless content_sid
+    return { success: false, error: I18n.t('errors.api.csat.no_content_sid') } unless content_sid
 
     template_response = fetch_template_details(content_sid)
     return template_response unless template_response[:success]
@@ -65,7 +65,7 @@ class Twilio::CsatTemplateService
       { success: true, data: response }
     else
       Rails.logger.error "Failed to get template details: #{response.code} - #{response.body}"
-      { success: false, error: 'Template not found' }
+      { success: false, error: I18n.t('errors.api.template.not_found') }
     end
   end
 
@@ -164,7 +164,7 @@ class Twilio::CsatTemplateService
       Rails.logger.error "Twilio template creation failed: #{response.code} - #{response.body}"
       {
         success: false,
-        error: 'Template creation failed',
+        error: I18n.t('errors.api.template.creation_failed'),
         response_body: response.body
       }
     end

@@ -13,7 +13,7 @@ module AccessTokenAuthHelper
 
   def authenticate_access_token!
     ensure_access_token
-    render_unauthorized('Invalid Access Token') && return if @access_token.blank?
+    render_unauthorized(I18n.t('errors.api.auth.invalid_access_token')) && return if @access_token.blank?
 
     # NOTE: This ensures that current_user is set and available for the rest of the controller actions
     @resource = @access_token.owner
@@ -31,7 +31,7 @@ module AccessTokenAuthHelper
     return if Current.user.is_a?(User)
     return if @resource.is_a?(AgentBot) && agent_bot_accessible?
 
-    render_unauthorized('Access to this endpoint is not authorized for bots')
+    render_unauthorized(I18n.t('errors.api.auth.bot_endpoint_not_allowed'))
   end
 
   def agent_bot_accessible?

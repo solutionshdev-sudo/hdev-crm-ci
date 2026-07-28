@@ -8,6 +8,9 @@ require 'active_support/core_ext/integer/time'
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # A suíte de specs asserta mensagens em inglês; o default pt_BR vale só fora de teste.
+  config.i18n.default_locale = :en
+
   config.cache_classes = false
 
   # Do not eager load code on boot. This avoids loading your whole application

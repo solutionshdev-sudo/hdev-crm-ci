@@ -594,8 +594,16 @@ pt_BR:
     invalid_option: 'Desculpe, não entendi. Escolha uma das opções (pode responder com o número).'
     invalid_answer: 'Esse valor não parece válido. Pode tentar de novo?'
   super_admin:
+    flash:
+      seeding_triggered: 'Geração de dados de exemplo iniciada'
+      cache_cleared: 'Chaves de cache limpas'
+      account_deletion_in_progress: 'A exclusão da conta está em andamento.'
+      instance_status_refreshed: 'Status da instância atualizado'
+      config_updated: 'Configurações de %{config} atualizadas com sucesso'
+      restart_required: 'Reinicie os processos web e worker do Hdev CRM para aplicar essa mudança em todo lugar.'
+      invalid_credentials: 'Credenciais inválidas. Tente novamente.'
     login:
-      headline: 'Bem-vindo de volta à'
+      headline: 'Bem-vindo de volta ao'
       subtitle: 'Console administrativo — gerencie contas, agências, usuários e configurações da plataforma.'
       rights: 'Todos os direitos reservados.'
       card_title: 'Acesso do Super Admin'
@@ -607,27 +615,27 @@ pt_BR:
       submit: 'Entrar'
     captain_model_overrides:
       form:
-        helper_text: 'Deixe um modelo em branco para usar o padrão YAML para esse recurso AI.'
+        helper_text: 'Deixe um modelo em branco para usar o padrão do YAML para esse recurso de IA.'
         use_default: 'Usar padrão: %{model} (%{model_id})'
       show:
         summary: 'Ver roteamento de modelo'
         provider: 'Fornecedor'
         model: 'Modelo'
       sources:
-        account_override: 'Substituição de cliente'
+        account_override: 'Sobrescrita da conta'
         default: 'Padrão'
       features:
-        editor: 'Editores'
+        editor: 'Editor'
         assistant: 'Assistente'
         copilot: 'Copiloto'
         label_suggestion: 'Sugestão de etiqueta'
-        document_faq_generation: 'Documentar geração de FAQ'
-        conversation_faq_generation: 'Conversação de geração FAQ'
-        help_center_article_generation: 'Ajuda da geração de artigo central'
-        onboarding_content_generation: 'Integração de geração de conteúdo'
-        help_center_query_translation: 'Tradução da consulta central de ajuda'
+        document_faq_generation: 'Geração de FAQ a partir de documentos'
+        conversation_faq_generation: 'Geração de FAQ a partir de conversas'
+        help_center_article_generation: 'Geração de artigos da central de ajuda'
+        onboarding_content_generation: 'Geração de conteúdo de onboarding'
+        help_center_query_translation: 'Tradução de buscas da central de ajuda'
         audio_transcription: 'Transcrição de áudio'
-        help_center_search: 'Pesquisa central de ajuda'
+        help_center_search: 'Busca na central de ajuda'
     push_diagnostics:
       user_not_found: 'Usuário não encontrado.'
       no_subscriptions_to_test: 'Selecione pelo menos uma assinatura para teste.'

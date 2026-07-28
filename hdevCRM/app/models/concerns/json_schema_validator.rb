@@ -67,23 +67,23 @@ class JsonSchemaValidator < ActiveModel::Validator
   def handle_required(error, record)
     missing_values = error['details']['missing_keys']
     missing_values.each do |missing|
-      record.errors.add(missing, 'is required')
+      record.errors.add(missing, I18n.t('errors.models.json_schema.required'))
     end
   end
 
   def handle_type(error, record, expected_type)
     data = get_name_from_data_pointer(error)
-    record.errors.add(data, "must be of type #{expected_type}")
+    record.errors.add(data, I18n.t('errors.models.json_schema.type', type: expected_type))
   end
 
   def handle_minimum(error, record)
     data = get_name_from_data_pointer(error)
-    record.errors.add(data, "must be greater than or equal to #{error['schema']['minimum']}")
+    record.errors.add(data, I18n.t('errors.models.json_schema.minimum', minimum: error['schema']['minimum']))
   end
 
   def handle_maximum(error, record)
     data = get_name_from_data_pointer(error)
-    record.errors.add(data, "must be less than or equal to #{error['schema']['maximum']}")
+    record.errors.add(data, I18n.t('errors.models.json_schema.maximum', maximum: error['schema']['maximum']))
   end
 
   def get_name_from_data_pointer(error)

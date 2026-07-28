@@ -69,8 +69,8 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
   end
 
   def transcript
-    render json: { error: 'email param missing' }, status: :unprocessable_entity and return if params[:email].blank?
-    return render_payment_required('Email transcript is not available on your plan') unless @conversation.account.email_transcript_enabled?
+    render json: { error: I18n.t('errors.api.conversation.email_param_missing') }, status: :unprocessable_entity and return if params[:email].blank?
+    return render_payment_required(I18n.t('errors.api.conversation.transcript_not_available')) unless @conversation.account.email_transcript_enabled?
     return head :too_many_requests unless @conversation.account.within_email_rate_limit?
 
     ConversationReplyMailer.with(account: @conversation.account).conversation_transcript(@conversation, params[:email])&.deliver_later
@@ -215,7 +215,7 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
     @contact_inbox ||= ::ContactInbox.find_by!(source_id: params[:source_id])
     authorize @contact_inbox.inbox, :show?
   rescue ActiveRecord::RecordNotUnique
-    render json: { error: 'source_id should be unique' }, status: :unprocessable_entity
+    render json: { error: I18n.t('errors.api.conversation.source_id_not_unique') }, status: :unprocessable_entity
   end
 
   def build_contact_inbox

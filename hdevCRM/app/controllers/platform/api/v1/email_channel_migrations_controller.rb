@@ -18,21 +18,21 @@ class Platform::Api::V1::EmailChannelMigrationsController < PlatformController
   def validate_account_permissible
     return if @platform_app.platform_app_permissibles.find_by(permissible: @account)
 
-    render json: { error: 'Non permissible resource' }, status: :unauthorized
+    render json: { error: I18n.t('errors.api.platform.non_permissible_resource') }, status: :unauthorized
   end
 
   def validate_feature_flag
     return if ActiveModel::Type::Boolean.new.cast(ENV.fetch('EMAIL_CHANNEL_MIGRATION', false))
 
-    render json: { error: 'Email channel migration is not enabled' }, status: :forbidden
+    render json: { error: I18n.t('errors.api.platform.email_migration_disabled') }, status: :forbidden
   end
 
   def validate_params
-    return render json: { error: 'Missing migrations parameter' }, status: :unprocessable_entity if migration_params.blank?
+    return render json: { error: I18n.t('errors.api.platform.missing_migrations') }, status: :unprocessable_entity if migration_params.blank?
 
     return unless migration_params.size > MAX_MIGRATIONS
 
-    return render json: { error: "Too many migrations (max #{MAX_MIGRATIONS})" },
+    return render json: { error: I18n.t('errors.api.platform.too_many_migrations', max: MAX_MIGRATIONS) },
                   status: :unprocessable_entity
   end
 

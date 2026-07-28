@@ -22,14 +22,13 @@ superfície JS do widget) e completar a identidade visual verde.
 fechado (commit `5d1208e`); kill-switch `DISABLE_ENTERPRISE` ativo em produção;
 valores de marca restaurados no banco.
 
-**Bloqueador agora:** erro 500 do `/super_admin` diagnosticado (rota `index`
-inexistente de `agency_users` na sidebar), corrigido e publicado (commit
-`161ee71`, já em `origin/main`) — falta o rebuild da imagem no EasyPanel pra
-confirmar.
+**Resolvido (27/07):** o 500 do `/super_admin` (rota `index` de `agency_users`)
+foi corrigido, deployado e confirmado — console navegável em produção.
 
 **Feito (26/07, comitado em `2b34d7b`):** redesign split-screen das cinco telas
-de auth e dois consertos de white-label no tema escuro. Falta rebuild +
-`DEFAULT_LOCALE=pt_BR` no EasyPanel.
+de auth e dois consertos de white-label no tema escuro. Falta rebuild
+(o `DEFAULT_LOCALE=pt_BR` deixou de ser necessário — virou default no código
+em 27/07).
 
 **Feito (27/07):** super admin 100% limpo — widget de suporte/phone-home do
 Chatwoot removido, versão própria 1.0.0 (não expõe mais a 4.16.0 do upstream),
@@ -37,8 +36,32 @@ cards EE com botões de upgrade removidos, links do Discord deles trocados por
 contato@hdev.online, console todo em pt-BR (locale `administrate.pt_BR.yml`),
 ícone de Agências e toggle claro/escuro.
 
+**Feito (27/07, commits `426385d`+`b0e0ed5`):** redesign do console super admin
+— dark mode em TODAS as páginas (SCSS do administrate tokenizado via pontes
+`var(--sa-*)`; `rgb(var())` direto quebrava o SassCompressor do precompile),
+tradução restante (`helpers.label`, "Novo(a) conta", filtros), switch compacto
+de tema, visual alinhado ao app (tokens `n-*`, acento white-label) e azul
+Chatwoot removido do gráfico do Painel. `PRODUCT.md` + `DESIGN.md` na raiz
+viraram a fonte de verdade visual (skill Impeccable instalada com detector via
+hook). **Pendente:** deploy com `b0e0ed5` + teste visual claro/escuro.
+
+**Feito (27/07, sem commit):** tradução pt-BR COMPLETA do app em 7 fases —
+locale padrão da instância virou `pt_BR` no código (specs fixados em `:en`);
+validações nativas do Rails e da política de senha em pt-BR
+(`rails.pt_BR.yml`/`secure_password.pt_BR.yml`); erros do Super Admin agora em
+flash VERMELHO (iam como notice verde); ~80 validações de models e ~140 erros
+JSON da API extraídos pra I18n (`model_errors`/`api_errors` en+pt_BR, inglês
+byte-idêntico pros specs); 20 subjects de e-mail via I18n + ~30 templates
+traduzidos direto (Liquid não acessa I18n) incluindo o convite de agente
+enterprise (é o que renderiza — view path prepended); installation_config.yml
+(89 títulos) e features.yml (61 nomes) traduzidos; cauda do frontend Vue
+fechada (preChat no idioma da conta, links de termos → hdev.online, {min} na
+senha). Pendente: commit, precompile+specs no Docker, teste visual.
+
 **Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
-textos/links visíveis, depois o rename do widget e dos identificadores internos.
+textos/links visíveis (parte adiantada em 27/07: links de termos do signup e
+remetente de e-mail já apontam pra hdev.online), depois o rename do widget e
+dos identificadores internos.
 
 ## Segunda trilha: features de venda (27/07 — deployadas e validadas)
 
@@ -78,6 +101,9 @@ Pendente: commit + rebuild.
 
 ## Contexto com prazo
 
+- Páginas `hdev.online/termos-de-uso` e `hdev.online/politica-de-privacidade`
+  ainda não existem — o signup já aponta pra elas desde 27/07 (links do
+  chatwoot.com removidos).
 - Domínio `crm.hdev.online` sem DNS. Como `FRONTEND_URL` já aponta pra ele,
   links de e-mail saem quebrados até criar o registro A no Cloudflare.
 - SMTP não configurado: convites de agente e recuperação de senha não saem.

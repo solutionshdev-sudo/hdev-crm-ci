@@ -376,7 +376,7 @@ RSpec.describe ConversationReplyMailer do
           # Should be attached to the email
           expect(mail.attachments.map(&:filename).map(&:to_s)).to include('avatar.png')
           # Should not be in large_attachments
-          expect(mail.body.encoded).not_to include('Attachments:')
+          expect(mail.body.encoded).not_to include('Anexos:')
         end
 
         it 'renders large attachments as links in the email body' do
@@ -391,7 +391,7 @@ RSpec.describe ConversationReplyMailer do
           # Should NOT be attached to the email
           expect(mail.attachments.map(&:filename).map(&:to_s)).not_to include('large_file.pdf')
           # Should be rendered as a link in the body
-          expect(mail.body.encoded).to include('Attachments:')
+          expect(mail.body.encoded).to include('Anexos:')
           expect(mail.body.encoded).to include('large_file.pdf')
           # Should render a link with large_file.pdf as the link text
           expect(mail.body.encoded).to match(%r{<a [^>]*>large_file\.pdf</a>})
@@ -422,7 +422,7 @@ RSpec.describe ConversationReplyMailer do
           expect(mail.attachments.map(&:filename).map(&:to_s)).not_to include('large_file.pdf')
 
           # Large file should be rendered as a link in the body
-          expect(mail.body.encoded).to include('Attachments:')
+          expect(mail.body.encoded).to include('Anexos:')
           expect(mail.body.encoded).to include('large_file.pdf')
           # Should render a link with large_file.pdf as the link text
           expect(mail.body.encoded).to match(%r{<a [^>]*>large_file\.pdf</a>})

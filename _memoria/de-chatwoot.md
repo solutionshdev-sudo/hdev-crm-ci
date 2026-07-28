@@ -1,7 +1,7 @@
 # Projeto: desvincular o Hdev CRM do Chatwoot
 
 > Documento de trabalho da migração. Atualizar ao fim de cada fase.
-> Última atualização: **2026-07-26**
+> Última atualização: **2026-07-27**
 
 ---
 
@@ -185,7 +185,7 @@ O gate da Fase 3 (48h com `DISABLE_ENTERPRISE` + o 500 confirmado) continua de p
 | Fase | O que é | Pré-requisito |
 |---|---|---|
 | **3** | Remover `enterprise/` e `spec/enterprise/` de vez; deletar `lib/chatwoot_hub.rb` e toda a telemetria; remover `UpdateBanner`, changelog card, testimonials | 48h estável com `DISABLE_ENTERPRISE` + o 500 resolvido |
-| **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl` | precisa de páginas próprias de Termos e Privacidade publicadas |
+| **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
 | **5** | Superfície do widget: `window.chatwootSDK`→`hdevSDK`, `$chatwoot`→`$hdev`, classes `woot-*`→`hdev-*` (617 refs), cookies `cw_`→`hd_`, eventos, postMessage, headers `X-Chatwoot-*` | Fases 3 e 4 |
 | **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
 

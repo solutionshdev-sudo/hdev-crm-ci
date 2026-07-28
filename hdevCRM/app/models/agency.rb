@@ -127,8 +127,8 @@ class Agency < ApplicationRecord
     { logo: logo, logo_dark: logo_dark, logo_thumbnail: logo_thumbnail }.each do |attribute, attachment|
       next unless attachment.attached?
 
-      errors.add(attribute, 'is too big') if attachment.byte_size > 15.megabytes
-      errors.add(attribute, 'filetype not supported') unless ALLOWED_LOGO_CONTENT_TYPES.include?(attachment.content_type)
+      errors.add(attribute, :too_big) if attachment.byte_size > 15.megabytes
+      errors.add(attribute, :filetype_not_supported) unless ALLOWED_LOGO_CONTENT_TYPES.include?(attachment.content_type)
     end
   end
 end

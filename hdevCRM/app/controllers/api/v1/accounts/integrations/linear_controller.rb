@@ -88,7 +88,7 @@ class Api::V1::Accounts::Integrations::LinearController < Api::V1::Accounts::Bas
   end
 
   def search_issue
-    render json: { error: 'Specify search string with parameter q' }, status: :unprocessable_entity if params[:q].blank? && return
+    render json: { error: I18n.t('errors.api.common.query_param_missing') }, status: :unprocessable_entity if params[:q].blank? && return
 
     term = params[:q]
     issues = linear_processor_service.search_issue(term)

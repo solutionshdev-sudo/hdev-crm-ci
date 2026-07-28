@@ -172,14 +172,14 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
     unless Current.account.feature_enabled?(:branded_email_templates)
       return true if branded_email_layout.blank?
 
-      render_could_not_create_error('Branded email templates feature is not enabled')
+      render_could_not_create_error(I18n.t('errors.api.inbox.branded_email_disabled'))
       return false
     end
 
     unless @inbox.email?
       return true if branded_email_layout.blank?
 
-      render_could_not_create_error('Branded email layout is only supported for email inboxes')
+      render_could_not_create_error(I18n.t('errors.api.inbox.branded_email_only_email'))
       return false
     end
 

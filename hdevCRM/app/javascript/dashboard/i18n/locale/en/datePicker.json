@@ -4,6 +4,7 @@
     "NEXT_PERIOD": "Next period",
     "WEEK_NUMBER": "Week #{weekNumber}",
     "APPLY_BUTTON": "Apply",
+    "INVALID_TIME_RANGE": "Please select a valid time range",
     "CLEAR_BUTTON": "Clear",
     "DATE_RANGE_INPUT": {
       "START": "Start Date",
