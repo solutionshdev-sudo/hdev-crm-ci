@@ -19,6 +19,11 @@ defaults:
   run:
     working-directory: hdevCRM
 
+env:
+  # O `prepare` do package.json roda `husky install`, que precisa do .git no cwd
+  # — e o cwd aqui é hdevCRM/, não a raiz. Hook de commit não serve pra nada no CI.
+  HUSKY: '0'
+
 jobs:
   backend:
     name: rspec

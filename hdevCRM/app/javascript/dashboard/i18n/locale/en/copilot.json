@@ -1,0 +1,16 @@
+{
+  "COPILOT": {
+    "HEADER": "Setup copilot",
+    "DESCRIPTION": "Describe what you want to set up and the copilot proposes the changes. Nothing is saved until you apply it.",
+    "PLACEHOLDER": "Ex: create a simple sales pipeline",
+    "PREVIEW": {
+      "TITLE": "Proposed changes",
+      "APPLY": "Apply",
+      "DISCARD": "Discard"
+    },
+    "API": {
+      "APPLIED": "Changes applied.",
+      "ERROR": "Could not talk to the copilot. Try again in a moment."
+    }
+  }
+}

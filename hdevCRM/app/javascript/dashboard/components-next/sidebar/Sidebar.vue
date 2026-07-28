@@ -896,6 +896,12 @@ const menuItems = computed(() => {
           to: accountScopedRoute('ai_agent_settings_index'),
         },
         {
+          name: 'Settings Copilot',
+          label: t('SIDEBAR.COPILOT'),
+          icon: 'i-lucide-wand-sparkles',
+          to: accountScopedRoute('copilot_settings_index'),
+        },
+        {
           name: 'Settings Agency',
           label: t('SIDEBAR.AGENCY'),
           icon: 'i-lucide-building-2',
