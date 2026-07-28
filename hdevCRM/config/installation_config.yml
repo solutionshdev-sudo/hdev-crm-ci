@@ -181,6 +181,27 @@
   type: secret
 # End of Microsoft Email Channel Config
 
+# MARK: IA Config
+# Chaves dos provedores de IA do HDEV CRM. Uma chave por instância; o rateio
+# entre contas e agências é feito pela quota em Ai::QuotaService, não por
+# chave separada.
+- name: ANTHROPIC_API_KEY
+  display_title: 'Chave de API da Anthropic (Claude)'
+  description: 'Chave usada para autenticar as requisições à Anthropic. Provedor padrão do agente de IA e dos nós de IA do chatbot.'
+  locked: false
+  type: secret
+- name: OPENAI_API_KEY
+  display_title: 'Chave de API da OpenAI (opcional)'
+  description: 'Chave usada para autenticar as requisições à OpenAI. Necessária apenas se algum modelo GPT estiver selecionado.'
+  locked: false
+  type: secret
+- name: GEMINI_API_KEY
+  display_title: 'Chave de API do Gemini (opcional)'
+  description: 'Chave usada para autenticar as requisições ao Google Gemini. Necessária apenas se algum modelo Gemini estiver selecionado.'
+  locked: false
+  type: secret
+# End of IA Config
+
 # MARK: Captain Config
 - name: CAPTAIN_OPEN_AI_API_KEY
   display_title: 'Chave de API da OpenAI'
