@@ -19,7 +19,7 @@ import { setCookieWithDomain } from '../sdk/cookieHelpers';
 import { SDK_SET_BUBBLE_VISIBILITY } from 'shared/constants/sharedFrameEvents';
 
 const runSDK = ({ baseUrl, websiteToken }) => {
-  if (window.$chatwoot) {
+  if (window.$hdev) {
     return;
   }
 
@@ -47,38 +47,38 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     restoreWidgetInDOM(event.newDocument.body)
   );
 
-  const chatwootSettings = window.chatwootSettings || {};
-  let locale = chatwootSettings.locale;
-  let baseDomain = chatwootSettings.baseDomain;
+  const hdevSettings = window.hdevSettings || {};
+  let locale = hdevSettings.locale;
+  let baseDomain = hdevSettings.baseDomain;
 
-  if (chatwootSettings.useBrowserLanguage) {
+  if (hdevSettings.useBrowserLanguage) {
     locale = window.navigator.language.replace('-', '_');
   }
 
-  window.$chatwoot = {
+  window.$hdev = {
     baseUrl,
     baseDomain,
     hasLoaded: false,
-    hideMessageBubble: chatwootSettings.hideMessageBubble || false,
+    hideMessageBubble: hdevSettings.hideMessageBubble || false,
     isOpen: false,
-    position: chatwootSettings.position === 'left' ? 'left' : 'right',
+    position: hdevSettings.position === 'left' ? 'left' : 'right',
     websiteToken,
     locale,
-    useBrowserLanguage: chatwootSettings.useBrowserLanguage || false,
-    type: getBubbleView(chatwootSettings.type),
-    launcherTitle: chatwootSettings.launcherTitle || '',
-    showPopoutButton: chatwootSettings.showPopoutButton || false,
-    showUnreadMessagesDialog: chatwootSettings.showUnreadMessagesDialog ?? true,
-    widgetStyle: getWidgetStyle(chatwootSettings.widgetStyle) || 'standard',
+    useBrowserLanguage: hdevSettings.useBrowserLanguage || false,
+    type: getBubbleView(hdevSettings.type),
+    launcherTitle: hdevSettings.launcherTitle || '',
+    showPopoutButton: hdevSettings.showPopoutButton || false,
+    showUnreadMessagesDialog: hdevSettings.showUnreadMessagesDialog ?? true,
+    widgetStyle: getWidgetStyle(hdevSettings.widgetStyle) || 'standard',
     resetTriggered: false,
-    darkMode: getDarkMode(chatwootSettings.darkMode),
-    welcomeTitle: chatwootSettings.welcomeTitle || '',
-    welcomeDescription: chatwootSettings.welcomeDescription || '',
-    availableMessage: chatwootSettings.availableMessage || '',
-    unavailableMessage: chatwootSettings.unavailableMessage || '',
-    enableFileUpload: chatwootSettings.enableFileUpload,
-    enableEmojiPicker: chatwootSettings.enableEmojiPicker ?? true,
-    enableEndConversation: chatwootSettings.enableEndConversation ?? true,
+    darkMode: getDarkMode(hdevSettings.darkMode),
+    welcomeTitle: hdevSettings.welcomeTitle || '',
+    welcomeDescription: hdevSettings.welcomeDescription || '',
+    availableMessage: hdevSettings.availableMessage || '',
+    unavailableMessage: hdevSettings.unavailableMessage || '',
+    enableFileUpload: hdevSettings.enableFileUpload,
+    enableEmojiPicker: hdevSettings.enableEmojiPicker ?? true,
+    enableEndConversation: hdevSettings.enableEndConversation ?? true,
 
     toggle(state) {
       IFrameHelper.events.toggleBubble(state);
@@ -90,21 +90,21 @@ const runSDK = ({ baseUrl, websiteToken }) => {
       if (visibility === 'hide') {
         addClasses(widgetHolder, 'woot-widget--without-bubble');
         addClasses(widgetElm, 'woot-hidden');
-        window.$chatwoot.hideMessageBubble = true;
+        window.$hdev.hideMessageBubble = true;
       } else if (visibility === 'show') {
         removeClasses(widgetElm, 'woot-hidden');
         removeClasses(widgetHolder, 'woot-widget--without-bubble');
-        window.$chatwoot.hideMessageBubble = false;
+        window.$hdev.hideMessageBubble = false;
       }
       IFrameHelper.sendMessage(SDK_SET_BUBBLE_VISIBILITY, {
-        hideMessageBubble: window.$chatwoot.hideMessageBubble,
+        hideMessageBubble: window.$hdev.hideMessageBubble,
       });
     },
 
     popoutChatWindow() {
       IFrameHelper.events.popoutChatWindow({
-        baseUrl: window.$chatwoot.baseUrl,
-        websiteToken: window.$chatwoot.websiteToken,
+        baseUrl: window.$hdev.baseUrl,
+        websiteToken: window.$hdev.websiteToken,
         locale,
       });
     },
@@ -127,8 +127,8 @@ const runSDK = ({ baseUrl, websiteToken }) => {
         return;
       }
 
-      window.$chatwoot.identifier = identifier;
-      window.$chatwoot.user = user;
+      window.$hdev.identifier = identifier;
+      window.$hdev.user = user;
       IFrameHelper.sendMessage('set-user', { identifier, user });
 
       setCookieWithDomain(userCookieName, hashToBeStored, {
@@ -193,7 +193,7 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     },
 
     reset() {
-      if (window.$chatwoot.isOpen) {
+      if (window.$hdev.isOpen) {
         IFrameHelper.events.toggleBubble();
       }
 
@@ -202,11 +202,11 @@ const runSDK = ({ baseUrl, websiteToken }) => {
 
       const iframe = IFrameHelper.getAppFrame();
       iframe.src = IFrameHelper.getUrl({
-        baseUrl: window.$chatwoot.baseUrl,
-        websiteToken: window.$chatwoot.websiteToken,
+        baseUrl: window.$hdev.baseUrl,
+        websiteToken: window.$hdev.websiteToken,
       });
 
-      window.$chatwoot.resetTriggered = true;
+      window.$hdev.resetTriggered = true;
     },
   };
 
@@ -216,6 +216,6 @@ const runSDK = ({ baseUrl, websiteToken }) => {
   });
 };
 
-window.chatwootSDK = {
+window.hdevSDK = {
   run: runSDK,
 };

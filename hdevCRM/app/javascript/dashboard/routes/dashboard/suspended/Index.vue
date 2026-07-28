@@ -4,19 +4,19 @@ import NextButton from 'dashboard/components-next/button/Button.vue';
 import { onMounted } from 'vue';
 
 const toggleSupportWidgetVisibility = () => {
-  if (window.$chatwoot) {
-    window.$chatwoot.toggleBubbleVisibility('show');
+  if (window.$hdev) {
+    window.$hdev.toggleBubbleVisibility('show');
   }
 };
 
 const toggleSupportWidget = () => {
-  if (window.$chatwoot) {
-    window.$chatwoot.toggle();
+  if (window.$hdev) {
+    window.$hdev.toggle();
   }
 };
 
 const setupListenerForWidgetEvent = () => {
-  window.addEventListener('chatwoot:on-message', () => {
+  window.addEventListener('hdev:on-message', () => {
     toggleSupportWidgetVisibility();
   });
 };

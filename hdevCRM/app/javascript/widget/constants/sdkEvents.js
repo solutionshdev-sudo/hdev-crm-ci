@@ -1,7 +1,7 @@
-export const CHATWOOT_ERROR = 'chatwoot:error';
-export const CHATWOOT_ON_MESSAGE = 'chatwoot:on-message';
-export const CHATWOOT_ON_START_CONVERSATION = 'chatwoot:on-start-conversation';
-export const CHATWOOT_POSTBACK = 'chatwoot:postback';
-export const CHATWOOT_READY = 'chatwoot:ready';
-export const CHATWOOT_OPENED = 'chatwoot:opened';
-export const CHATWOOT_CLOSED = 'chatwoot:closed';
+export const HDEV_ERROR = 'hdev:error';
+export const HDEV_ON_MESSAGE = 'hdev:on-message';
+export const HDEV_ON_START_CONVERSATION = 'hdev:on-start-conversation';
+export const HDEV_POSTBACK = 'hdev:postback';
+export const HDEV_READY = 'hdev:ready';
+export const HDEV_OPENED = 'hdev:opened';
+export const HDEV_CLOSED = 'hdev:closed';

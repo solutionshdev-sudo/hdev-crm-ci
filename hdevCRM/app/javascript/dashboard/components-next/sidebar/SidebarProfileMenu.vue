@@ -45,8 +45,8 @@ const showChatSupport = computed(() => {
 });
 
 const toggleChatSupport = () => {
-  if (window.$chatwoot) {
-    window.$chatwoot.toggle();
+  if (window.$hdev) {
+    window.$hdev.toggle();
   }
 };
 

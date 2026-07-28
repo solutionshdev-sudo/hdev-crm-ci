@@ -149,8 +149,8 @@ const onClickBillingPortal = () => {
 };
 
 const onToggleChatWindow = () => {
-  if (window.$chatwoot) {
-    window.$chatwoot.toggle();
+  if (window.$hdev) {
+    window.$hdev.toggle();
   }
 };
 

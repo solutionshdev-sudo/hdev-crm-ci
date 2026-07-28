@@ -13,4 +13,7 @@ export const MESSAGE_TYPE = {
   TEMPLATE: 3,
 };
 
-export const WOOT_PREFIX = 'chatwoot-widget:';
+// ponytail: o prefixo está duplicado como literal em utils.js (escrita) e em
+// sdk/IFrameHelper.js (os dois lados do postMessage). Unificar tudo aqui se
+// desincronizar de novo — a falha é silenciosa, o iframe só para de responder.
+export const WOOT_PREFIX = 'hdev-widget:';
