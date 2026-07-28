@@ -41,8 +41,10 @@ let pollFailures = 0;
 // está conectada?". Rápido enquanto pareia, devagar no repouso.
 const FAST_POLL = 3000;
 const SLOW_POLL = 15000;
-// Depois disso o serviço é dado como fora do ar e a UI mostra erro em vez
-// de "Conectando..." eterno (~15s com polling de 3s).
+// Depois disso o serviço é dado como fora do ar e a UI mostra erro em vez de
+// "Conectando..." eterno: ~15s durante o pareamento (polling de 3s) e ~75s em
+// repouso (15s). Não baixar o contador — o microserviço engasga justamente
+// durante o pareamento, e menos tolerância deixa a tela nervosa aí.
 const MAX_POLL_FAILURES = 5;
 
 const statusLabel = computed(() => t(baileysStatusLabelKey(status.value)));

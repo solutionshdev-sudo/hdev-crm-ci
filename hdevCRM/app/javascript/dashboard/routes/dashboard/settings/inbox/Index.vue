@@ -96,7 +96,9 @@ const connectionLabel = inbox => t(baileysStatusLabelKey(baileysStatus(inbox)));
 const connectionTooltip = inbox => {
   const updatedAt = inbox.connection_state_updated_at;
   if (!updatedAt) return connectionLabel(inbox);
-  return t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.LAST_CHECK', {
+  // connection_state_updated_at é quando o estado mudou, não quando foi lido:
+  // "última verificação" faria um número conectado há dias parecer painel travado.
+  return t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.STATUS_SINCE', {
     time: new Date(updatedAt).toLocaleString(),
   });
 };

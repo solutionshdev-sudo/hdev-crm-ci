@@ -42,10 +42,38 @@ RSpec.describe Whatsapp::BaileysSessionService do
       expect(service.status).to eq({ 'status' => 'connected' })
     end
 
+    it 'persists the state so the inbox list and the reply box banner see it' do
+      allow(client).to receive(:status).and_return({ 'status' => 'connected' })
+
+      service.status
+
+      config = channel.reload.provider_config
+      expect(config['connection_state']).to eq('connected')
+      expect(config['connection_state_updated_at']).to be_present
+    end
+
+    it 'does not touch the database while the state is unchanged' do
+      allow(client).to receive(:status).and_return({ 'status' => 'connected' })
+      service.status
+      allow(channel).to receive(:update_column)
+
+      service.status
+
+      expect(channel).not_to have_received(:update_column)
+    end
+
     it 'reports a stopped session instead of raising when the instance is unknown' do
       allow(client).to receive(:status).and_raise(Whatsapp::BaileysClient::NotFoundError)
 
       expect(service.status).to eq({ 'status' => 'disconnected', 'lastError' => 'not_provisioned' })
+    end
+
+    it 'persists the disconnection when the instance is unknown' do
+      allow(client).to receive(:status).and_raise(Whatsapp::BaileysClient::NotFoundError)
+
+      service.status
+
+      expect(channel.reload.provider_config['connection_state']).to eq('disconnected')
     end
   end
 

@@ -20,15 +20,20 @@ done
 
 echo "Database ready to accept connections."
 
-#install missing gems for local dev as we are using base image compiled for production
-bundle install
+# Instala gems faltando no dev, onde a imagem base é a de produção.
+# NUNCA em produção: se um gem não estiver na imagem, o `until bundle check`
+# trava o boot em silêncio pra sempre — sem log, sem crash, sem restart.
+# Fora do if, a mesma situação vira erro visível no log do container.
+if [ "$RAILS_ENV" != "production" ]; then
+  bundle install
 
-BUNDLE="bundle check"
+  BUNDLE="bundle check"
 
-until $BUNDLE
-do
-  sleep 2;
-done
+  until $BUNDLE
+  do
+    sleep 2;
+  done
+fi
 
 # Execute the main process of the container
 exec "$@"

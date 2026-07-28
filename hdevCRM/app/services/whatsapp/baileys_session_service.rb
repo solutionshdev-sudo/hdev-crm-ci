@@ -29,9 +29,9 @@ class Whatsapp::BaileysSessionService
   end
 
   def status
-    client.status(instance_id)
+    sync_status(client.status(instance_id))
   rescue Whatsapp::BaileysClient::NotFoundError
-    { 'status' => 'disconnected', 'lastError' => NOT_PROVISIONED }
+    sync_status({ 'status' => 'disconnected', 'lastError' => NOT_PROVISIONED })
   end
 
   # Applies a `connection.update` webhook event to the channel.
@@ -58,6 +58,17 @@ class Whatsapp::BaileysSessionService
 
   def instance_id
     channel.provider_config['instance_id']
+  end
+
+  # O polling da aba Conexão é a leitura de estado mais frequente que existe; sem
+  # persistir aqui, o selo da lista de inboxes e o banner da caixa de resposta
+  # ficam no último valor que o webhook trouxe — verde para sempre numa inbox
+  # cuja instância morreu. Só escreve quando muda: são até 20 polls por minuto.
+  def sync_status(value)
+    state = value['status'].to_s
+    write_state('connection_state' => state) if state.present? && state != channel.provider_config['connection_state']
+
+    value
   end
 
   def jid_mismatch?(jid)

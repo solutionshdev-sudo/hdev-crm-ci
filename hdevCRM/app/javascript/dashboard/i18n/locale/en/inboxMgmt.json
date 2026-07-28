@@ -372,6 +372,7 @@
             "SERVICE_UNREACHABLE": "The WhatsApp service is not responding. Check that the baileys container is running and try again.",
             "CONNECTED_AS": "Connected as {number}",
             "LAST_CHECK": "Last check: {time}",
+            "STATUS_SINCE": "In this state since {time}",
             "RECONNECT": "Generate a new QR code",
             "RECONNECT_CONFIRM": "The current session will be disconnected and a new QR code will be generated for the same number. Messages will not be delivered until you scan it again.",
             "NOT_PROVISIONED": "The session is not running on the WhatsApp service. Click \"Generate QR code\" to start it again.",

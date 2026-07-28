@@ -83,6 +83,9 @@ services:
     env_file: [.env]
     environment:
       <<: *app_env
+    # Mesmo entrypoint do web: o Dockerfile não define um, então sem esta linha
+    # o sidekiq sobe antes do Postgres aceitar conexão.
+    entrypoint: docker/entrypoints/rails.sh
     command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
     volumes:
       - storage_data:/app/storage

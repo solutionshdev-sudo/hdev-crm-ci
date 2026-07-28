@@ -52,11 +52,19 @@ const goToInboxSettings = () => {
 
 // A lista de inboxes é carregada no boot; recarrega ao abrir uma conversa de
 // inbox baileys para o aviso não ficar preso num estado velho (não há push de
-// inbox por websocket).
+// inbox por websocket). Com freio de 30s: quem varre a fila troca de conversa
+// dezenas de vezes por minuto e o estado não muda nesse ritmo.
+const INBOX_REFETCH_INTERVAL = 30 * 1000;
+let lastInboxFetchAt = 0;
+
 watch(
   () => currentChat.value?.inbox_id,
   () => {
-    if (isBaileysInbox(currentInbox.value)) store.dispatch('inboxes/get');
+    if (!isBaileysInbox(currentInbox.value)) return;
+    if (Date.now() - lastInboxFetchAt < INBOX_REFETCH_INTERVAL) return;
+
+    lastInboxFetchAt = Date.now();
+    store.dispatch('inboxes/get');
   },
   { immediate: true }
 );
