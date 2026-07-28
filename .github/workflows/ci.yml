@@ -59,6 +59,9 @@ jobs:
       POSTGRES_DATABASE: chatwoot_test
       REDIS_URL: redis://localhost:6379
       SECRET_KEY_BASE: ci-secret-key-base-not-a-real-secret
+      # Mesmo valor do docker/Dockerfile. No default do Node (~2 GB) o build
+      # morre de heap em "rendering chunks".
+      NODE_OPTIONS: --max-old-space-size=4096
 
     steps:
       - uses: actions/checkout@v4
