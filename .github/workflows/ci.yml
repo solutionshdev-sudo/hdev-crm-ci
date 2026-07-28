@@ -91,6 +91,14 @@ jobs:
       - name: Preparar banco
         run: bundle exec rake db:create db:schema:load db:migrate
 
+      # ConfigLoader roda de carona no db:migrate (lib/tasks/db_enhancements.rake)
+      # e semeia ~106 installation_configs. Os specs assumem banco limpo: a linha
+      # semeada vence o stub de ENV em GlobalConfigService.load (DB primeiro),
+      # o que derrubava ~70 exemplos (signup 404, features extras, HUMAN_AGENT).
+      # O CI do upstream nao roda migrate, por isso la nunca doeu.
+      - name: Limpar configs semeadas pelo migrate
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d chatwoot_test -c 'TRUNCATE installation_configs'
+
       # Build explicito em vez de deixar o autoBuild disparar dentro do rspec: o
       # vite_ruby captura a saida do build, entao uma falha ali fica invisivel no
       # log e o processo trava sem escrever nada (foi o que segurou a suite por
@@ -113,7 +121,10 @@ jobs:
         # sem aspas de proposito: vazio precisa sumir e virar "suite inteira"
         # < /dev/null: qualquer subprocesso que peca confirmacao no stdin (npx,
         # corepack) recebe EOF e morre, em vez de segurar o job ate o timeout
-        run: bundle exec rspec $SPEC_PATH --tag '~opensearch' < /dev/null
+        # exclude-pattern (relativo a spec/): spec/enterprise cobre codigo que a
+        # licenca proibe em producao/revenda; a Fase 3 do de-chatwoot deleta o
+        # diretorio. Vale tambem pro spec_path do workflow_dispatch.
+        run: bundle exec rspec $SPEC_PATH --exclude-pattern "enterprise/**/*" --tag '~opensearch' < /dev/null
 
   lint:
     name: lint

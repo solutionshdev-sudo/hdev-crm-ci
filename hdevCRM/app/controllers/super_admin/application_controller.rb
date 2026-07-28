@@ -12,9 +12,9 @@ class SuperAdmin::ApplicationController < Administrate::ApplicationController
   helper_method :render_vue_component, :settings_open?, :settings_pages
   # authenticiation done via devise : SuperAdmin Model
   before_action :authenticate_super_admin!
-  # Console do Super Admin é sempre pt-BR (strings do Administrate em
-  # config/locales/administrate.pt_BR.yml).
-  around_action :force_pt_br_locale
+  # Console do Super Admin segue o locale padrão da instância (pt_BR em
+  # produção via application.rb; :en nos specs via test.rb — assertam inglês).
+  around_action :force_default_locale
 
   # Override this value to specify the number of elements to display at a time
   # on index pages. Defaults to 20.
@@ -31,8 +31,8 @@ class SuperAdmin::ApplicationController < Administrate::ApplicationController
 
   private
 
-  def force_pt_br_locale(&)
-    I18n.with_locale(:pt_BR, &)
+  def force_default_locale(&)
+    I18n.with_locale(I18n.default_locale, &)
   end
 
   def render_vue_component(component_name, props = {})

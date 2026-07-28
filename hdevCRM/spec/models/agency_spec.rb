@@ -122,7 +122,8 @@ RSpec.describe Agency do
 
     it 'uses the default color when none is set' do
       agency = build(:agency, primary_color: nil)
-      expect(agency.brand_rgb).to eq('31 147 255')
+      # Verde HDEV (#00875A) — Agency::DEFAULT_COLOR
+      expect(agency.brand_rgb).to eq('0 135 90')
     end
   end
 
