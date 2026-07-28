@@ -96,8 +96,20 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **`workflow_dispatch` aceita um `spec_path`** — use pra iterar num arquivo só
-  em vez de esperar os 813 specs (~45 min a suíte inteira).
+- **A suíte nunca terminou de rodar, nenhuma vez.** Ela trava: cerca de 10-11 min
+  depois do início do rspec o processo para de escrever no log e fica vivo, parado,
+  até o `timeout-minutes: 90` matar o job. Reproduzido em dois runs, com a mesma
+  última linha nos dois. Qualquer estimativa de "a suíte leva X minutos" é chute —
+  não existe medição. Diagnóstico aberto desde 28/07.
+- **`concurrency: cancel-in-progress: true`** — todo push na `main` executa o run
+  anterior. Um `cancelled` no histórico quase sempre é isso, não falha de teste;
+  a exceção é o run que morre exatamente em 90 min, que é o timeout. Olhar a
+  duração antes de concluir qualquer coisa.
+- **`workflow_dispatch` aceita um `spec_path`** — use pra iterar num arquivo só.
+  O valor é interpolado **sem aspas** no comando, de propósito, então ele engole
+  qualquer flag do rspec e não só caminho: `--format documentation` roda a suíte
+  inteira imprimindo o nome de cada exemplo antes de executá-lo. É assim que se
+  acha spec que trava, sem precisar commitar nada.
 - **Regenera o `db/schema.rb` de graça:** `dump_schema_after_migration` só está
   desligado em production/staging, então o `db:migrate` em `RAILS_ENV=test`
   redumpa o schema, publicado como artifact `schema`. Baixar e commitar a mão

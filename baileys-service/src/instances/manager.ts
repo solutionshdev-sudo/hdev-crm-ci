@@ -1,6 +1,12 @@
 import pino from 'pino';
 import { Instance } from './instance.js';
-import { listInstanceIds, loadConfig, removeInstanceDir, saveConfig } from './store.js';
+import {
+  hasRegisteredCreds,
+  listInstanceIds,
+  loadConfig,
+  removeInstanceDir,
+  saveConfig,
+} from './store.js';
 import type { InstanceConfig } from '../types.js';
 
 const logger = pino({ name: 'manager' });
@@ -51,6 +57,11 @@ export async function loadAll(): Promise<void> {
     if (!config) continue;
     const instance = new Instance(config);
     instances.set(id, instance);
+    // Sem credencial pareada, connect() aqui gera QR que ninguém está olhando,
+    // expira ("QR refs attempts ended"), reconecta e recomeça — para sempre, e
+    // no mesmo event loop das instâncias que funcionam. Fica registrada e
+    // parada até o painel pedir um QR.
+    if (!hasRegisteredCreds(id)) continue;
     instance.connect().catch(error => {
       logger.error({ id, error: String(error) }, 'boot reconnect failed');
     });

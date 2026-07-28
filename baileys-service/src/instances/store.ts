@@ -34,6 +34,19 @@ export function listInstanceIds(): string[] {
     .filter(id => loadConfig(id) !== null);
 }
 
+// Pareada de verdade? useMultiFileAuthState grava creds.json já na primeira
+// tentativa de registro, com registered:false — a existência do arquivo não diz
+// nada. O flag é o mesmo que instance.ts lê em socket.authState.creds.registered.
+export function hasRegisteredCreds(id: string): boolean {
+  const path = join(authDir(id), 'creds.json');
+  if (!existsSync(path)) return false;
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')).registered === true;
+  } catch {
+    return false;
+  }
+}
+
 export function removeInstanceDir(id: string): void {
   rmSync(instanceDir(id), { recursive: true, force: true });
 }

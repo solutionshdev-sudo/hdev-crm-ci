@@ -24,7 +24,10 @@ const emit = defineEmits(['connected']);
 
 const { t } = useI18n();
 
-const status = ref('disconnected');
+// null = nada observado ainda nesta montagem. Não é o mesmo que 'disconnected':
+// é o que impede o emit('connected') de disparar na primeira leitura — ver o
+// guard em refreshStatus.
+const status = ref(null);
 const qrDataUrl = ref('');
 const pairingCode = ref('');
 const errorDetail = ref('');
@@ -91,7 +94,15 @@ const refreshStatus = async () => {
     } else {
       qrDataUrl.value = '';
     }
-    if (status.value === 'connected' && previous !== 'connected') {
+    // Só emite numa transição observada aqui dentro. Emitir também na primeira
+    // leitura fecha um ciclo infinito: o pai responde com dispatch('inboxes/get'),
+    // o isFetching troca a raiz do Settings.vue pelo spinner, este componente
+    // desmonta e remonta com status zerado, e a primeira leitura acontece de novo.
+    if (
+      status.value === 'connected' &&
+      previous !== null &&
+      previous !== 'connected'
+    ) {
       emit('connected');
     }
   } catch (error) {

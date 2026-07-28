@@ -253,7 +253,7 @@ deve buscar `/assets/images/hdev_bot.png` com 200.
 | Fase | O que é | Pré-requisito |
 |---|---|---|
 | **3** | Remover `enterprise/` e `spec/enterprise/` de vez; deletar `lib/chatwoot_hub.rb` e toda a telemetria; remover `UpdateBanner`, changelog card, testimonials | 48h estável com `DISABLE_ENTERPRISE` + o 500 resolvido |
-| **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
+| **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Achado em 28/07 no HTML servido — grep por `chatwoot.com` não pega:** o `helpUrls` inteiro aponta pra `https://chwt.app/hc/*` (o encurtador deles), então todo link de ajuda do dashboard leva pra documentação do Chatwoot; e o `window.globalConfig` ainda expõe as chaves `CHATWOOT_INBOX_TOKEN` e `chatwootConfig`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
 | **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
 
@@ -275,6 +275,17 @@ Plano detalhado com comandos, armadilhas e verificação por fase:
   não pelo entrypoint. Renomear a task sem atualizar o compose derruba a instância.
 - **Mudança de JS/SCSS só aparece após rebuild da imagem** (o Dockerfile roda
   `assets:precompile` no build) — restart não basta.
+- **E rebuild não basta pro `/packs/js/sdk.js`.** Esse arquivo sai do
+  `vite.lib.config.ts` com nome fixo, sem hash, porque a URL vai dentro do snippet
+  que a agência cola no site do cliente. Só que o `public_file_server` do
+  `production.rb` carimba `max-age=1.year` em tudo dentro de `public/`. Resultado
+  em 28/07: o Cloudflare serviu o SDK **antigo, ainda com `chatwootSDK`**, por horas
+  depois do rebuild, enquanto o host do EasyPanel já servia o novo. Diagnóstico:
+  baixar o arquivo dos dois hosts e comparar md5 (`cf-cache-status: HIT` + `Age`
+  alto confirmam). Remédio imediato: purge no Cloudflare. Conserto: o middleware
+  `config/initializers/widget_sdk_cache_control.rb` (escrito em 28/07), que baixa
+  só esse asset pra `max-age=300, must-revalidate` — os assets com hash continuam
+  com o ano inteiro. Vale pro navegador do visitante também, que purge nenhum alcança.
 - **`INSTALLATION_NAME`/`BRAND_NAME` no bloco `environment` do compose são no-ops** —
   nenhum código lê essas chaves do ENV; os valores vêm da tabela `installation_configs`.
 - **As chaves de marca nascem `locked: true`** e por isso não aparecem em
@@ -283,7 +294,8 @@ Plano detalhado com comandos, armadilhas e verificação por fase:
 ## Pendências de infra herdadas
 
 - **Backup do Postgres**: feito manualmente uma vez. Falta a rotina de cron diária.
-- **DNS `crm.hdev.online`**: ainda não existe. A instância roda no domínio
-  `hdev-crm-app-crm.jz4bvz.easypanel.host`, mas `FRONTEND_URL` aponta para
-  `crm.hdev.online` — links de e-mail saem errados até isso ser resolvido.
+- ~~**DNS `crm.hdev.online`**~~: **no ar desde 28/07**, atrás do Cloudflare, e
+  `FRONTEND_URL` já apontava pra ele. O host `hdev-crm-app-crm.jz4bvz.easypanel.host`
+  continua respondendo direto, sem CDN — guardar esse par, porque comparar os dois
+  é o diagnóstico de cache envenenado (ver armadilha do `sdk.js` acima).
 - **SMTP**: não configurado. Convites de agente e recuperação de senha não saem.

@@ -35,7 +35,7 @@ válido (0 × U+FFFD).
 
 ### Urgente — infra (bloqueia operação real)
 1. **SMTP não configurado** — convite de agente e reset de senha não saem.
-2. **DNS `crm.hdev.online` não existe** — `FRONTEND_URL` aponta pra lá; links de e-mail saem quebrados.
+2. ~~**DNS `crm.hdev.online` não existe**~~ — **resolvido em 28/07**: responde 200 atrás do Cloudflare.
 3. **Backup do Postgres sem rotina** — só foi feito manual uma vez.
 
 ### Alto — de-Chatwoot (gates próprios, ver `de-chatwoot.md`)

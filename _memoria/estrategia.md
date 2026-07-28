@@ -138,6 +138,28 @@ quando foi lido), refetch de inboxes com freio de 30s e o comentário do
 importa** é derrubar a sessão pelo celular e conferir que o selo da *lista*
 também fica vermelho.
 
+**Conserto (28/07, nº 2):** a aba Conexão travava a **página inteira** em
+"carregando" — e só quando a sessão estava conectada, que é por isso que passou
+batido. Ciclo fechado entre três arquivos: o `BaileysSession` emitia `connected`
+já na primeira leitura, o `Settings.vue` respondia com `dispatch('inboxes/get')`,
+o `uiFlags.isFetching` trocava a **raiz** do template pelo spinner, o componente
+desmontava, remontava com o `status` zerado — e a primeira leitura acontecia de
+novo. Duas XHRs por volta, para sempre. Correção: `status` nasce `null` (que não
+é o mesmo que `'disconnected'`) e o emit exige uma transição observada dentro da
+mesma montagem. Deixou spec de regressão em vitest, verificada revertendo o guard.
+**Lição que vale além daqui:** emitir evento no `onMounted` é seguro só enquanto
+o pai não puder desmontar o filho em resposta — e `uiFlags` global de fetch na
+raiz de um template faz exatamente isso.
+
+Junto, no microserviço: `loadAll` só reconecta instância com credencial pareada.
+O teste é `creds.registered`, **não** a existência do `creds.json` — o
+`useMultiFileAuthState` grava esse arquivo já na primeira tentativa de registro,
+com `registered: false`, então existir não prova nada. É o que o comentário da
+função já prometia e o código não fazia, e era o que mantinha as instâncias
+zumbis gerando QR eterno no mesmo event loop single-thread das instâncias boas.
+**Pendente:** deploy (o frontend precisa de rebuild). As 3 zumbis já foram
+apagadas do volume em 28/07.
+
 **Feito (27/07, commit `096daf3`):** polish UX do canvas do chatbot estilo Make —
 duplo-clique abre config, drag threshold, snap-to-grid, arestas animadas,
 busca na paleta, handles acessíveis (~30px) e fix do viewport inicial.
@@ -208,8 +230,9 @@ habilitado.
 - Páginas `hdev.online/termos-de-uso` e `hdev.online/politica-de-privacidade`
   ainda não existem — o signup já aponta pra elas desde 27/07 (links do
   chatwoot.com removidos).
-- Domínio `crm.hdev.online` sem DNS. Como `FRONTEND_URL` já aponta pra ele,
-  links de e-mail saem quebrados até criar o registro A no Cloudflare.
+- ~~Domínio `crm.hdev.online` sem DNS~~ — **resolvido em 28/07**. Responde 200
+  servindo o app, atrás do Cloudflare. Como `FRONTEND_URL` já apontava pra ele,
+  os links de e-mail deixaram de sair quebrados (falta o SMTP pra testar).
 - SMTP não configurado: convites de agente e recuperação de senha não saem.
 - Backup do Postgres feito manualmente uma vez; falta a rotina de cron.
 - ~~9 migrations pendentes em produção~~ — **aplicadas em 28/07**. Confirmado no
@@ -221,6 +244,17 @@ habilitado.
   voltou `{}` — não existia **nenhum** widget no banco, então o backfill da
   `20260726120000` não tocou em linha alguma. É o que autorizou o rename da
   superfície JS sem retrocompatibilidade (nada instalado pra quebrar).
-- 2 instâncias zumbis do baileys no volume (`0ed2d284-…` e `685e21f5-…`, de
-  canais deletados) ficam martelando registro no WhatsApp — limpar via
-  `DELETE /instances/:id` (comandos na memória da sessão).
+- ~~3 instâncias zumbis do baileys no volume~~ — **apagadas em 28/07**. Eram
+  três, não duas (`0ed2d284-…`, `5716d36c-…` e `685e21f5-…`, de canais
+  deletados), e ficavam martelando registro no WhatsApp. Fica o método, porque
+  vai acontecer de novo: a instância viva do `+5516997223968` é a
+  `2d3f0585-…` — **não** a `5716d36c-…`, como uma anotação anterior dizia.
+  Causa confirmada em 28/07:
+  `teardown_baileys_instance` faz `rescue StandardError` e só loga, então
+  microserviço fora do ar na hora de apagar a inbox = diretório de sessão órfão
+  pra sempre. Como identificar: no log do baileys elas levam 401 no webhook
+  enquanto a instância viva passa; o motivo sai no log do Rails
+  (`no channel for instance=` → órfã de verdade; `invalid signature` → é
+  `webhook_secret` divergente, e aí o remédio é reprovisionar, não apagar).
+  Conferir antes de apagar — o `DELETE` some com a sessão. O guard novo no
+  `loadAll` evita a recorrência do sintoma (QR eterno), mas não a órfã em si.
