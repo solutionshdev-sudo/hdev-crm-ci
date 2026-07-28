@@ -1,3 +1,11 @@
+inherit_from: .rubocop_todo.yml
+
+# Sem isso o Exclude daqui SUBSTITUI o do todo em vez de somar (ClassLength e
+# MethodLength têm Exclude nos dois arquivos).
+inherit_mode:
+  merge:
+    - Exclude
+
 plugins:
   - rubocop-performance
   - rubocop-rails

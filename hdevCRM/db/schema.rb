@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_21_000003) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -739,6 +739,64 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_21_000003) do
     t.index ["phone_number"], name: "index_channel_whatsapp_on_phone_number", unique: true
   end
 
+  create_table "chatbot_inboxes", force: :cascade do |t|
+    t.bigint "chatbot_id", null: false
+    t.bigint "inbox_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chatbot_id", "inbox_id"], name: "index_chatbot_inboxes_on_chatbot_id_and_inbox_id", unique: true
+    t.index ["inbox_id"], name: "index_chatbot_inboxes_on_inbox_id"
+  end
+
+  create_table "chatbot_session_events", force: :cascade do |t|
+    t.bigint "chatbot_session_id", null: false
+    t.bigint "account_id", null: false
+    t.string "node_id"
+    t.string "node_type"
+    t.integer "event_type", default: 0, null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.index ["account_id", "created_at"], name: "index_chatbot_session_events_on_account_id_and_created_at"
+    t.index ["chatbot_session_id", "id"], name: "index_chatbot_session_events_on_chatbot_session_id_and_id"
+  end
+
+  create_table "chatbot_sessions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "chatbot_id", null: false
+    t.bigint "conversation_id", null: false
+    t.bigint "contact_id"
+    t.string "current_node_id"
+    t.integer "status", default: 0, null: false
+    t.jsonb "variables", default: {}, null: false
+    t.jsonb "context", default: {}, null: false
+    t.integer "flow_version", default: 1, null: false
+    t.datetime "expires_at"
+    t.datetime "last_activity_at"
+    t.string "last_error"
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_chatbot_sessions_on_account_id_and_status"
+    t.index ["conversation_id"], name: "index_chatbot_sessions_active_unique", unique: true, where: "(status = ANY (ARRAY[0, 1, 2]))"
+    t.index ["conversation_id"], name: "index_chatbot_sessions_on_conversation_id"
+    t.index ["expires_at"], name: "index_chatbot_sessions_on_expires_at", where: "(status = ANY (ARRAY[1, 2]))"
+  end
+
+  create_table "chatbots", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.integer "status", default: 0, null: false
+    t.jsonb "flow", default: {}, null: false
+    t.jsonb "settings", default: {}, null: false
+    t.integer "flow_version", default: 1, null: false
+    t.bigint "created_by_id"
+    t.bigint "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_chatbots_on_account_id_and_status"
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string "name", null: false
     t.string "domain"
@@ -1030,6 +1088,72 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_21_000003) do
     t.index ["account_id"], name: "index_data_imports_on_account_id"
     t.index ["initiated_by_id"], name: "index_data_imports_on_initiated_by_id"
     t.index ["source_provider"], name: "index_data_imports_on_source_provider"
+  end
+
+  create_table "deal_activities", force: :cascade do |t|
+    t.bigint "deal_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "user_id"
+    t.integer "activity_type", default: 0, null: false
+    t.bigint "from_stage_id"
+    t.bigint "to_stage_id"
+    t.jsonb "data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.index ["account_id", "created_at"], name: "index_deal_activities_on_account_id_and_created_at"
+    t.index ["deal_id", "id"], name: "index_deal_activities_on_deal_id_and_id"
+  end
+
+  create_table "deal_pipelines", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.integer "position", default: 0, null: false
+    t.boolean "is_default", default: false, null: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "position"], name: "index_deal_pipelines_on_account_id_and_position"
+  end
+
+  create_table "deal_stages", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "deal_pipeline_id", null: false
+    t.string "name", null: false
+    t.string "color", default: "#64748B", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "probability", default: 0, null: false
+    t.integer "stage_type", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_deal_stages_on_account_id"
+    t.index ["deal_pipeline_id", "position"], name: "index_deal_stages_on_deal_pipeline_id_and_position"
+  end
+
+  create_table "deals", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "deal_pipeline_id", null: false
+    t.bigint "deal_stage_id", null: false
+    t.bigint "contact_id", null: false
+    t.bigint "conversation_id"
+    t.bigint "assignee_id"
+    t.bigint "created_by_id"
+    t.string "title", null: false
+    t.text "description"
+    t.decimal "value", precision: 15, scale: 2, default: "0.0", null: false
+    t.string "currency", default: "BRL", null: false
+    t.integer "status", default: 0, null: false
+    t.decimal "position", precision: 20, scale: 10, default: "0.0", null: false
+    t.date "expected_close_on"
+    t.datetime "closed_at"
+    t.string "lost_reason"
+    t.jsonb "custom_attributes", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_deals_on_account_id_and_status"
+    t.index ["assignee_id"], name: "index_deals_on_assignee_id"
+    t.index ["contact_id"], name: "index_deals_on_contact_id"
+    t.index ["conversation_id"], name: "index_deals_on_conversation_id"
+    t.index ["deal_stage_id", "position"], name: "index_deals_on_deal_stage_id_and_position"
   end
 
   create_table "email_templates", force: :cascade do |t|
