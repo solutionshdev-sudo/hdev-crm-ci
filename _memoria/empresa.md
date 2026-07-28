@@ -19,3 +19,4 @@
 - O núcleo do Chatwoot é MIT (pode ser vendido); o diretório `enterprise/` tem licença que proíbe revenda — por isso o produto roda em modo Community, e as features enterprise que importarem serão reconstruídas com código próprio.
 - Modelo de negócio inicial: white-label pra agências. Estrutura de planos ainda em definição.
 - Existe no fork um modelo `Agency` (feature própria, não do Chatwoot) que já aplica marca e cor por agência via domínio customizado.
+- **IA própria (commitada em 27/07, ainda NÃO deployada):** substituta MIT do Captain em `app/services/ai/` — agente de atendimento, tool calling e geração de fluxo de chatbot por linguagem natural, com quota de tokens por conta e por agência (base do rateio nos planos de revenda). Vira diferencial de venda quando o deploy confirmar. Detalhes na terceira trilha do `_memoria/estrategia.md`.

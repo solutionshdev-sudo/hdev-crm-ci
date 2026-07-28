@@ -369,7 +369,14 @@
             "CONNECT_ERROR": "Não foi possível falar com o serviço de WhatsApp. Tente de novo em instantes.",
             "LOGOUT_ERROR": "Não foi possível desconectar a sessão. Tente de novo em instantes.",
             "ERROR_DETAIL": "Detalhe do erro",
-            "SERVICE_UNREACHABLE": "O serviço de WhatsApp não está respondendo. Verifique se o container baileys está no ar e tente de novo."
+            "SERVICE_UNREACHABLE": "O serviço de WhatsApp não está respondendo. Verifique se o container baileys está no ar e tente de novo.",
+            "CONNECTED_AS": "Conectado como {number}",
+            "LAST_CHECK": "Última verificação: {time}",
+            "RECONNECT": "Gerar novo QR code",
+            "RECONNECT_CONFIRM": "A sessão atual será desconectada e um QR code novo será gerado para o mesmo número. As mensagens só voltam a chegar depois que você escanear de novo.",
+            "NOT_PROVISIONED": "A sessão não está rodando no serviço de WhatsApp. Clique em \"Gerar QR code\" para iniciar de novo.",
+            "RECONNECT_BANNER": "Este número de WhatsApp está desconectado. Você não recebe nem envia mensagens até parear de novo.",
+            "RECONNECT_BANNER_ACTION": "Abrir a aba Conexão"
           }
         }
       },
@@ -692,7 +699,8 @@
       "ACCOUNT_HEALTH": "Saúde da conta",
       "CSAT": "CSAT",
       "VOICE": "Voz",
-      "CALLS": "Chamadas"
+      "CALLS": "Chamadas",
+      "WHATSAPP_SESSION": "Conexão"
     },
     "VOICE_CONFIGURATION": {
       "ENABLE_VOICE": {

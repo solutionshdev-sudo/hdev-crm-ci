@@ -68,3 +68,12 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 - [x] git 2.55 — repo `solutionshdev-sudo/hdev-crm` no GitHub, `main` sincronizada
 - [ ] gh (GitHub CLI) — opcional
 - [ ] playwright — só quando for usar render de carrossel
+- [ ] **ruby / bundler — NÃO instalados nesta máquina**
+- [ ] **docker — NÃO instalado nesta máquina**
+
+**Consequência prática:** nada de Rails roda localmente — nem `rspec`, nem
+`db:migrate`, nem inspecionar o código de uma gem instalada. Tudo que precisa
+executar vai pro terminal do container no EasyPanel. Ao planejar trabalho no
+`hdevCRM/`, assumir que o código sai daqui **sem execução** e que a verificação
+acontece no servidor, depois do deploy. Quando precisar da API de uma gem, ler a
+documentação oficial (WebFetch) em vez de chutar a assinatura.

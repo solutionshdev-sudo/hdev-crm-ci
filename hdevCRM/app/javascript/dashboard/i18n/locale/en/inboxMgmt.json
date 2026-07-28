@@ -369,7 +369,14 @@
             "CONNECT_ERROR": "Could not reach the WhatsApp service. Try again in a moment.",
             "LOGOUT_ERROR": "Could not disconnect the session. Try again in a moment.",
             "ERROR_DETAIL": "Error detail",
-            "SERVICE_UNREACHABLE": "The WhatsApp service is not responding. Check that the baileys container is running and try again."
+            "SERVICE_UNREACHABLE": "The WhatsApp service is not responding. Check that the baileys container is running and try again.",
+            "CONNECTED_AS": "Connected as {number}",
+            "LAST_CHECK": "Last check: {time}",
+            "RECONNECT": "Generate a new QR code",
+            "RECONNECT_CONFIRM": "The current session will be disconnected and a new QR code will be generated for the same number. Messages will not be delivered until you scan it again.",
+            "NOT_PROVISIONED": "The session is not running on the WhatsApp service. Click \"Generate QR code\" to start it again.",
+            "RECONNECT_BANNER": "This WhatsApp number is disconnected. You will not receive or send messages until you pair it again.",
+            "RECONNECT_BANNER_ACTION": "Open the Connection tab"
           }
         }
       },
@@ -692,7 +699,8 @@
       "ACCOUNT_HEALTH": "Account Health",
       "CSAT": "CSAT",
       "VOICE": "Voice",
-      "CALLS": "Calls"
+      "CALLS": "Calls",
+      "WHATSAPP_SESSION": "Connection"
     },
     "VOICE_CONFIGURATION": {
       "ENABLE_VOICE": {

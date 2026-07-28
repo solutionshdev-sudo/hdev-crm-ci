@@ -1,10 +1,13 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useAlert } from 'dashboard/composables';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useI18n } from 'vue-i18n';
 import wootConstants from 'dashboard/constants/globals';
+import { isBaileysInbox, isBaileysConnected } from 'dashboard/helper/baileys';
 
 import Banner from 'dashboard/components/ui/Banner.vue';
 
@@ -20,10 +23,43 @@ const props = defineProps({
 });
 
 const store = useStore();
+const router = useRouter();
 const { t } = useI18n();
+const { isAdmin } = useAdmin();
 
 const currentChat = useMapGetter('getSelectedChat');
 const currentUser = useMapGetter('getCurrentUser');
+const accountId = useMapGetter('getCurrentAccountId');
+const inboxGetter = useMapGetter('inboxes/getInbox');
+
+const currentInbox = computed(() =>
+  inboxGetter.value(currentChat.value?.inbox_id)
+);
+
+// WhatsApp não-oficial cai sozinho (celular sem rede, sessão expirada). Sem esse
+// aviso o agente só descobre quando a mensagem falha.
+const showWhatsappDisconnectedBanner = computed(
+  () =>
+    isBaileysInbox(currentInbox.value) && !isBaileysConnected(currentInbox.value)
+);
+
+const goToInboxSettings = () => {
+  router.push({
+    name: 'settings_inbox_show',
+    params: { accountId: accountId.value, inboxId: currentInbox.value.id },
+  });
+};
+
+// A lista de inboxes é carregada no boot; recarrega ao abrir uma conversa de
+// inbox baileys para o aviso não ficar preso num estado velho (não há push de
+// inbox por websocket).
+watch(
+  () => currentChat.value?.inbox_id,
+  () => {
+    if (isBaileysInbox(currentInbox.value)) store.dispatch('inboxes/get');
+  },
+  { immediate: true }
+);
 
 const assignedAgent = computed({
   get() {
@@ -109,6 +145,16 @@ const onClickBotHandoff = async () => {
 </script>
 
 <template>
+  <Banner
+    v-if="showWhatsappDisconnectedBanner"
+    color-scheme="alert"
+    action-button-variant="ghost"
+    class="mx-2 mb-2 rounded-lg !py-2"
+    :banner-message="$t('CONVERSATION.WHATSAPP_DISCONNECTED')"
+    :has-action-button="isAdmin"
+    :action-button-label="$t('CONVERSATION.WHATSAPP_DISCONNECTED_ACTION')"
+    @primary-action="goToInboxSettings"
+  />
   <Banner
     v-if="showSelfAssignBanner && !showBotHandoffBanner"
     action-button-variant="ghost"

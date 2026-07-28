@@ -139,6 +139,14 @@ if resource.whatsapp?
     (resource.channel.try(:provider_config) || {}).to_h['source'] == 'embedded_signup' &&
     resource.channel.try(:reauthorization_required?)
   )
+
+  # Estado da sessão do baileys para todos os papéis (provider_config inteiro é
+  # só de administrador): agente precisa ver que o número caiu antes de responder.
+  if resource.channel.try(:baileys?)
+    baileys_config = (resource.channel.try(:provider_config) || {}).to_h
+    json.connection_state baileys_config['connection_state'].presence || 'disconnected'
+    json.connection_state_updated_at baileys_config['connection_state_updated_at']
+  end
 end
 
 ## Voice attributes for TwilioSms

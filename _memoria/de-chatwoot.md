@@ -180,6 +180,32 @@ O gate da Fase 3 (48h com `DISABLE_ENTERPRISE` + o 500 confirmado) continua de p
 **Confirmado também:** todos os 9 models `Captain::*` são de `enterprise/`, e o
 `report_data_seeder.rb` os usa nas linhas 100-104, 239-269 — o plano já previa.
 
+**Decisão (27/07): o Captain não é reconstruído — é substituído.** A IA própria
+em `app/services/ai/` (MIT, commit `18e879b`) já cobre o que importa: cliente
+Anthropic com quota por conta/agência, agente de atendimento com handoff, tool
+calling neutro de provider e geração de fluxo de chatbot. Isso remove o último
+argumento pra manter `enterprise/` e destrava a Fase 3. Detalhes e roadmap em
+`_memoria/estrategia.md` (terceira trilha).
+
+Dois pontos que a Fase 3 precisa tratar junto, além do que já está listado:
+
+1. **`app/models/account.rb:34,57,60-61`** — `include CaptainFeaturable`,
+   `include AccountCaptainAutoResolve` e os `store_accessor :settings` de
+   `captain_models`/`captain_features`/`captain_auto_resolve_mode`. São MIT, mas
+   só servem ao Captain; saem junto ou o boot quebra por constante faltando.
+2. **`InstallationConfig::CAPTAIN_LLM_CONFIG_KEYS`** (`installation_config.rb:18-22`)
+   e o bloco `# MARK: Captain Config` do `installation_config.yml` — some junto
+   com o `# MARK: IA Config` que entrou no lugar em `18e879b`.
+
+**Fica (não deletar):** `lib/llm/` e `config/llm.yml`. Eram peso morto do
+Captain, mas com o multi-provider aprovado viraram o registry model→provider da
+IA própria. Só `CaptainFeaturable` e o `captain_v2_assistant_model` hardcoded em
+`lib/llm/feature_router.rb:4,32-37` saem.
+
+**Bônus MIT:** o frontend do Captain (`app/javascript/dashboard/components-next/captain/`)
+está **fora** de `enterprise/`, então é MIT e reutilizável — cards, playground,
+empty states e gerenciador de documentos. Não redesenhar do zero.
+
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 
 | Fase | O que é | Pré-requisito |

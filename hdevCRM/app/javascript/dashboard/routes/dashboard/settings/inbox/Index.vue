@@ -13,6 +13,12 @@ import {
   useStore,
 } from 'dashboard/composables/store';
 import ChannelName from './components/ChannelName.vue';
+import {
+  isBaileysInbox,
+  baileysStatus,
+  baileysStatusClass,
+  baileysStatusLabelKey,
+} from 'dashboard/helper/baileys';
 import ChannelIcon from 'next/icon/ChannelIcon.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 
@@ -82,6 +88,18 @@ const openDelete = inbox => {
   showDeletePopup.value = true;
   selectedInbox.value = inbox;
 };
+
+// Selo de conexão do WhatsApp não-oficial: sem ele a lista não diz se o número
+// continua pareado. O estado vem do webhook do baileys-service.
+const connectionLabel = inbox => t(baileysStatusLabelKey(baileysStatus(inbox)));
+
+const connectionTooltip = inbox => {
+  const updatedAt = inbox.connection_state_updated_at;
+  if (!updatedAt) return connectionLabel(inbox);
+  return t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.LAST_CHECK', {
+    time: new Date(updatedAt).toLocaleString(),
+  });
+};
 </script>
 
 <template>
@@ -146,12 +164,22 @@ const openDelete = inbox => {
               <span class="block text-heading-3 text-n-slate-12 capitalize">
                 {{ inbox.name }}
               </span>
-              <ChannelName
-                :channel-type="inbox.channel_type"
-                :medium="inbox.medium"
-                :voice-enabled="inbox.voice_enabled"
-                class="text-body-main text-n-slate-11"
-              />
+              <div class="flex items-center gap-2">
+                <ChannelName
+                  :channel-type="inbox.channel_type"
+                  :medium="inbox.medium"
+                  :voice-enabled="inbox.voice_enabled"
+                  class="text-body-main text-n-slate-11"
+                />
+                <span
+                  v-if="isBaileysInbox(inbox)"
+                  v-tooltip.top="connectionTooltip(inbox)"
+                  class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md"
+                  :class="baileysStatusClass(baileysStatus(inbox))"
+                >
+                  {{ connectionLabel(inbox) }}
+                </span>
+              </div>
             </div>
           </div>
           <div class="flex gap-3 justify-end">

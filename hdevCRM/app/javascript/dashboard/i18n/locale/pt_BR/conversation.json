@@ -34,6 +34,8 @@
     "24_HOURS_WINDOW": "Restrições de janela de mensagem de 24 horas",
     "48_HOURS_WINDOW": "Restrição da janela de mensagens de 48 horas",
     "API_HOURS_WINDOW": "Você só pode responder a esta conversa em {hours} horas",
+    "WHATSAPP_DISCONNECTED": "Este número de WhatsApp está desconectado. As mensagens enviadas daqui não serão entregues até parear de novo.",
+    "WHATSAPP_DISCONNECTED_ACTION": "Reconectar caixa de entrada",
     "NOT_ASSIGNED_TO_YOU": "Esta conversa não está atribuída a você. Gostaria de atribuir esta conversa a você mesmo?",
     "ASSIGN_TO_ME": "Atribuir a mim",
     "BOT_HANDOFF_MESSAGE": "Você está respondendo a uma conversa que é atualmente tratada por um assistente ou um robô.",

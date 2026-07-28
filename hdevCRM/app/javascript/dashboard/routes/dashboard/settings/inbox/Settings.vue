@@ -18,6 +18,8 @@ import DuplicateInboxBanner from './channels/instagram/DuplicateInboxBanner.vue'
 import MicrosoftReauthorize from './channels/microsoft/Reauthorize.vue';
 import GoogleReauthorize from './channels/google/Reauthorize.vue';
 import WhatsappReauthorize from './channels/whatsapp/Reauthorize.vue';
+import BaileysSession from './channels/whatsapp/BaileysSession.vue';
+import InboxReconnectionRequired from './components/InboxReconnectionRequired.vue';
 import InboxHealthAPI from 'dashboard/api/inboxHealth';
 import PreChatFormSettings from './PreChatForm/Settings.vue';
 import WeeklyAvailability from './components/WeeklyAvailability.vue';
@@ -74,6 +76,8 @@ export default {
     InstagramReauthorize,
     TiktokReauthorize,
     WhatsappReauthorize,
+    BaileysSession,
+    InboxReconnectionRequired,
     DuplicateInboxBanner,
     Editor,
     Avatar,
@@ -163,6 +167,9 @@ export default {
       if (this.isAWhatsAppCloudChannel) {
         return this.$t('INBOX_MGMT.ADD.WHATSAPP.PROVIDERS.WHATSAPP_CLOUD');
       }
+      if (this.isABaileysChannel) {
+        return this.$t('INBOX_MGMT.ADD.WHATSAPP.PROVIDERS.BAILEYS');
+      }
       if (this.is360DialogWhatsAppChannel) {
         return this.$t('INBOX_MGMT.ADD.WHATSAPP.PROVIDERS.360_DIALOG');
       }
@@ -182,6 +189,16 @@ export default {
           name: this.$t('INBOX_MGMT.TABS.COLLABORATORS'),
         },
       ];
+
+      if (this.isABaileysChannel) {
+        visibleToAllChannelTabs = [
+          ...visibleToAllChannelTabs,
+          {
+            key: 'whatsapp-session',
+            name: this.$t('INBOX_MGMT.TABS.WHATSAPP_SESSION'),
+          },
+        ];
+      }
 
       visibleToAllChannelTabs = [
         ...visibleToAllChannelTabs,
@@ -288,6 +305,13 @@ export default {
     inboxIcon() {
       const { medium, channel_type: type } = this.inbox;
       return getInboxIconByType(type, medium, 'line');
+    },
+    showBaileysDisconnectedBanner() {
+      return (
+        this.isABaileysChannel &&
+        this.selectedTabKey !== 'whatsapp-session' &&
+        this.inbox.connection_state !== 'connected'
+      );
     },
     bannerMaxWidth() {
       const narrowTabs = ['collaborators', 'bot-configuration'];
@@ -624,6 +648,15 @@ export default {
       this.selectedTabIndex = selectedTabIndex;
       this.updateRouteWithoutRefresh(selectedTabIndex);
     },
+    openWhatsAppSessionTab() {
+      const index = this.tabs.findIndex(tab => tab.key === 'whatsapp-session');
+      if (index !== -1) this.onTabChange(index);
+    },
+    // O selo da lista e o banner leem connection_state do inbox serializado,
+    // então recarrega a lista quando a sessão acabou de conectar.
+    refreshInboxes() {
+      this.$store.dispatch('inboxes/get');
+    },
     updateRouteWithoutRefresh(selectedTabIndex) {
       const tab = this.tabs[selectedTabIndex];
       if (!tab) return;
@@ -807,6 +840,18 @@ export default {
           :inbox="inbox"
           class="mb-4"
           :class="bannerMaxWidth"
+        />
+        <InboxReconnectionRequired
+          v-if="showBaileysDisconnectedBanner"
+          class="mx-6 mb-4"
+          :class="bannerMaxWidth"
+          :description="
+            $t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_BANNER')
+          "
+          :action-label="
+            $t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_BANNER_ACTION')
+          "
+          @reauthorize="openWhatsAppSessionTab"
         />
         <DuplicateInboxBanner
           v-if="hasDuplicateInstagramInbox"
@@ -1372,6 +1417,19 @@ export default {
 
         <div v-if="selectedTabKey === 'collaborators'" class="mx-6 max-w-4xl">
           <CollaboratorsPage :inbox="inbox" />
+        </div>
+        <div
+          v-if="selectedTabKey === 'whatsapp-session'"
+          class="mx-6 max-w-4xl"
+        >
+          <SettingsFieldSection
+            :label="$t('INBOX_MGMT.SETTINGS_POPUP.BAILEYS_SESSION_TITLE')"
+            :help-text="
+              $t('INBOX_MGMT.SETTINGS_POPUP.BAILEYS_SESSION_SUBHEADER')
+            "
+          >
+            <BaileysSession :inbox-id="inbox.id" @connected="refreshInboxes" />
+          </SettingsFieldSection>
         </div>
         <div
           v-if="selectedTabKey === 'configuration'"

@@ -4,7 +4,14 @@ import { useI18n } from 'vue-i18n';
 import QRCode from 'qrcode';
 import BaileysAPI from 'dashboard/api/inbox/baileys';
 import { useAlert } from 'dashboard/composables';
+import {
+  BAILEYS_TRANSIENT_STATES,
+  BAILEYS_NOT_PROVISIONED,
+  baileysStatusClass,
+  baileysStatusLabelKey,
+} from 'dashboard/helper/baileys';
 import NextButton from 'dashboard/components-next/button/Button.vue';
+import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
 
 const props = defineProps({
   inboxId: {
@@ -21,36 +28,59 @@ const status = ref('disconnected');
 const qrDataUrl = ref('');
 const pairingCode = ref('');
 const errorDetail = ref('');
+const lastError = ref('');
+const connectedNumber = ref('');
+const lastCheckedAt = ref(null);
 const isWorking = ref(false);
+const reconnectDialogRef = ref(null);
 let pollTimer = null;
+let pollInterval = null;
 let pollFailures = 0;
 
-const POLLING_STATES = ['connecting', 'qr', 'pairing'];
+// O selo precisa continuar vivo depois de conectar — é o que responde "ainda
+// está conectada?". Rápido enquanto pareia, devagar no repouso.
+const FAST_POLL = 3000;
+const SLOW_POLL = 15000;
 // Depois disso o serviço é dado como fora do ar e a UI mostra erro em vez
 // de "Conectando..." eterno (~15s com polling de 3s).
 const MAX_POLL_FAILURES = 5;
 
-const statusLabel = computed(() =>
-  t(`INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.STATUS.${status.value.toUpperCase()}`)
+const statusLabel = computed(() => t(baileysStatusLabelKey(status.value)));
+
+const statusBadgeClass = computed(() => baileysStatusClass(status.value));
+
+const isConnected = computed(() => status.value === 'connected');
+
+const isNotProvisioned = computed(
+  () => lastError.value === BAILEYS_NOT_PROVISIONED
 );
 
-const statusBadgeClass = computed(() => {
-  if (status.value === 'connected') return 'bg-n-teal-3 text-n-teal-11';
-  if (POLLING_STATES.includes(status.value)) return 'bg-n-amber-3 text-n-amber-11';
-  return 'bg-n-ruby-3 text-n-ruby-11';
+const showErrorDetail = computed(
+  () => errorDetail.value && !isConnected.value && !isNotProvisioned.value
+);
+
+const lastCheckedLabel = computed(() => {
+  if (!lastCheckedAt.value) return '';
+  return t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.LAST_CHECK', {
+    time: lastCheckedAt.value.toLocaleTimeString(),
+  });
 });
 
-const showErrorDetail = computed(
-  () => errorDetail.value && status.value !== 'connected'
+const desiredInterval = computed(() =>
+  BAILEYS_TRANSIENT_STATES.includes(status.value) ? FAST_POLL : SLOW_POLL
 );
 
 const refreshStatus = async () => {
   try {
     const { data } = await BaileysAPI.getStatus(props.inboxId);
     pollFailures = 0;
+    lastCheckedAt.value = new Date();
     const previous = status.value;
     status.value = data.status || 'disconnected';
     pairingCode.value = data.pairingCode || '';
+    lastError.value = data.lastError || '';
+    connectedNumber.value =
+      data.phoneNumber || data.jid?.split('@')?.[0]?.split(':')?.[0] || '';
     errorDetail.value =
       [data.lastDisconnectReason, data.lastError].filter(Boolean).join(' — ') ||
       '';
@@ -63,8 +93,9 @@ const refreshStatus = async () => {
       emit('connected');
     }
   } catch (error) {
-    // A instância pode ainda não estar provisionada; tolera falhas
-    // transitórias, mas depois de N seguidas assume serviço fora do ar.
+    // Falha de rede/serviço: tolera falhas transitórias, mas depois de N
+    // seguidas assume serviço fora do ar. Instância inexistente já vem do
+    // Rails como 'disconnected' + not_provisioned, não cai aqui.
     pollFailures += 1;
     if (pollFailures >= MAX_POLL_FAILURES) {
       status.value = 'error';
@@ -80,6 +111,7 @@ const connect = async (usePairingCode = false) => {
   try {
     pollFailures = 0;
     errorDetail.value = '';
+    lastError.value = '';
     await BaileysAPI.connect(props.inboxId, { usePairingCode });
     await refreshStatus();
   } catch (error) {
@@ -104,25 +136,45 @@ const logout = async () => {
   }
 };
 
-const startPolling = () => {
-  if (pollTimer) return;
-  pollTimer = setInterval(refreshStatus, 3000);
+// Repareia o mesmo número sem recriar a caixa de entrada: derruba a sessão
+// atual e pede um QR novo em seguida.
+const reconnect = async () => {
+  isWorking.value = true;
+  try {
+    await BaileysAPI.logout(props.inboxId);
+    await BaileysAPI.connect(props.inboxId, { usePairingCode: false });
+    pollFailures = 0;
+    await refreshStatus();
+  } catch (error) {
+    useAlert(
+      error?.response?.data?.error ||
+        t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECT_ERROR')
+    );
+  } finally {
+    isWorking.value = false;
+    reconnectDialogRef.value?.close();
+  }
 };
 
 const stopPolling = () => {
   if (!pollTimer) return;
   clearInterval(pollTimer);
   pollTimer = null;
+  pollInterval = null;
 };
 
-watch(status, value => {
-  if (POLLING_STATES.includes(value)) startPolling();
-  else stopPolling();
-});
+const startPolling = () => {
+  if (pollTimer && pollInterval === desiredInterval.value) return;
+  stopPolling();
+  pollInterval = desiredInterval.value;
+  pollTimer = setInterval(refreshStatus, pollInterval);
+};
+
+watch(desiredInterval, startPolling);
 
 onMounted(async () => {
   await refreshStatus();
-  if (POLLING_STATES.includes(status.value)) startPolling();
+  startPolling();
 });
 
 onBeforeUnmount(stopPolling);
@@ -130,13 +182,33 @@ onBeforeUnmount(stopPolling);
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
       <span
         class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md"
         :class="statusBadgeClass"
       >
         {{ statusLabel }}
       </span>
+      <span
+        v-if="isConnected && connectedNumber"
+        class="text-sm text-n-slate-11"
+      >
+        {{
+          t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECTED_AS', {
+            number: connectedNumber,
+          })
+        }}
+      </span>
+      <span v-if="lastCheckedLabel" class="text-xs text-n-slate-10">
+        {{ lastCheckedLabel }}
+      </span>
+    </div>
+
+    <div
+      v-if="isNotProvisioned"
+      class="p-3 text-sm border rounded-lg bg-n-amber-3 border-n-amber-6 text-n-amber-11"
+    >
+      {{ t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.NOT_PROVISIONED') }}
     </div>
 
     <div
@@ -173,22 +245,29 @@ onBeforeUnmount(stopPolling);
       </p>
     </div>
 
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <NextButton
-        v-if="status !== 'connected'"
+        v-if="!isConnected"
         :is-loading="isWorking"
         :label="t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECT_QR')"
         @click="connect(false)"
       />
       <NextButton
-        v-if="status !== 'connected'"
+        v-if="!isConnected"
         :is-loading="isWorking"
         faded
         :label="t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.CONNECT_CODE')"
         @click="connect(true)"
       />
       <NextButton
-        v-if="status === 'connected'"
+        v-if="isConnected"
+        :is-loading="isWorking"
+        faded
+        :label="t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT')"
+        @click="reconnectDialogRef?.open()"
+      />
+      <NextButton
+        v-if="isConnected"
         :is-loading="isWorking"
         ruby
         faded
@@ -196,5 +275,19 @@ onBeforeUnmount(stopPolling);
         @click="logout"
       />
     </div>
+
+    <Dialog
+      ref="reconnectDialogRef"
+      type="alert"
+      :title="t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT')"
+      :description="
+        t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT_CONFIRM')
+      "
+      :confirm-button-label="
+        t('INBOX_MGMT.ADD.WHATSAPP.BAILEYS.SESSION.RECONNECT')
+      "
+      :is-loading="isWorking"
+      @confirm="reconnect"
+    />
   </div>
 </template>

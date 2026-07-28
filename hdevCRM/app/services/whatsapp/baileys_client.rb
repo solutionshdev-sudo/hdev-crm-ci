@@ -5,6 +5,9 @@ class Whatsapp::BaileysClient
   DEFAULT_TIMEOUT = 5
 
   class ApiError < StandardError; end
+  # Instância desconhecida pelo microserviço (ainda não provisionada ou perdida
+  # num restart sem volume). Tratada como "sessão parada", não como serviço fora do ar.
+  class NotFoundError < ApiError; end
 
   def initialize
     @base_url = ENV.fetch('BAILEYS_URL', 'http://baileys:3025')
@@ -67,6 +70,7 @@ class Whatsapp::BaileysClient
   end
 
   def parse(response)
+    raise NotFoundError, "baileys-service 404: #{response.body.to_s.first(200)}" if response.code == 404
     raise ApiError, "baileys-service #{response.code}: #{response.body.to_s.first(200)}" unless response.success?
 
     response.parsed_response

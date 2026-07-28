@@ -3,23 +3,35 @@
 # update_column: update! would re-run validate_provider_config and fire
 # after_update_commit hooks for what is effectively ephemeral state.
 class Whatsapp::BaileysSessionService
+  # Sinaliza pro painel que a instância não existe no microserviço: a UI mostra
+  # "sessão parada" e o botão de QR resolve, em vez de erro de serviço fora do ar.
+  NOT_PROVISIONED = 'not_provisioned'.freeze
+
   pattr_initialize [:channel!]
 
   def provision!
     client.provision(channel)
   end
 
+  # Provisiona antes de conectar: provisionInstance é idempotente no microserviço,
+  # então isso recria a instância que sumiu num restart sem volume (ou cujo
+  # BaileysProvisionJob falhou) em vez de devolver 404 sem saída pelo painel.
   def connect!(use_pairing_code: false)
+    provision!
     client.connect(instance_id, use_pairing_code: use_pairing_code)
   end
 
   def logout!
     client.logout(instance_id)
     write_state('connection_state' => 'disconnected')
+  rescue Whatsapp::BaileysClient::NotFoundError
+    write_state('connection_state' => 'disconnected')
   end
 
   def status
     client.status(instance_id)
+  rescue Whatsapp::BaileysClient::NotFoundError
+    { 'status' => 'disconnected', 'lastError' => NOT_PROVISIONED }
   end
 
   # Applies a `connection.update` webhook event to the channel.
@@ -53,7 +65,10 @@ class Whatsapp::BaileysSessionService
     channel.phone_number.delete('+') != jid_number
   end
 
+  # Carimba a hora sempre que o estado muda: é o que o painel mostra como
+  # "última atualização" do selo de conexão.
   def write_state(updates)
+    updates = updates.merge('connection_state_updated_at' => Time.current.iso8601)
     # rubocop:disable Rails/SkipsModelValidations
     channel.update_column(:provider_config, channel.provider_config.merge(updates))
     # rubocop:enable Rails/SkipsModelValidations

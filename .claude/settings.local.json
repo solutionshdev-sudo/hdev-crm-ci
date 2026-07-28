@@ -25,7 +25,25 @@
       "Bash(curl -s https://registry.npmjs.org/@whiskeysockets%2Fbaileys/latest)",
       "WebSearch",
       "Bash(cd \"c:/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Hdev-CRM/hdevCRM\" && echo \"=== outbound.ts ===\"; cat -n ../baileys-service/src/translate/outbound.ts | head -40; echo \"=== whatsapp_phone_source_id ===\"; grep -n -E \"def whatsapp_phone_source_id|def whatsapp_source_id\" -A 8 app/services/whatsapp/incoming_message_identifier_helper.rb; echo \"=== send service ===\"; grep -rn \"source_id\\\\|send_message\" app/services/whatsapp/send_on_whatsapp_service.rb 2>/dev/null || find app -name \"*send_on_whatsapp*\")",
-      "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/baileys-service/src/translate/**)"
+      "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/baileys-service/src/translate/**)",
+      "Bash(gem which *)",
+      "Bash(gem contents *)",
+      "Read(//c//**)",
+      "Bash(ruby -v)",
+      "Read(//c/Users/hdev/**)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(awk -F_ '$1>20260726120000')",
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(git add *)",
+      "Bash(git commit -m '@ *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" status --short)",
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" diff --stat)",
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" log --oneline -3)",
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" status -sb)",
+      "PowerShell(git -C \"c:\\\\Users\\\\hdev\\\\Downloads\\\\backup-20260723T235954Z-1-001\\\\backup\\\\Hdev-CRM\" diff -- hdevCRM/app/javascript/dashboard/routes/dashboard/settings/inbox/Settings.vue)"
     ]
   },
   "hooks": {
