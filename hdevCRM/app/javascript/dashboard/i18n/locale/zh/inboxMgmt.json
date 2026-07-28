@@ -1104,7 +1104,7 @@
         "AGENT_MESSAGE": "您好"
       },
       "BRANDING_TEXT": "由 Hdev CRM 支持",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "ሰላም"
       },
       "BRANDING_TEXT": "በChatwoot የተነሳ",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

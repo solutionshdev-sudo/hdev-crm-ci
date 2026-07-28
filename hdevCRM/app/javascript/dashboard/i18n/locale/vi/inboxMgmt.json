@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Xin chào"
       },
       "BRANDING_TEXT": "CC bởi Hdev CRM",
-      "SCRIPT_SETTINGS": "\nwindow.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\nwindow.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

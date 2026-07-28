@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "სალამი"
       },
       "BRANDING_TEXT": "მოძრავებულია Hdev CRM-ის მიერ",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

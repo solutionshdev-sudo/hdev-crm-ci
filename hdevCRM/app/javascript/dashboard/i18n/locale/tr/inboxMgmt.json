@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Merhaba"
       },
       "BRANDING_TEXT": "Hdev CRM tarafından desteklenmektedir",
-      "SCRIPT_SETTINGS": "\nwindow.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\nwindow.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

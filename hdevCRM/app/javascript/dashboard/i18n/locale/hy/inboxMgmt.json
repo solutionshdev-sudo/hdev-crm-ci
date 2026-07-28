@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Բարև ձեզ"
       },
       "BRANDING_TEXT": "Շահագործվում է Hdev CRM-ով",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

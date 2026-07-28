@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Tere"
       },
       "BRANDING_TEXT": "Toetab Hdev CRM’i",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

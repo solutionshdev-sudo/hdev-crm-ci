@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Labdien"
       },
       "BRANDING_TEXT": "Darbināts ar Hdev CRM",
-      "SCRIPT_SETTINGS": "\nwindow.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\nwindow.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

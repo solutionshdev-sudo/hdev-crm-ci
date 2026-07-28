@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "안녕하십니까"
       },
       "BRANDING_TEXT": "Hdev CRM 작동중",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {

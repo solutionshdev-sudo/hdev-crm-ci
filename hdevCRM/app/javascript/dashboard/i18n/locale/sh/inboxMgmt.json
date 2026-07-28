@@ -1247,7 +1247,7 @@
         "AGENT_MESSAGE": "Bok"
       },
       "BRANDING_TEXT": "Powered by Hdev CRM",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.hdevSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {
