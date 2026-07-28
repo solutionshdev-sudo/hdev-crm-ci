@@ -12,19 +12,25 @@ module Ai
   class ToolRegistry
     SETS = {
       agent: [].freeze,
-      copilot: [Ai::Tools::CreateChatbotFlow].freeze
+      copilot: [
+        Ai::Tools::CreateChatbotFlow,
+        Ai::Tools::CreateDealPipeline,
+        Ai::Tools::CreateLabels,
+        Ai::Tools::SetBusinessHours,
+        Ai::Tools::AssignChatbotToInbox
+      ].freeze
     }.freeze
 
     class UnknownContextError < StandardError; end
 
-    pattr_initialize [:context!, :account!, :user]
+    pattr_initialize [:context!, :account!, :user, :dry_run]
 
     # pattr_initialize gera readers privados; o ToolLoop precisa do account
     # para logar falha de iteração.
     public :account
 
     def tools
-      @tools ||= classes.map { |klass| klass.new(account: account, user: user) }
+      @tools ||= classes.map { |klass| klass.new(account: account, user: user, dry_run: dry_run) }
     end
 
     # As classes carregam o schema neutro; quem embrulha no shape do provider

@@ -27,12 +27,50 @@ module Ai
       end
     end
 
-    pattr_initialize [:account!, :user]
+    pattr_initialize [:account!, :user, :dry_run]
 
     # Recebe o input já parseado e devolve String — o texto vira o tool_result
     # que o modelo lê. Erro previsível deve virar Ai::ToolError.
     def call(_input)
       raise NotImplementedError
+    end
+
+    # Ponto de entrada do loop. Em `dry_run` a ferramenta roda de verdade e o
+    # banco é desfeito no fim: a validação é a real, sem nenhuma tool precisar
+    # saber que está em preview. É isso que permite propor e aplicar com uma
+    # definição só.
+    #
+    # `requires_new` é obrigatório: sem savepoint, o ActiveRecord::Rollback é
+    # engolido quando já existe transação aberta (o caso dos specs) e a
+    # gravação vazaria.
+    #
+    # ponytail: savepoint por chamada, não por turno — no preview uma ferramenta
+    # não enxerga o que a anterior criou (criar chatbot e vincular à inbox no
+    # mesmo turno falha ao propor e funciona ao aplicar). Um savepoint por turno
+    # resolveria, mas levaria junto o AiUsageEvent e furaria a quota; o conserto
+    # é acumular o usage e regravar depois do rollback.
+    #
+    # ponytail: o savepoint desfaz o banco, não job enfileirado em after_create.
+    # As ferramentas de hoje só gravam. Revisar ao adicionar tool que dispare job.
+    def perform(input)
+      return call(input) unless dry_run
+
+      result = nil
+      ActiveRecord::Base.transaction(requires_new: true) do
+        result = call(input)
+        raise ActiveRecord::Rollback
+      end
+      result
+    end
+
+    private
+
+    # Erro de validação vira Ai::ToolError: o texto volta pro modelo como
+    # tool_result de erro e ele corrige na iteração seguinte.
+    def persist!(record)
+      return record if record.save
+
+      raise Ai::ToolError, record.errors.full_messages.join('; ').presence || 'Não foi possível salvar.'
     end
   end
 end

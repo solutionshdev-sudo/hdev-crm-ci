@@ -65,6 +65,9 @@ Rails.application.routes.draw do
           end
           resource :ai_agent, only: [:show, :update]
           resource :ai_usage, only: [:show]
+          resource :copilot, only: [:create] do
+            post :apply
+          end
           resource :bulk_actions, only: [:create]
           resource :onboarding, only: [:update] do
             get :help_center_generation

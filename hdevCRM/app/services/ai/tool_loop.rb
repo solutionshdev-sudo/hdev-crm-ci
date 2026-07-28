@@ -22,6 +22,12 @@ module Ai
     # Kernel#system dentro da classe.
     pattr_initialize [:service!, :registry!, :system_prompt, :model, :max_tokens]
 
+    # Chamadas que rodaram sem erro, na ordem. O copiloto reexecuta essa lista
+    # na hora de aplicar — é o que dispensa uma segunda ida ao modelo.
+    def executed
+      @executed ||= []
+    end
+
     # Devolve o último texto que o modelo produziu.
     def run(messages:)
       history = messages.dup
@@ -58,7 +64,9 @@ module Ai
       tool = registry.find(call.name)
       return Result.new(id: call.id, content: "Ferramenta desconhecida: #{call.name}", error: true) if tool.nil?
 
-      Result.new(id: call.id, content: tool.call(call.input).to_s, error: false)
+      content = tool.perform(call.input).to_s
+      executed << { name: call.name, input: call.input, result: content }
+      Result.new(id: call.id, content: content, error: false)
     rescue Ai::ToolError => e
       Result.new(id: call.id, content: e.message, error: true)
     rescue StandardError => e

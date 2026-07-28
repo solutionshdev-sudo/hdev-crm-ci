@@ -21,6 +21,9 @@ en:
       form:
         field_required: 'Please fill this field'
         alphabets_only: 'Only alphabets are allowed'
+      copilot:
+        quota_exceeded: 'The AI token quota for this account has been used up'
+        unknown_change: 'Unknown change: %{name}'
       csat:
         locked: 'You cannot update the CSAT survey after 14 days'
         template_params_required: 'Template parameters are required'

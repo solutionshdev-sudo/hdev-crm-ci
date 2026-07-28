@@ -21,6 +21,9 @@ pt_BR:
       form:
         field_required: 'Preencha este campo'
         alphabets_only: 'Apenas letras são permitidas'
+      copilot:
+        quota_exceeded: 'A cota de tokens de IA desta conta acabou'
+        unknown_change: 'Mudança desconhecida: %{name}'
       csat:
         locked: 'Não é possível atualizar a pesquisa de satisfação após 14 dias'
         template_params_required: 'Os parâmetros do template são obrigatórios'
