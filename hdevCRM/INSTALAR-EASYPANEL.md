@@ -91,9 +91,12 @@ BAILEYS_API_KEY=<gerar hex de 32 bytes>
 > BAILEYS_URL=http://hdev-crm_baileys:3025
 > RAILS_INTERNAL_URL=http://hdev-crm_web:3000
 > DISABLE_ENTERPRISE=true
-> DISABLE_TELEMETRY=true
-> ENABLE_PUSH_RELAY_SERVER=false
 > ```
+>
+> `DISABLE_TELEMETRY` e `ENABLE_PUSH_RELAY_SERVER` não existem mais — a
+> telemetria e o relay de push de terceiros foram removidos do código.
+> Push pro app mobile agora exige credencial Firebase própria
+> (`FIREBASE_PROJECT_ID` + `FIREBASE_CREDENTIALS` no super admin).
 >
 > Atenção: fora do Compose os defaults `http://baileys:3025` e o fallback
 > pra `FRONTEND_URL` **não funcionam** — sem essas duas linhas o QR do

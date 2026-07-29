@@ -598,7 +598,6 @@ pt_BR:
       seeding_triggered: 'Geração de dados de exemplo iniciada'
       cache_cleared: 'Chaves de cache limpas'
       account_deletion_in_progress: 'A exclusão da conta está em andamento.'
-      instance_status_refreshed: 'Status da instância atualizado'
       config_updated: 'Configurações de %{config} atualizadas com sucesso'
       restart_required: 'Reinicie os processos web e worker do Hdev CRM para aplicar essa mudança em todo lugar.'
       invalid_credentials: 'Credenciais inválidas. Tente novamente.'
