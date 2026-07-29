@@ -40,7 +40,6 @@ RSpec.describe 'Installation::Onboarding API', type: :request do
         post '/installation/onboarding', params: { user: {} }
         expect(Redis::Alfred.get(Redis::Alfred::CHATWOOT_INSTALLATION_ONBOARDING)).to be_nil
       end
-
     end
 
     context 'when onboarding is not successfull' do
