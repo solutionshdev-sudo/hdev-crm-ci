@@ -35,20 +35,21 @@ describe '/app/login', type: :request do
       get '/app/login', headers: { 'Host' => 'painel.agencia.com' }
       expect(response).to have_http_status(:success)
       expect(response.body).to include('Painel Pro')
-      expect(response.body).to include('--brand-color: #ff5500')
+      # #ff5500 vira o token de acento runtime (vueapp.html.erb injeta --blue-9/10/11)
+      expect(response.body).to include('--blue-9: 255 85 0 !important')
     end
 
     it 'does not apply agency branding on other hosts' do
       get '/app/login'
       expect(response).to have_http_status(:success)
-      expect(response.body).not_to include('--brand-color')
+      expect(response.body).not_to include('255 85 0')
     end
 
     it 'does not apply branding for suspended agencies' do
       agency.update!(status: 'suspended')
       get '/app/login', headers: { 'Host' => 'painel.agencia.com' }
       expect(response).to have_http_status(:success)
-      expect(response.body).not_to include('--brand-color')
+      expect(response.body).not_to include('255 85 0')
     end
   end
 

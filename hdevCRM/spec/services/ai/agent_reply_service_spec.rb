@@ -86,7 +86,9 @@ RSpec.describe Ai::AgentReplyService do
       service.perform
 
       expect(conversation.reload.custom_attributes['ai_agent_handoff']).to be(true)
-      expect(conversation.messages.outgoing.count).to eq(0)
+      # "silencioso" = nada público pro cliente; a nota privada de handoff
+      # também é message_type outgoing (default do MessageBuilder)
+      expect(conversation.messages.outgoing.where(private: false).count).to eq(0)
       expect(conversation.messages.where(private: true).count).to eq(1)
     end
 
