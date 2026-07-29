@@ -18,7 +18,7 @@ RSpec.describe Messages::AudioTranscriptionService do
     create(:installation_config, name: 'CAPTAIN_OPEN_AI_API_KEY', value: 'test-key')
     account.update!(audio_transcriptions: true)
     allow(Llm::Config).to receive(:with_api_key).and_yield(context)
-    allow(context).to receive(:transcribe).and_return(transcription)
+    allow(RubyLLM::Transcription).to receive(:transcribe).and_return(transcription)
   end
 
   describe '#perform' do
@@ -54,8 +54,8 @@ RSpec.describe Messages::AudioTranscriptionService do
 
       described_class.new(attachment: attachment).perform
 
-      expect(context).to have_received(:transcribe).with(
-        anything, model: Llm::Models.default_model_for('audio_transcription'), provider: :openai
+      expect(RubyLLM::Transcription).to have_received(:transcribe).with(
+        anything, model: Llm::Models.default_model_for('audio_transcription'), provider: :openai, context: context
       )
     end
 
@@ -65,7 +65,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
       described_class.new(attachment: attachment).perform
 
-      expect(context).to have_received(:transcribe).with(anything, model: 'whisper-1', provider: :openai)
+      expect(RubyLLM::Transcription).to have_received(:transcribe).with(anything, model: 'whisper-1', provider: :openai, context: context)
     end
 
     context 'when it should not run' do
@@ -75,7 +75,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
         described_class.new(attachment: attachment).perform
 
-        expect(context).not_to have_received(:transcribe)
+        expect(RubyLLM::Transcription).not_to have_received(:transcribe)
       end
 
       it 'skips when there is no api key configured' do
@@ -84,7 +84,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
         described_class.new(attachment: attachment).perform
 
-        expect(context).not_to have_received(:transcribe)
+        expect(RubyLLM::Transcription).not_to have_received(:transcribe)
       end
 
       it 'skips an attachment that was already transcribed' do
@@ -93,7 +93,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
         described_class.new(attachment: attachment).perform
 
-        expect(context).not_to have_received(:transcribe)
+        expect(RubyLLM::Transcription).not_to have_received(:transcribe)
         expect(attachment.reload.meta['transcribed_text']).to eq('já transcrito')
       end
 
@@ -102,7 +102,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
         described_class.new(attachment: attachment).perform
 
-        expect(context).not_to have_received(:transcribe)
+        expect(RubyLLM::Transcription).not_to have_received(:transcribe)
       end
 
       it 'skips a file over the provider size limit' do
@@ -111,7 +111,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
         described_class.new(attachment: attachment).perform
 
-        expect(context).not_to have_received(:transcribe)
+        expect(RubyLLM::Transcription).not_to have_received(:transcribe)
       end
 
       it 'does not store an empty transcription' do
@@ -126,7 +126,7 @@ RSpec.describe Messages::AudioTranscriptionService do
 
     context 'when the provider fails' do
       before do
-        allow(context).to receive(:transcribe).and_raise(StandardError, 'boom')
+        allow(RubyLLM::Transcription).to receive(:transcribe).and_raise(StandardError, 'boom')
       end
 
       it 'swallows the error and leaves the attachment untouched' do

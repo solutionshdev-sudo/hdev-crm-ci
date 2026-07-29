@@ -39,7 +39,9 @@ class Messages::AudioTranscriptionService
     # infere o formato do áudio pelo nome do arquivo.
     attachment.file.blob.open do |file|
       Llm::Config.with_api_key(api_key, api_base: api_base) do |context|
-        context.transcribe(file.path, model: model, provider: PROVIDER).text
+        # `RubyLLM::Context` só ganhou `#transcribe` depois da 1.15; a versão
+        # fixada aqui expõe isso na classe, que aceita o context como kwarg.
+        RubyLLM::Transcription.transcribe(file.path, model: model, provider: PROVIDER, context: context).text
       end
     end
   rescue StandardError => e
