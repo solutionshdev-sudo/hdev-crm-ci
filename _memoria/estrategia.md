@@ -24,10 +24,12 @@ redumpa o schema e publica como artifact, sem gastar janela de deploy.
 18min19s, 8028 exemplos. O travamento crônico (90 min mudo até o timeout) era o
 autoBuild do Vite dentro de spec de request num job sem Node; atrás dele, um OOM
 de heap e o seed do ConfigLoader no banco de teste. Conserto no PR #1
-(`ci/rspec-vite-autobuild-hang`). As 340 falhas viraram dívida mapeada:
-239 em `spec/enterprise` (excluído do run — Fase 3 deleta) e ~102 no core,
-~70 delas com causa única (seed) já tratada no CI; o resíduo está em triagem.
-Detalhes operacionais no `CLAUDE.md` (seção CI).
+(`ci/rspec-vite-autobuild-hang`), **mergeado na main (`f0fb6c6`) com CI 100%
+verde** — `5994 examples, 0 failures`, rspec em ~15-16 min. Das 340 falhas:
+239 eram `spec/enterprise` (excluído do run — Fase 3 deleta), ~100 eram o seed
+do ConfigLoader, e só 2 sobreviveram — ambas spec desatualizado, **zero
+regressões reais de código**. Detalhes operacionais no `CLAUDE.md` (seção CI);
+mapa visual no Artifact "Anatomia das 340 falhas".
 
 ## Prioridade principal
 

@@ -96,7 +96,8 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **A suíte termina: ~18-19 min de rspec** (medição real de 28/07: 8028 exemplos).
+- **A suíte termina VERDE: ~15-16 min de rspec** (5994 exemplos, 0 falhas desde
+  o merge `f0fb6c6` de 28/07 — o primeiro CI 100% verde do repo).
   O "travamento eterno" era o autoBuild do Vite disparando DENTRO de um spec de
   request (`vite_javascript_tag` sem manifest) num job sem Node — o vite_ruby
   captura a saída do build, então o processo ficava mudo esperando stdin até o
