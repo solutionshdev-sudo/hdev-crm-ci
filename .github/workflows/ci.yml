@@ -62,6 +62,12 @@ jobs:
       # Mesmo valor do docker/Dockerfile. No default do Node (~2 GB) o build
       # morre de heap em "rendering chunks".
       NODE_OPTIONS: --max-old-space-size=4096
+      # Probe da Fase 3 (temporario): os 5994 exemplos verdes foram medidos com
+      # os modulos enterprise injetados. Este run responde "quais specs do core
+      # passam so porque o enterprise esta ligado?" ANTES de qualquer arquivo
+      # sumir, separando isso de "spec quebrou porque a constante sumiu".
+      # Sai no commit da delecao, junto com o --exclude-pattern.
+      DISABLE_ENTERPRISE: 'true'
 
     steps:
       - uses: actions/checkout@v4
