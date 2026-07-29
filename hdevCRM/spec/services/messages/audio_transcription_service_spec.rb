@@ -69,9 +69,11 @@ RSpec.describe Messages::AudioTranscriptionService do
     end
 
     context 'when it should not run' do
+      # Desligar antes de criar o anexo, não depois: o callback do Attachment
+      # lê a conta ao salvar e a associação fica memoizada com o valor antigo.
       it 'skips when the account setting is off' do
-        attachment = audio_attachment
         account.update!(audio_transcriptions: false)
+        attachment = audio_attachment
 
         described_class.new(attachment: attachment).perform
 
