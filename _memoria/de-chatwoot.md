@@ -206,13 +206,15 @@ IA própria. Só `CaptainFeaturable` e o `captain_v2_assistant_model` hardcoded 
 está **fora** de `enterprise/`, então é MIT e reutilizável — cards, playground,
 empty states e gerenciador de documentos. Não redesenhar do zero.
 
-### ✅ Fase 3 EXECUTADA (29/07) — `enterprise/` deletado, CI 100% verde
+### ✅ Fase 3 EXECUTADA E MERGEADA (29/07) — `enterprise/` deletado
 
-PR #2 (`fase3/remove-enterprise`), três commits. **`5989 examples, 0 failures,
-64 pending` em 13m50s + rubocop `2148 files inspected, no offenses` + vitest.**
-A suíte rodou **inteira, sem `--exclude-pattern`, sem `enterprise/`** — que era
-o teste que o plano chamou de "o teste de verdade". Falta só o merge e o rebuild
-no EasyPanel.
+PR #2 (`fase3/remove-enterprise`), 4 commits, **mergeado na `main` em `c4e3f74`**
+com CI verde nos três jobs — no PR e de novo na `main` depois do merge.
+**`5989 examples, 0 failures, 64 pending` em 13m50s + rubocop `2148 files
+inspected, no offenses` + vitest.** A suíte rodou **inteira, sem
+`--exclude-pattern`, sem `enterprise/`** — o teste que o plano chamou de "o teste
+de verdade". `db/schema.rb` conferido contra o artifact do CI: **idêntico**, não
+houve migration nesta rodada.
 
 **733 arquivos, −51.915 linhas.** Saiu: `enterprise/` (465), `spec/enterprise/`
 (234), o `conversation_spec.rb` de fora, 9 factories + `spec/factories/captain/`,
@@ -251,10 +253,14 @@ a `enterprise/` no `.rubocop.yml` (`Metrics/MethodLength`,
 `Rails/HelperInstanceVariable`, `Rails/InverseOf`,
 `Rails/UniqueValidationWithoutIndex`) e o `model_dir` do `.annotaterb.yml`.
 
-**Falta:** merge do PR #2 e **rebuild** (não restart) no EasyPanel — depois,
+**Falta só o servidor:** **rebuild** (não restart) no EasyPanel — depois,
 conferir que `/super_admin` abre, o dashboard carrega, os menus Captain / SLA /
 Audit Logs / Custom Roles / Negócios não aparecem, e login e envio de mensagem
-funcionam.
+funcionam. Risco baixo: produção já roda com `DISABLE_ENTERPRISE=true` desde
+26/07, então em runtime a deleção é um no-op.
+
+**Destravou a Fase 3b** (textos e links visíveis), que agora só depende das
+páginas `hdev.online/termos-de-uso` e `/politica-de-privacidade` existirem.
 
 ### 📋 Revisão do plano da Fase 3 + corte da Fase 3.5 (29/07, análise)
 
@@ -381,7 +387,8 @@ deve buscar `/assets/images/hdev_bot.png` com 200.
 
 | Fase | O que é | Pré-requisito |
 |---|---|---|
-| **3** | Remover `enterprise/` e `spec/enterprise/` de vez; deletar `lib/chatwoot_hub.rb` e toda a telemetria; remover `UpdateBanner`, changelog card, testimonials | 48h estável com `DISABLE_ENTERPRISE` + o 500 resolvido |
+| **3** | ✅ **Feita em 29/07** — `enterprise/` e `spec/enterprise/` deletados, PR #2 mergeado em `c4e3f74`, CI verde. Ver o bloco "Fase 3 EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
+| **3-tele** | ⏳ **O resto do escopo original da Fase 3, não feito**: deletar `lib/chatwoot_hub.rb` e a telemetria (6 arquivos ainda usam `ChatwootHub`: `dashboard_controller`, `installation/onboarding_controller`, `internal/check_new_versions_job`, `internal/trigger_daily_scheduled_items_job`, `notification/push_notification_service`, `notification/push_test_service` — os dois de push usam o hub como relay de VAPID, então precisa de substituto antes de cortar); remover `UpdateBanner.vue`, `components-next/changelog-card/` + `SidebarChangelog*`, e `v3/api/testimonials.js` + `signup/components/Testimonials/` | — |
 | **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Achado em 28/07 no HTML servido — grep por `chatwoot.com` não pega:** o `helpUrls` inteiro aponta pra `https://chwt.app/hc/*` (o encurtador deles), então todo link de ajuda do dashboard leva pra documentação do Chatwoot; e o `window.globalConfig` ainda expõe as chaves `CHATWOOT_INBOX_TOKEN` e `chatwootConfig`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
 | **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
