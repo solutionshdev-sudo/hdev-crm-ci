@@ -383,12 +383,59 @@ a mesma lista com as mudanças no stash. São testes dependentes de data.
 (se abrir e ficar inerte, o prefixo postMessage dessincronizou), e o avatar do bot
 deve buscar `/assets/images/hdev_bot.png` com 200.
 
+### ✅ Fase 3-tele EXECUTADA E MERGEADA (29/07) — telemetria e hub cortados
+
+PR #3 (`fase3/remove-telemetry`), mergeado em `59025f0` com **CI verde nos três
+jobs**: `5975 examples, 0 failures, 64 pending` (11min21s), rubocop+eslint
+`2142 files inspected, no offenses` e vitest `382 arquivos, todos passando`.
+107 arquivos, −1.401 linhas. Nenhuma linha do app fala com `hub.2.chatwoot.com`.
+
+**A pendência registrada como bloqueio não existia.** A nota dizia que os dois
+serviços de push usavam o hub como "relay de VAPID" e precisariam de substituto
+antes do corte. **Era FCM, não VAPID.** Web push sempre foi local
+(`WebPush.payload_send` com as chaves do `VapidService`); o relay só existia pro
+push do app **mobile**, e o substituto — `send_fcm_push` com credencial Firebase
+própria — já estava no arquivo, logo acima. O que vazava: título e corpo da
+notificação iam pro servidor deles quando a instância não tinha Firebase.
+
+Saiu: `lib/chatwoot_hub.rb`, `register_instance` no onboarding (empresa, nome e
+e-mail do dono) + o checkbox que o disparava, `Internal::CheckNewVersionsJob` e
+`Internal::TriggerDailyScheduledItemsJob` (o segundo **só existia** pra agendar o
+primeiro), a entrada do `schedule.yml`, a chave Redis `LATEST_CHATWOOT_VERSION`,
+o campo `latest_chatwoot_version` da API de conta + swagger, a action `refresh`
+do super admin (já sem link na tela), `UpdateBanner`+`versionCheckHelper` (chave
+`UPDATE_CHATWOOT` fora dos 57 locales), o changelog do sidebar e os testimonials
+do signup.
+
+**Dois achados de brinde:**
+
+1. **`'saml'` no `allowed_login_methods` era código morto desde a Fase 3** —
+   dependia de `ChatwootHub.pricing_plan != 'community'`, e `pricing_plan`
+   retorna `'community'` incondicionalmente desde que `enterprise/` sumiu.
+2. **`ExceptionList::REST_CLIENT_EXCEPTIONS` ficou sem consumidor**, e com ele a
+   gem `rest-client` ficou sem uso real. A constante saiu; **a gem não** —
+   remover exige regenerar o `Gemfile.lock` com bundler (rodada com Ruby).
+
+**Armadilha do swagger:** os 5 JSONs foram editados **por texto**, não por
+`JSON.parse`+`stringify`. O round-trip reordena as chaves numéricas de status
+HTTP (`"404"` antes de `"403"`, porque JS ordena chaves integer-like) e
+reescreveria o arquivo inteiro. Fonte de verdade é o `.yml` em
+`swagger/definitions/`; os JSONs são gerados por rake que precisa de Ruby.
+
+**`DISABLE_TELEMETRY` e `ENABLE_PUSH_RELAY_SERVER` viraram no-op** e saíram do
+compose e do `INSTALAR-EASYPANEL.md` — nenhum código lê essas chaves. Push mobile
+agora exige `FIREBASE_PROJECT_ID` + `FIREBASE_CREDENTIALS` no super admin.
+
+**Confirmado:** as 18 falhas de vitest em 6 arquivos que aparecem na máquina do
+Harvey **passam no CI**. São dependentes de data/fuso, não de código — a
+suspeita registrada na Fase 5 está fechada.
+
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 
 | Fase | O que é | Pré-requisito |
 |---|---|---|
 | **3** | ✅ **Feita em 29/07** — `enterprise/` e `spec/enterprise/` deletados, PR #2 mergeado em `c4e3f74`, CI verde. Ver o bloco "Fase 3 EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
-| **3-tele** | ⏳ **O resto do escopo original da Fase 3, não feito**: deletar `lib/chatwoot_hub.rb` e a telemetria (6 arquivos ainda usam `ChatwootHub`: `dashboard_controller`, `installation/onboarding_controller`, `internal/check_new_versions_job`, `internal/trigger_daily_scheduled_items_job`, `notification/push_notification_service`, `notification/push_test_service` — os dois de push usam o hub como relay de VAPID, então precisa de substituto antes de cortar); remover `UpdateBanner.vue`, `components-next/changelog-card/` + `SidebarChangelog*`, e `v3/api/testimonials.js` + `signup/components/Testimonials/` | — |
+| **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
 | **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Achado em 28/07 no HTML servido — grep por `chatwoot.com` não pega:** o `helpUrls` inteiro aponta pra `https://chwt.app/hc/*` (o encurtador deles), então todo link de ajuda do dashboard leva pra documentação do Chatwoot; e o `window.globalConfig` ainda expõe as chaves `CHATWOOT_INBOX_TOKEN` e `chatwootConfig`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
 | **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
