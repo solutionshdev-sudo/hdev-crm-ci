@@ -77,32 +77,6 @@ Rails.application.routes.draw do
           end
           namespace :captain do
             resource :preferences, only: [:show, :update]
-            resources :assistants do
-              member do
-                post :playground
-                get :stats
-                get :summary
-                get :drilldown
-              end
-              collection do
-                get :tools
-              end
-              resources :inboxes, only: [:index, :create, :destroy], param: :inbox_id
-              resources :scenarios
-            end
-            resources :agent_sessions, only: [:show]
-            resources :assistant_responses
-            resources :message_reports, only: [:create]
-            resources :bulk_actions, only: [:create]
-            resources :copilot_threads, only: [:index, :create] do
-              resources :copilot_messages, only: [:index, :create]
-            end
-            resources :custom_tools do
-              post :test, on: :collection
-            end
-            resources :documents, only: [:index, :show, :create, :destroy] do
-              post :sync, on: :member
-            end
             resource :tasks, only: [], controller: 'tasks' do
               post :rewrite
               post :summarize
@@ -111,7 +85,6 @@ Rails.application.routes.draw do
               post :follow_up
             end
           end
-          resource :saml_settings, only: [:show, :create, :update, :destroy]
           resources :agent_bots, only: [:index, :create, :show, :update, :destroy] do
             delete :avatar, on: :member
             post :reset_access_token, on: :member
@@ -123,7 +96,6 @@ Rails.application.routes.draw do
             end
           end
           resources :assignable_agents, only: [:index]
-          resource :audit_logs, only: [:show]
           resources :callbacks, only: [] do
             collection do
               post :register_facebook_page
@@ -150,14 +122,6 @@ Rails.application.routes.draw do
           resources :deals, only: [:index, :create, :show, :update, :destroy] do
             post :move, on: :member
             resources :activities, only: [:index], module: :deals
-          end
-          resources :sla_policies, only: [:index, :create, :show, :update, :destroy]
-          resources :custom_roles, only: [:index, :create, :show, :update, :destroy]
-          resources :agent_capacity_policies, only: [:index, :create, :show, :update, :destroy] do
-            scope module: :agent_capacity_policies do
-              resources :users, only: [:index, :create, :destroy]
-              resources :inbox_limits, only: [:create, :update, :destroy]
-            end
           end
           resources :campaigns, only: [:index, :create, :show, :update, :destroy]
           resources :dashboard_apps, only: [:index, :show, :create, :update, :destroy]
@@ -209,24 +173,6 @@ Rails.application.routes.draw do
             end
           end
 
-          resources :companies, only: [:index, :show, :create, :update, :destroy] do
-            collection do
-              get :search
-            end
-            member do
-              post :destroy_custom_attributes
-              delete :avatar
-            end
-            scope module: :companies do
-              resources :contacts, only: [:index, :create, :destroy] do
-                collection do
-                  get :search
-                end
-              end
-              resources :conversations, only: [:index]
-              resources :notes, only: [:index]
-            end
-          end
           resources :contacts, only: [:index, :show, :update, :create, :destroy] do
             collection do
               get :active
@@ -267,12 +213,6 @@ Rails.application.routes.draw do
             end
             member do
               patch :update if ChatwootApp.enterprise?
-            end
-          end
-          resources :applied_slas, only: [:index] do
-            collection do
-              get :metrics
-              get :download
             end
           end
           resources :reporting_events, only: [:index] if ChatwootApp.enterprise?

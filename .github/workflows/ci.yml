@@ -62,12 +62,6 @@ jobs:
       # Mesmo valor do docker/Dockerfile. No default do Node (~2 GB) o build
       # morre de heap em "rendering chunks".
       NODE_OPTIONS: --max-old-space-size=4096
-      # Probe da Fase 3 (temporario): os 5994 exemplos verdes foram medidos com
-      # os modulos enterprise injetados. Este run responde "quais specs do core
-      # passam so porque o enterprise esta ligado?" ANTES de qualquer arquivo
-      # sumir, separando isso de "spec quebrou porque a constante sumiu".
-      # Sai no commit da delecao, junto com o --exclude-pattern.
-      DISABLE_ENTERPRISE: 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -127,10 +121,10 @@ jobs:
         # sem aspas de proposito: vazio precisa sumir e virar "suite inteira"
         # < /dev/null: qualquer subprocesso que peca confirmacao no stdin (npx,
         # corepack) recebe EOF e morre, em vez de segurar o job ate o timeout
-        # exclude-pattern (relativo a spec/): spec/enterprise cobre codigo que a
-        # licenca proibe em producao/revenda; a Fase 3 do de-chatwoot deleta o
-        # diretorio. Vale tambem pro spec_path do workflow_dispatch.
-        run: bundle exec rspec $SPEC_PATH --exclude-pattern "enterprise/**/*" --tag '~opensearch' < /dev/null
+        # sem --exclude-pattern desde a Fase 3: spec/enterprise nao existe mais,
+        # e rodar a suite inteira sem exclusao e o que prova que a delecao ficou
+        # limpa.
+        run: bundle exec rspec $SPEC_PATH --tag '~opensearch' < /dev/null
 
   lint:
     name: lint
