@@ -50,8 +50,8 @@ services:
       # De-Chatwoot: enterprise/ é licenciado (proíbe revenda) e o job de
       # reconciliação dele desfaz o rebrand — manter SEMPRE desligado.
       DISABLE_ENTERPRISE: 'true'
-      DISABLE_TELEMETRY: 'true'
-      ENABLE_PUSH_RELAY_SERVER: 'false'
+      # DISABLE_TELEMETRY e ENABLE_PUSH_RELAY_SERVER saíram: o código que lia
+      # essas chaves (lib/chatwoot_hub.rb e o relay de push) foi deletado.
       POSTGRES_HOST: postgres
       POSTGRES_PORT: '5432'
       POSTGRES_USERNAME: postgres
