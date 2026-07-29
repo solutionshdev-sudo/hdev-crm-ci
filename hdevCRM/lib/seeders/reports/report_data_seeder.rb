@@ -25,7 +25,7 @@ require 'faker'
 require_relative 'conversation_creator'
 require_relative 'message_creator'
 
-# rubocop:disable Rails/Output, Metrics/ClassLength
+# rubocop:disable Rails/Output
 class Seeders::Reports::ReportDataSeeder
   include ActiveSupport::Testing::TimeHelpers
 
@@ -231,4 +231,4 @@ class Seeders::Reports::ReportDataSeeder
     print "\n"
   end
 end
-# rubocop:enable Rails/Output, Metrics/ClassLength
+# rubocop:enable Rails/Output
