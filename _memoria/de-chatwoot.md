@@ -206,6 +206,135 @@ IA própria. Só `CaptainFeaturable` e o `captain_v2_assistant_model` hardcoded 
 está **fora** de `enterprise/`, então é MIT e reutilizável — cards, playground,
 empty states e gerenciador de documentos. Não redesenhar do zero.
 
+### ✅ Fase 3 EXECUTADA (29/07) — `enterprise/` deletado, CI 100% verde
+
+PR #2 (`fase3/remove-enterprise`), três commits. **`5989 examples, 0 failures,
+64 pending` em 13m50s + rubocop `2148 files inspected, no offenses` + vitest.**
+A suíte rodou **inteira, sem `--exclude-pattern`, sem `enterprise/`** — que era
+o teste que o plano chamou de "o teste de verdade". Falta só o merge e o rebuild
+no EasyPanel.
+
+**733 arquivos, −51.915 linhas.** Saiu: `enterprise/` (465), `spec/enterprise/`
+(234), o `conversation_spec.rb` de fora, 9 factories + `spec/factories/captain/`,
+4 rake tasks órfãs, `config/initializers/audited.rb` e
+`lib/seeders/reports/assistant_conversation_creator.rb`. Editado:
+`config/application.rb`, `Rakefile`, `_account.json.jbuilder`,
+`report_data_seeder.rb`, `routes.rb` (6 blocos) e `ci.yml`.
+
+**O probe do passo 1 valeu o run.** Fechou vermelho com 9 falhas, todas o mesmo
+override: `enterprise/.../confirmation_instructions.html.erb` chamava
+`account.saml_enabled?`, que só existe no módulo enterprise, enquanto
+`config/application.rb` prependava `enterprise/app/views` **sem guarda nenhuma**
+— dependia do arquivo existir no disco, não da env var. Estado que só existe com
+`DISABLE_ENTERPRISE` ligado E os arquivos presentes; a deleção foi o conserto.
+Lição: **view path do enterprise não era gateado, só o módulo era.**
+
+**A contagem fecha exata** — nenhum spec foi comido pelo pattern:
+`5994` (baseline) `−3` (os `super_admin/accounts_controller_spec.rb:30,50,69`
+com `if: ChatwootApp.enterprise?` passam a pular) `= 5991` (probe) `−2` (o
+`conversation_spec.rb` deletado, que tinha exatamente 2 exemplos e **nunca** foi
+pego pelo `--exclude-pattern`, porque mora em `spec/models/enterprise/`, não em
+`spec/enterprise/`) `= 5989`.
+
+**Duas correções ao que estava registrado antes:**
+
+1. **`CaptainFeaturable` e `AccountCaptainAutoResolve` FICAM** — a nota de 27/07
+   dizia que sairiam junto "ou o boot quebra". Errado: os dois são MIT puros
+   (usam `Llm::Models` do core e o hash `settings`), zero constante enterprise.
+   O plano estava certo, a nota estava desatualizada.
+2. **Uma ofensa de lint apareceu depois da deleção**: o seeder encolheu ~90
+   linhas e o `# rubocop:disable Metrics/ClassLength` virou
+   `RedundantCopDisableDirective`. Consertado no terceiro commit.
+
+**Sobras de config que o plano não listava** e foram limpas junto: 4 referências
+a `enterprise/` no `.rubocop.yml` (`Metrics/MethodLength`,
+`Rails/HelperInstanceVariable`, `Rails/InverseOf`,
+`Rails/UniqueValidationWithoutIndex`) e o `model_dir` do `.annotaterb.yml`.
+
+**Falta:** merge do PR #2 e **rebuild** (não restart) no EasyPanel — depois,
+conferir que `/super_admin` abre, o dashboard carrega, os menus Captain / SLA /
+Audit Logs / Custom Roles / Negócios não aparecem, e login e envio de mensagem
+funcionam.
+
+### 📋 Revisão do plano da Fase 3 + corte da Fase 3.5 (29/07, análise)
+
+Auditoria do plano `1-isso-ja-foi-starry-neumann.md` contra o repo. **O plano está
+correto** — as três armadilhas (bitset do `features.yml`, `installation_config.yml`,
+namespace `Captain::` dividido) e a regra mecânica das rotas conferem. Executar
+como está escrito. O que muda é o **depois**.
+
+**Enquadramento que faltava:** a Fase 3 não é mudança de produto, é mudança de
+repositório. Com `DISABLE_ENTERPRISE=true` desde 26/07, as 14 famílias de feature
+já estão desligadas em produção. E a deleção **não tira um único arquivo de
+frontend nem uma única tabela**: `enterprise/` tem **zero** `.js`/`.vue`
+(verificado). Cada feature é cortada em três camadas — o cérebro (model,
+controller, jbuilder, job, service) sai; tabela + Vue + i18n + mailers ficam,
+MIT.
+
+**Fase 3.5 reordenada (decisão de 29/07):** as quatro reconstruções viram lista
+de espera com **gatilho por pedido de cliente**, não roadmap — há zero agências
+pagantes hoje e cada uma é código a manter sem demanda.
+
+| Feature | Custo real | Decisão |
+|---|---|---|
+| **Companies** | ~200 linhas | **Cortada de vez.** Sobreposta pelo Kanban de Negócios (`deals`), que é o que agência usa. Um atributo customizado "empresa" no contato cobre o resto por zero linha |
+| **Audit logs** | ~70 linhas (a gem `audited` faz o trabalho) | Primeira a voltar **se** um cliente pedir compliance |
+| **Custom roles** | CRUD 106 linhas + **a matriz de permissões em ~20 policies** ← custo escondido | Adiar. Quando vier, 2-3 papéis fixos resolvem 90% |
+| **SLA** | ~600 linhas, 3 tabelas, jobs | Adiar. Maior apelo comercial e maior custo — só quando houver a quem vender |
+
+**As duas reconstruções que valem mais que as quatro (não estavam no plano):**
+
+1. **Transcrição de áudio** (`enterprise/app/services/messages/audio_transcription_service.rb`)
+   — áudio no WhatsApp é expectativa no Brasil, não feature. O contrato inteiro
+   já é MIT e já está no core: toggle em `Settings > Account`, e
+   `meta['transcribed_text']` já lido por `attachment.rb:113`, `message.rb:279`,
+   `search_data_presenter.rb:37` e a busca do dashboard. Falta só quem preenche
+   — ~60 linhas contra a Anthropic. O gatilho também é EE
+   (`enterprise/app/models/enterprise/concerns/attachment.rb:21`), então tem que
+   voltar junto.
+2. **Campos de limite/feature do super admin** (`enterprise/app/fields/`) — sem
+   eles não há UI pra ligar feature ou setar limite por conta, que é literalmente
+   a mecânica dos planos de revenda. É um `Administrate::Field` de ~20 linhas.
+   `app/dashboards/account_dashboard.rb:11` já está gateado por
+   `ChatwootApp.enterprise?`, então **a deleção não quebra o `/super_admin`** —
+   os campos só somem, como já sumiram em produção.
+
+**Canais oficiais não estão em risco — confusão desfeita em 29/07.** A API oficial
+do WhatsApp (Meta Cloud) e o Twilio continuam sendo oferecidos e **são 100% core
+MIT**: `app/models/channel/whatsapp.rb` + 34 arquivos em `app/services/whatsapp/`
+(embedded signup, templates, webhooks, `providers/whatsapp_cloud_service.rb`), e
+`app/models/channel/twilio_sms.rb` + 18 arquivos (`send_on_twilio_service`,
+delivery status, callbacks). 360Dialog e Baileys idem. **A deleção não encosta em
+nenhum deles.**
+
+O que `enterprise/` tem de WhatsApp/Twilio é **só chamada de voz**, verificado
+arquivo por arquivo: Twilio Voice (16 arq. — ligação, conferência, gravação,
+token WebRTC) e WhatsApp Calling API (7 arq., exige Graph v17+ e aprovação da
+Meta). O override `Enterprise::Channel::TwilioSms` só adiciona `voice_enabled`,
+provisionamento de TwiML App e `initiate_call` — zero linha de envio de mensagem;
+e o `Enterprise::Webhooks::WhatsappEventsJob` intercepta apenas
+`field == 'calls'`, todo o resto cai no `super` do core.
+
+**Decisão (29/07): voz sai junto e volta reconstruída se precisar.** Entra na
+fila da Fase 3.5 com gatilho por necessidade, sem prioridade. O Vue de voz (9
+arquivos) é core e fica pronto pra ser religado. Custo quando vier: é a
+reconstrução mais cara da lista — WebRTC + conferência + gravação +
+armazenamento + consentimento de gravação (LGPD), maior que o SLA.
+
+**Dois órfãos que o plano não lista** (além do `sla_activity_message_handler.rb`
+que ele decide preservar):
+
+- `app/jobs/companies/fetch_avatars_job.rb` — core, chama `account.companies` sem
+  guarda de `enterprise?`. **Zero chamadores** (grep confirmado), então não
+  quebra. Mesma categoria do handler de SLA: fica ou sai junto, mas não é o
+  único caso.
+- Os enums `sla_missed_*` em `notification.rb:44-46` + os 3 mailers `.liquid`
+  ficam no core. Nada os emite sem o SLA — texto morto, inofensivo.
+
+**Ressalva do plano sobre o histórico do git: resolvida.** O repo
+`solutionshdev-sudo/hdev-crm` é **privado** (confirmado via `gh`), então não há
+exposição pública de licença a fechar. Só vale reavaliar se um dia for aberto.
+
 ### ✅ Fase 5 — superfície JS do widget (28/07, não deployada)
 
 O gatilho: a tela "Sua caixa de entrada está pronta" mostrava
@@ -259,6 +388,10 @@ deve buscar `/assets/images/hdev_bot.png` com 200.
 
 Plano detalhado com comandos, armadilhas e verificação por fase:
 `C:\Users\hdev\.claude\plans\crie-um-plano-completo-buzzing-stardust.md`
+
+Plano específico da Fase 3 (deleção do `enterprise/`, auditado e aprovado em
+29/07 — ver o bloco "Revisão do plano da Fase 3" acima):
+`C:\Users\hdev\.claude\plans\1-isso-ja-foi-starry-neumann.md`
 
 ---
 
