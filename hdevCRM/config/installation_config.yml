@@ -43,11 +43,11 @@
   display_title: 'Nome da marca'
   description: 'O nome usado nos e-mails e no widget'
 - name: TERMS_URL
-  value: '#'
+  value: 'https://hdev.online/terms'
   display_title: 'URL dos termos'
   description: 'A URL dos termos de serviço exibida na página de cadastro'
 - name: PRIVACY_URL
-  value: '#'
+  value: 'https://hdev.online/privacy'
   display_title: 'URL de privacidade'
   description: 'A URL da política de privacidade exibida no aplicativo'
 - name: DISPLAY_MANIFEST
