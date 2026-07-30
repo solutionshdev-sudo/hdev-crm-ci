@@ -90,10 +90,21 @@ soletram "chatwoot". Detalhes e armadilhas em `_memoria/de-chatwoot.md`.
 **Pendente:** rebuild + teste manual em `/widget_tests` (o SDK não tem nenhum
 teste unitário; o rename está verificado por grep, não por execução).
 
-**Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
-textos/links visíveis (parte adiantada em 27/07: links de termos do signup e
-remetente de e-mail já apontam pra hdev.online), depois os identificadores
-internos Ruby (Fase 6).
+**Feito (29/07, PR #2 mergeado em `c4e3f74`):** Fase 3 — `enterprise/` e
+`spec/enterprise/` deletados, 733 arquivos e −51.915 linhas, com a suíte
+rodando **inteira** pela primeira vez (`5989 examples, 0 failures`).
+
+**Feito (29/07, PR #3 mergeado em `59025f0`):** Fase 3-tele — `lib/chatwoot_hub.rb`
+e toda a telemetria cortados (ping diário com contagens, registro da instância no
+onboarding, relay de push, banner de update, changelog e testimonials). Nenhuma
+linha do app fala com `hub.2.chatwoot.com`. As envs `DISABLE_TELEMETRY` e
+`ENABLE_PUSH_RELAY_SERVER` viraram no-op e saíram do compose.
+
+**Próximo (de-Chatwoot):** a **Fase 3b** (textos e links visíveis — parte
+adiantada em 27/07: links de termos do signup e remetente de e-mail já apontam
+pra hdev.online) está **bloqueada** até as páginas de termos e privacidade
+existirem no hdev.online. Sem esse bloqueio, sobra a Fase 6 (identificadores
+internos Ruby).
 
 **Dois azuis que sobraram, achados em 28/07 (não corrigidos):**
 - `app/javascript/.../inbox/channels/Website.vue:21` — `channelWidgetColor: '#009CE0'`
@@ -224,15 +235,29 @@ nada foi gravado. **Deployado em 28/07** — o item "Copiloto" já aparece no me
 de Configurações. **Pendente:** o teste ponta a ponta (é o único ponto que valida
 o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 
-**Próximo:** multi-provider, depois remover `enterprise/`. RAG só quando um
+**Próximo:** multi-provider (o `enterprise/` já saiu em 29/07). RAG só quando um
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
 ## O que pode esperar
 
 - Definição da estrutura de planos de revenda pras agências (ainda em estudo).
-- Reconstrução das features enterprise com código próprio (SLA, audit logs,
-  custom roles, companies) — só depois da desvinculação terminar.
+- **Reconstrução das features enterprise: virou lista de espera com gatilho por
+  pedido de cliente, não roadmap** (decisão de 29/07). Há zero agências pagantes
+  hoje e cada uma é código a manter sem demanda. **Companies foi cortada de vez**
+  — o Kanban de Negócios cobre o caso, e um atributo customizado "empresa" no
+  contato resolve o resto. Audit logs volta primeiro se alguém pedir compliance
+  (~70 linhas, a gem `audited` faz o trabalho); custom roles e SLA ficam adiados,
+  o primeiro porque o custo real é a matriz de permissões em ~20 policies e o
+  segundo porque são ~600 linhas e 3 tabelas. Voz idem, e é a mais cara de todas
+  (WebRTC + gravação + consentimento LGPD).
+- **Já reconstruída (29/07, PR #4):** transcrição de áudio. Não estava naquela
+  lista e vale mais que as quatro — áudio no WhatsApp é expectativa no Brasil.
+  Saiu barata porque o contrato inteiro era MIT e já estava no core: faltava só
+  quem preenche o `meta['transcribed_text']`.
+- Ainda de pé como candidata barata: os **campos de limite/feature do super
+  admin** (~20 linhas de `Administrate::Field`) — é a UI que liga feature e seta
+  limite por conta, ou seja, a mecânica dos planos de revenda.
 - Skills de marketing/conteúdo do template (carrossel, SEO, ads) — o foco
   agora é produto, não divulgação.
 

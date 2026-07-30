@@ -50,10 +50,13 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
   upstream). Renomear com cuidado: Zeitwerk exige arquivo e constante
   casados, e há resoluções por string que busca-e-substitui não pega.
   Exceções conhecidas em `_memoria/de-chatwoot.md`.
-- **Nunca reativar o diretório `enterprise/`.** A licença dele exige
-  assinatura paga para uso em produção e proíbe revenda — o oposto do
-  modelo de negócio. O núcleo é MIT e pode ser vendido; nunca alterar
-  o arquivo `LICENSE`.
+- **Nunca reativar o diretório `enterprise/`** — deletado em 29/07 (Fase 3,
+  PR #2). A licença dele exige assinatura paga para uso em produção e proíbe
+  revenda — o oposto do modelo de negócio. Nunca ressuscitar aquele código a
+  partir do histórico do git: o que a licença proíbe é o uso, não o arquivo.
+  Feature enterprise que fizer falta se reconstrói do zero sobre o contrato
+  MIT que ficou no core. O núcleo é MIT e pode ser vendido; nunca alterar o
+  arquivo `LICENSE`.
 - Nunca comitar `.env` nem chaves/tokens (ver seção Segurança nas regras).
 - **Idioma:** o locale padrão do app é `pt_BR` (`config.i18n.default_locale`
   no `application.rb`); os specs rodam em `:en` (fixado no `test.rb`). Texto
@@ -96,8 +99,10 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **A suíte termina VERDE: ~15-16 min de rspec** (5994 exemplos, 0 falhas desde
-  o merge `f0fb6c6` de 28/07 — o primeiro CI 100% verde do repo).
+- **A suíte termina VERDE: ~13-14 min de rspec** (5996 exemplos, 0 falhas,
+  64 pending). Verde desde o merge `f0fb6c6` de 28/07, o primeiro CI 100%
+  verde do repo; ficou mais rápida em 29/07, quando a Fase 3 tirou o
+  `enterprise/` e a suíte passou a rodar inteira, sem exclusão.
   O "travamento eterno" era o autoBuild do Vite disparando DENTRO de um spec de
   request (`vite_javascript_tag` sem manifest) num job sem Node — o vite_ruby
   captura a saída do build, então o processo ficava mudo esperando stdin até o
@@ -110,8 +115,9 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
   (`lib/tasks/db_enhancements.rake`) e semeia ~106 configs; a linha semeada
   vence o stub de ENV em `GlobalConfigService.load` (lê o DB primeiro) e
   derruba ~70 exemplos em cascata. O workflow trunca a tabela depois do migrate.
-- **`spec/enterprise` não roda** (`--exclude-pattern`): cobre código que a
-  licença proíbe em produção/revenda; a Fase 3 do de-chatwoot deleta o diretório.
+- **Sem `--exclude-pattern` desde 29/07**: a Fase 3 deletou `spec/enterprise`,
+  então a suíte roda inteira. Se algum dia voltar a aparecer exclusão no
+  `ci.yml`, é bug — não há mais nada legítimo a excluir.
 - **`concurrency: cancel-in-progress: true`** — todo push na `main` executa o run
   anterior. Um `cancelled` no histórico quase sempre é isso, não falha de teste;
   a exceção é o run que morre exatamente em 90 min, que é o timeout. Olhar a
