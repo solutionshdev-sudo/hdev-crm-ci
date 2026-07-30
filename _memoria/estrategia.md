@@ -118,10 +118,11 @@ Saiu junto a cadeia `feature_help_urls` → `window.globalConfig.helpUrls` (que
 publicava as URLs de documentação do Chatwoot em toda página e não tinha
 consumidor no frontend) e os fallbacks de remetente `accounts@chatwoot.com`.
 
-**Pendente, e é o que segura o resultado prático:** criar os dois artigos no
-Help Center e apontar `TERMS_URL`/`PRIVACY_URL` pra eles. Enquanto valerem `'#'`,
-o link do cadastro não leva a lugar nenhum — o conserto garante que ele *obedece*
-à configuração, não que a configuração exista.
+**Configuração já feita (30/07):** `TERMS_URL` e `PRIVACY_URL` apontam pra
+`hdev.online/terms` e `/privacy` em produção. **Pendente: o rebuild** — até ele,
+o código velho ainda roda o `.replace` contra o literal do chatwoot.com e ignora
+as duas chaves, então o link visível continua o `/termos-de-uso` cravado na
+tradução, que não existe.
 
 **Próximo (de-Chatwoot):** sobra a **Fase 6** (identificadores internos Ruby),
 com auditoria feita em 30/07 — ver `_memoria/de-chatwoot.md`.
@@ -313,12 +314,18 @@ habilitado.
 
 ## Contexto com prazo
 
-- **Termos e privacidade ainda não existem em lugar nenhum.** Desde 30/07 isso
-  não depende mais do hdev.online: o signup lê `TERMS_URL`/`PRIVACY_URL` de
-  `installation_configs` (hoje `'#'`), e o Help Center do próprio produto
-  hospeda em `crm.hdev.online/hc/<slug>/pt-BR/articles/<slug>` sem código novo.
-  Falta escrever os dois textos, publicar como artigos e setar as duas chaves.
-  Cada agência pode apontar pras dela pelo `Agency` — o override já funciona.
+- ~~**Termos e privacidade não existem**~~ — **resolvidos em 30/07**. Estão no
+  ar em `https://hdev.online/terms` e `https://hdev.online/privacy`, e as chaves
+  `TERMS_URL`/`PRIVACY_URL` já apontam pra elas em produção (confirmado pelos
+  dois caminhos: banco e `GlobalConfig.get`, que passa pelo cache do Redis).
+  **As URLs não são as que a tradução de 27/07 tinha cravado** (`/termos-de-uso`
+  e `/politica-de-privacidade`) — aqueles links estavam quebrados, e é por isso
+  que virar configuração importou. Cada agência aponta pras dela pelo `Agency`.
+  Como editar, porque não é óbvio: as duas nascem `locked: true` e **não
+  aparecem** em `/super_admin/installation_configs`; só por `rails runner`. E
+  `value` **não é coluna** — a tabela tem `serialized_value :jsonb` e `value` é
+  acessor Ruby, então `update!(value:)` funciona mas `pluck(:value)` estoura
+  `PG::UndefinedColumn`; usar `map`.
 - ~~Domínio `crm.hdev.online` sem DNS~~ — **resolvido em 28/07**. Responde 200
   servindo o app, atrás do Cloudflare. Como `FRONTEND_URL` já apontava pra ele,
   os links de e-mail deixaram de sair quebrados (falta o SMTP pra testar).
