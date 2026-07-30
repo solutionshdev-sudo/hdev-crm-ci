@@ -140,8 +140,8 @@ RSpec.describe Messages::AudioTranscriptionService do
 
       it 'reports the failure' do
         attachment = audio_attachment
-        tracker = instance_double(ChatwootExceptionTracker, capture_exception: true)
-        allow(ChatwootExceptionTracker).to receive(:new).and_return(tracker)
+        tracker = instance_double(HdevExceptionTracker, capture_exception: true)
+        allow(HdevExceptionTracker).to receive(:new).and_return(tracker)
 
         described_class.new(attachment: attachment).perform
 

@@ -20,7 +20,7 @@ module Integrations::LlmInstrumentation
       result
     end
   rescue StandardError => e
-    ChatwootExceptionTracker.new(e, account: resolve_account(params)).capture_exception
+    HdevExceptionTracker.new(e, account: resolve_account(params)).capture_exception
     executed ? result : yield
   end
 
@@ -43,7 +43,7 @@ module Integrations::LlmInstrumentation
       end
     end
   rescue StandardError => e
-    ChatwootExceptionTracker.new(e, account: resolve_account(params)).capture_exception
+    HdevExceptionTracker.new(e, account: resolve_account(params)).capture_exception
     executed ? result : yield
   end
 

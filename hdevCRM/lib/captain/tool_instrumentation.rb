@@ -21,7 +21,7 @@ module Captain::ToolInstrumentation
     end
     response
   rescue StandardError => e
-    ChatwootExceptionTracker.new(e, account: account).capture_exception
+    HdevExceptionTracker.new(e, account: account).capture_exception
     executed ? response : yield
   end
 

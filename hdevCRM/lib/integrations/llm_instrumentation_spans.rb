@@ -74,7 +74,7 @@ module Integrations::LlmInstrumentationSpans
       yield(span, track_result)
     end
   rescue StandardError => e
-    ChatwootExceptionTracker.new(e, account: resolve_account(params)).capture_exception
+    HdevExceptionTracker.new(e, account: resolve_account(params)).capture_exception
     raise unless executed
 
     result
