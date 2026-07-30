@@ -1,9 +1,11 @@
 import makeWASocket, {
   DisconnectReason,
   downloadMediaMessage,
+  fetchLatestWaWebVersion,
   useMultiFileAuthState,
   type WASocket,
   type WAMessage,
+  type WAVersion,
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
@@ -29,6 +31,53 @@ const logger = pino({ name: 'instance' });
 // Outbound pacing: ~1 msg/s with jitter. Blasting at machine speed is the
 // fastest way to get an unofficial number banned.
 const SEND_DELAY_MS = 1000;
+
+// Fechamentos em que a credencial salva não serve mais. Reconectar com ela só
+// repete o mesmo erro — e prende a instância num beco sem saída, porque o
+// Baileys só emite QR quando `creds.registered` é false: com credencial morta no
+// disco ele vai direto pra "logging in...", leva o failure de volta e o painel
+// fica em "Conectando..." pra sempre. Apagar a auth state é o que faz o botão
+// "Gerar QR code" voltar a produzir QR.
+//
+// 405 não está no enum do Baileys: é o `<failure reason="405">` que o WhatsApp
+// manda quando recusa o login daquele device (sessão invalidada sem logout
+// limpo). Terminal como o 401, só sem a cortesia de dizer isso.
+const FATAL_CLOSE_CODES = new Set<number>([
+  DisconnectReason.loggedOut, // 401 — desvinculado no celular
+  DisconnectReason.forbidden, // 403 — número bloqueado pelo WhatsApp
+  DisconnectReason.multideviceMismatch, // 411
+  405,
+]);
+
+// A versão do cliente WhatsApp Web que o Baileys hardcoda envelhece: quando o
+// WhatsApp para de aceitar aquele número, TODO handshake volta com
+// `failure reason="405"` — login e registro novo — e nem QR sai. Foi o que
+// derrubou a 6.x (commit 5af436b, "resolvido" subindo pra 7.0.0-rc13) e o que
+// derrubou a rc13 depois: ela pede 2.3000.1035194821, e o WhatsApp já estava
+// em 2.3000.1044104838. Bumpar a dependência a cada vez é enxugar gelo — a
+// versão se pergunta ao WhatsApp na hora de conectar.
+//
+// Não passa pelo proxy da instância: é um GET público de versão, não tráfego
+// da conta. Se falhar, cai na última versão boa desta réplica e, na falta
+// dela, no default do Baileys (undefined = a lib decide).
+let lastKnownVersion: WAVersion | undefined;
+
+const VERSION_FETCH_TIMEOUT_MS = 5000;
+
+async function resolveWaVersion(): Promise<WAVersion | undefined> {
+  try {
+    const { version } = await fetchLatestWaWebVersion({
+      signal: AbortSignal.timeout(VERSION_FETCH_TIMEOUT_MS),
+    });
+    lastKnownVersion = version;
+  } catch (error) {
+    logger.warn(
+      { error: String(error), fallback: lastKnownVersion },
+      'wa web version fetch failed'
+    );
+  }
+  return lastKnownVersion;
+}
 
 const MEDIA_TYPES = [
   'imageMessage',
@@ -96,6 +145,7 @@ export class Instance {
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir(this.config.id));
     const agent = buildAgent(this.config.proxyUrl);
+    const version = await resolveWaVersion();
     const wantsPairingCode =
       usePairingCode ?? this.config.pairingMethod === 'code';
 
@@ -103,6 +153,7 @@ export class Instance {
       auth: state,
       agent,
       fetchAgent: agent,
+      version,
       logger: logger.child({ instance: this.config.id, level: 'warn' }),
       markOnlineOnConnect: false,
       syncFullHistory: false,
@@ -211,15 +262,25 @@ export class Instance {
     if (connection === 'close') {
       const statusCode = (lastDisconnect?.error as Boom | undefined)?.output
         ?.statusCode;
-      const loggedOut = statusCode === DisconnectReason.loggedOut;
-      this.lastDisconnectReason = loggedOut
-        ? 'logged_out'
-        : `code_${statusCode ?? 'unknown'}`;
+      this.lastDisconnectReason =
+        statusCode === DisconnectReason.loggedOut
+          ? 'logged_out'
+          : `code_${statusCode ?? 'unknown'}`;
 
-      if (loggedOut) {
+      if (statusCode !== undefined && FATAL_CLOSE_CODES.has(statusCode)) {
+        // stopped: impede que um timer de backoff já agendado ressuscite a
+        // sessão morta. connect() zera isso, então o painel segue no controle.
+        this.stopped = true;
+        // Antes de apagar: o socket morto ainda pode emitir creds.update e
+        // reescrever creds.json em cima do diretório que acabamos de remover.
+        await this.teardownSocket();
         removeAuthState(this.config.id);
         this.jid = null;
         this.setStatus('disconnected');
+        logger.warn(
+          { id: this.config.id, statusCode },
+          'fatal close — auth state wiped, waiting for a new pairing'
+        );
         return;
       }
       if (this.stopped) {
@@ -413,6 +474,7 @@ export class Instance {
   private async teardownSocket(): Promise<void> {
     if (!this.socket) return;
     try {
+      this.socket.ev.removeAllListeners('creds.update');
       this.socket.ev.removeAllListeners('connection.update');
       this.socket.ev.removeAllListeners('messages.upsert');
       this.socket.ev.removeAllListeners('messages.update');
