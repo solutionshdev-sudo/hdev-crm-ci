@@ -511,7 +511,72 @@ abrir, dá 500. Problema separado, maior que texto.
 criar os dois artigos no Help Center — enquanto `TERMS_URL`/`PRIVACY_URL` valerem
 `'#'`, o link do cadastro obedece à configuração mas não leva a lugar nenhum.
 
-### 📋 Auditoria da Fase 6 (30/07, nada executado)
+### ✅ Fase 6 — as 7 constantes Ruby FEITAS (30/07, PR #7 verde, ainda draft)
+
+PR #7 (`fase6/renames-internos`), 8 commits, **CI verde nos três jobs**:
+`5996 examples, 0 failures, 64 pending` (16m03s). **Deixado como draft de
+propósito:** se entrar antes do rebuild da Fase 3b, o mesmo deploy carrega
+rename de constante e mudança de front, e qualquer quebra fica ambígua.
+
+| Constante | Refs | Zeitwerk |
+|---|---|---|
+| `ChatwootFbProvider` → `HdevFbProvider` | 2 | não — `config/initializers` |
+| `ChatwootDequeuedLogger` → `HdevDequeuedLogger` | 2 | não — idem |
+| `ChatwootMarkdownRenderer` → `HdevMarkdownRenderer` | 12 | sim |
+| `ChatwootCaptcha` → `HdevCaptcha` | 14 | sim |
+| `ChatwootExceptionTracker` → `HdevExceptionTracker` | 68 | sim |
+| `ChatwootApp` → `HdevApp` | 96 | sim |
+| `module Chatwoot` → `module HdevCrm` | **30** | não — `application.rb` |
+
+**As duas armadilhas de grep que custaram dois runs vermelhos** — valem além
+desta fase, porque são erros de medição, não de código:
+
+1. **`Chatwoot::` não casa `Chatwoot.`** O namespace expõe quatro métodos de
+   módulo (`config`, `redis_ssl_verify_mode`, `encryption_configured?`,
+   `mfa_enabled?`) usados em 30 lugares como `Chatwoot.metodo`. A contagem
+   inicial deu "2 refs" porque contou a string literal `module Chatwoot`, não a
+   constante. **O grep certo para namespace é `\bChatwoot[.:]`.**
+2. **Filtrar por extensão esconde ERB dentro de YAML.** `config/cable.yml:6`
+   tem `<%= Chatwoot.redis_ssl_verify_mode %>`, lido pelo `config_for` do
+   ActionCable. Nenhum grep restrito a `.rb`/`.erb` acha. A varredura final
+   correta é sem filtro de extensão, sobre `app/ lib/ config/ spec/ bin/ db/
+   Rakefile config.ru Gemfile`.
+
+Ambas quebraram o **boot** (`NameError` no `db:create`), então o rspec morreu em
+~90s sem rodar um teste. Foi barato exatamente porque cada constante subiu
+sozinha e foi validada antes da próxima — o CI é o único `zeitwerk:check`
+disponível sem Ruby na máquina.
+
+**Duas correções ao plano de 26/07, confirmadas no código:**
+
+- **A pior armadilha não existe neste repo.** O plano avisava sobre
+  `Chatwoot::Application` em `config.ru`, `Rakefile`, `bin/*` e
+  `config/environments/*`. Nenhum desses arquivos cita o namespace — usam
+  `Rails.application` e `APP_PATH`.
+- **Duas constantes não passam pelo Zeitwerk**, por viverem em
+  `config/initializers`: sem regra de arquivo casado com constante, sem `git mv`.
+
+**Dois achados de brinde:** `def bot; Chatwoot::Bot; end` no initializer do
+facebook-messenger apontava para constante que **não existe** no repo, e `bot`
+não faz parte da interface `Providers::Base` da gem (conferido na fonte) —
+código morto, apagado. E `sent_from_chatwoot_app?` no parser do Facebook, que o
+grep da constante não pegava por ser nome de método.
+
+**NÃO mexido, de propósito — mesma categoria: custo de runtime, não de código.**
+As duas são uma linha; o que decide é a janela de deploy:
+
+- `_chatwoot_session` (`config/initializers/session_store.rb`) — a chave do
+  cookie é **explícita**, não derivada do nome da classe da app (por isso o
+  rename do namespace não deslogou ninguém). Trocar invalida a sessão de todos
+  os agentes.
+- `channel_prefix: "chatwoot_#{Rails.env}_action_cable"` (`config/cable.yml:7`)
+  — trocar rompe as assinaturas de ActionCable em voo durante o deploy.
+
+**O que falta da Fase 6** (nada disso é `git push` e pronto):
+`db:chatwoot_prepare`, as 2 feature flags e as chaves `CHATWOOT_*` — detalhes na
+contagem abaixo.
+
+### 📋 Auditoria da Fase 6 (30/07)
 
 O plano da Fase 6 é de 26/07 e **está desatualizado** — as Fases 3 e 3-tele
 comeram pedaços dele. Contagem real hoje:
@@ -549,7 +614,7 @@ migration pro `ACCOUNT_LEVEL_FEATURE_DEFAULTS` continua obrigatória — o
 | **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
 | **3b** | ✅ **Feita em 30/07** — PR #5 mergeado em `76eddb7`, CI verde. Ver o bloco "Fase 3b EXECUTADA" acima. O pré-requisito registrado aqui (páginas próprias publicadas) era **falso**: os links são configuráveis e o Help Center do produto hospeda. Sobrou do escopo original, de propósito, o que não renderiza (gated por `isOnChatwootCloud`/`showOnCustomBrandedInstance`); `CHATWOOT_INBOX_TOKEN` e `chatwootConfig` no `window.globalConfig` são identificadores internos e ficam pra Fase 6. Falta o rebuild e criar os dois artigos | — |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
-| **6** | **A única que resta.** Identificadores internos Ruby (196 refs em 7 constantes — o plano de 26/07 dizia ~357, mas `ChatwootHub` e `Chatwoot::Application` zeraram nas Fases 3/3-tele), `db:chatwoot_prepare` (5 chamadores), feature flags, chaves `CHATWOOT_*`. Contagem e armadilhas no bloco "Auditoria da Fase 6" acima | Fases 1-5 estáveis — **satisfeito** |
+| **6** | 🟡 **Constantes feitas em 30/07** (PR #7, verde, **draft** até o rebuild da 3b): as 7 renomeadas, +220 refs — o namespace sozinho tinha 30, não 2. Ver o bloco "Fase 6 — as 7 constantes Ruby FEITAS" acima, inclusive as duas armadilhas de grep. **Falta:** `db:chatwoot_prepare` (5 chamadores, 2 deploys), as 2 feature flags (migration obrigatória) e as chaves `CHATWOOT_*` (o HMAC assina webhooks). Mais 2 decisões de janela: `_chatwoot_session` e o `channel_prefix` do cable.yml | Fases 1-5 estáveis — **satisfeito** |
 
 Plano detalhado com comandos, armadilhas e verificação por fase:
 `C:\Users\hdev\.claude\plans\crie-um-plano-completo-buzzing-stardust.md`

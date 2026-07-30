@@ -124,8 +124,22 @@ o código velho ainda roda o `.replace` contra o literal do chatwoot.com e ignor
 as duas chaves, então o link visível continua o `/termos-de-uso` cravado na
 tradução, que não existe.
 
-**Próximo (de-Chatwoot):** sobra a **Fase 6** (identificadores internos Ruby),
-com auditoria feita em 30/07 — ver `_memoria/de-chatwoot.md`.
+**Feito (30/07, PR #7 — verde, mas ainda DRAFT):** Fase 6, as 7 constantes
+internas Ruby (+220 refs; o namespace sozinho tinha 30, não 2 como a contagem
+inicial dizia). Draft de propósito: mergear antes do rebuild da 3b faria o mesmo
+deploy carregar rename de constante e mudança de front, e qualquer quebra ficaria
+ambígua. Duas armadilhas de grep, registradas em `_memoria/de-chatwoot.md`
+porque valem além desta fase: `Chatwoot::` não casa `Chatwoot.`, e filtrar por
+extensão esconde ERB dentro de YAML.
+
+**Próximo (de-Chatwoot):** o que resta da Fase 6 **não é código, é coordenação
+com o servidor** — `db:chatwoot_prepare` (5 chamadores; o `command` do compose
+roda a task, então renomear e deployar junto vira restart loop: exige 2 deploys
+com alias no meio), as 2 feature flags (migration obrigatória pro
+`ACCOUNT_LEVEL_FEATURE_DEFAULTS`) e as chaves `CHATWOOT_*` (o
+`CHATWOOT_INBOX_HMAC_KEY` assina os webhooks). Mais 2 decisões de janela:
+`_chatwoot_session` (desloga todos os agentes) e o `channel_prefix` do
+`cable.yml` (rompe assinaturas de ActionCable em voo).
 
 **Dois azuis que sobraram, achados em 28/07 (não corrigidos):**
 - `app/javascript/.../inbox/channels/Website.vue:21` — `channelWidgetColor: '#009CE0'`
