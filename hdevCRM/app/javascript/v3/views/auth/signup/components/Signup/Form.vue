@@ -52,13 +52,16 @@ const v$ = useVuelidate(rules, { credentials });
 
 const globalConfig = computed(() => store.getters['globalConfig/get']);
 
+// As URLs vêm do globalConfig (installation_configs), que o Agency
+// sobrescreve por agência — cada revendedora aponta pros próprios termos.
+// Interpolação, e não substituição de string literal: com `.replace` o link
+// só era trocado enquanto a tradução repetisse a URL exata do fallback, então
+// traduzir o texto desligava a configuração em silêncio.
 const termsLink = computed(() =>
-  t('REGISTER.TERMS_ACCEPT')
-    .replace('https://www.chatwoot.com/terms', globalConfig.value.termsURL)
-    .replace(
-      'https://www.chatwoot.com/privacy-policy',
-      globalConfig.value.privacyURL
-    )
+  t('REGISTER.TERMS_ACCEPT', {
+    termsUrl: globalConfig.value.termsURL,
+    privacyUrl: globalConfig.value.privacyURL,
+  })
 );
 
 const allowedLoginMethods = computed(
