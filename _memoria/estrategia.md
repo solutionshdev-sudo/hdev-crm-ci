@@ -124,11 +124,14 @@ o código velho ainda roda o `.replace` contra o literal do chatwoot.com e ignor
 as duas chaves, então o link visível continua o `/termos-de-uso` cravado na
 tradução, que não existe.
 
-**Feito (30/07, PR #7 — verde, mas ainda DRAFT):** Fase 6, as 7 constantes
-internas Ruby (+220 refs; o namespace sozinho tinha 30, não 2 como a contagem
-inicial dizia). Draft de propósito: mergear antes do rebuild da 3b faria o mesmo
-deploy carregar rename de constante e mudança de front, e qualquer quebra ficaria
-ambígua. Duas armadilhas de grep, registradas em `_memoria/de-chatwoot.md`
+**Feito (30/07, PR #7 mergeado em `5f4d3f9`):** Fase 6, as 7 constantes internas
+Ruby (+220 refs; o namespace sozinho tinha 30, não 2 como a contagem inicial
+dizia). Ficou em draft até o Deploy 1 (Fase 3b) ser confirmado no ar, para não
+misturar rename de constante com mudança de front no mesmo deploy. **Falta o
+rebuild** para valer em produção — enquanto ele não roda, `HdevCrm` não existe no
+container e o `rails runner` responde `uninitialized constant`, o que é sintoma
+de imagem velha e não de rename quebrado. Duas armadilhas de grep, registradas
+em `_memoria/de-chatwoot.md`
 porque valem além desta fase: `Chatwoot::` não casa `Chatwoot.`, e filtrar por
 extensão esconde ERB dentro de YAML.
 

@@ -511,12 +511,13 @@ abrir, dá 500. Problema separado, maior que texto.
 criar os dois artigos no Help Center — enquanto `TERMS_URL`/`PRIVACY_URL` valerem
 `'#'`, o link do cadastro obedece à configuração mas não leva a lugar nenhum.
 
-### ✅ Fase 6 — as 7 constantes Ruby FEITAS (30/07, PR #7 verde, ainda draft)
+### ✅ Fase 6 — as 7 constantes Ruby FEITAS E MERGEADAS (30/07)
 
 PR #7 (`fase6/renames-internos`), 8 commits, **CI verde nos três jobs**:
-`5996 examples, 0 failures, 64 pending` (16m03s). **Deixado como draft de
-propósito:** se entrar antes do rebuild da Fase 3b, o mesmo deploy carrega
-rename de constante e mudança de front, e qualquer quebra fica ambígua.
+`5996 examples, 0 failures, 64 pending` (16m03s). **Mergeado em `5f4d3f9`**,
+depois do Deploy 1 (Fase 3b) ter sido confirmado no ar — a separação em dois
+deploys era justamente para não misturar rename de constante com mudança de
+front. **Falta o rebuild** para a Fase 6 valer em produção.
 
 | Constante | Refs | Zeitwerk |
 |---|---|---|
@@ -614,7 +615,7 @@ migration pro `ACCOUNT_LEVEL_FEATURE_DEFAULTS` continua obrigatória — o
 | **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
 | **3b** | ✅ **Feita em 30/07** — PR #5 mergeado em `76eddb7`, CI verde. Ver o bloco "Fase 3b EXECUTADA" acima. O pré-requisito registrado aqui (páginas próprias publicadas) era **falso**: os links são configuráveis e o Help Center do produto hospeda. Sobrou do escopo original, de propósito, o que não renderiza (gated por `isOnChatwootCloud`/`showOnCustomBrandedInstance`); `CHATWOOT_INBOX_TOKEN` e `chatwootConfig` no `window.globalConfig` são identificadores internos e ficam pra Fase 6. Falta o rebuild e criar os dois artigos | — |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
-| **6** | 🟡 **Constantes feitas em 30/07** (PR #7, verde, **draft** até o rebuild da 3b): as 7 renomeadas, +220 refs — o namespace sozinho tinha 30, não 2. Ver o bloco "Fase 6 — as 7 constantes Ruby FEITAS" acima, inclusive as duas armadilhas de grep. **Falta:** `db:chatwoot_prepare` (5 chamadores, 2 deploys), as 2 feature flags (migration obrigatória) e as chaves `CHATWOOT_*` (o HMAC assina webhooks). Mais 2 decisões de janela: `_chatwoot_session` e o `channel_prefix` do cable.yml | Fases 1-5 estáveis — **satisfeito** |
+| **6** | 🟡 **Constantes mergeadas em 30/07** (PR #7 em `5f4d3f9`, CI verde; **falta o rebuild**): as 7 renomeadas, +220 refs — o namespace sozinho tinha 30, não 2. Ver o bloco "Fase 6 — as 7 constantes Ruby FEITAS" acima, inclusive as duas armadilhas de grep. **Falta:** `db:chatwoot_prepare` (5 chamadores, 2 deploys), as 2 feature flags (migration obrigatória) e as chaves `CHATWOOT_*` (o HMAC assina webhooks). Mais 2 decisões de janela: `_chatwoot_session` e o `channel_prefix` do cable.yml | Fases 1-5 estáveis — **satisfeito** |
 
 Plano detalhado com comandos, armadilhas e verificação por fase:
 `C:\Users\hdev\.claude\plans\crie-um-plano-completo-buzzing-stardust.md`
