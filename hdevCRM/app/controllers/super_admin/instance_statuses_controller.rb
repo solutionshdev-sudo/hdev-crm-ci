@@ -13,7 +13,7 @@ class SuperAdmin::InstanceStatusesController < SuperAdmin::ApplicationController
   end
 
   def app_version
-    @metrics['Versão do Hdev CRM'] = Chatwoot.config[:version]
+    @metrics['Versão do Hdev CRM'] = HdevCrm.config[:version]
   end
 
   def sha

@@ -40,7 +40,7 @@ class DataImport < ApplicationRecord
   belongs_to :account
   belongs_to :initiated_by, class_name: 'User', optional: true
 
-  encrypts :access_token if Chatwoot.encryption_configured?
+  encrypts :access_token if HdevCrm.encryption_configured?
 
   has_many :items, class_name: 'DataImportItem', dependent: :destroy_async
   has_many :mappings, class_name: 'DataImportMapping', dependent: :destroy_async

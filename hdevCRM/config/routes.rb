@@ -160,7 +160,7 @@ Rails.application.routes.draw do
               post :custom_attributes
               get :attachments
               get :inbox_assistant
-              get :reporting_events if ChatwootApp.enterprise?
+              get :reporting_events if HdevApp.enterprise?
             end
           end
 
@@ -192,7 +192,7 @@ Rails.application.routes.draw do
               resources :labels, only: [:create, :index]
               resources :notes
               get :attachments, to: 'attachments#index'
-              post :call, on: :member, to: 'calls#create' if ChatwootApp.enterprise?
+              post :call, on: :member, to: 'calls#create' if HdevApp.enterprise?
             end
           end
           resources :data_imports, only: [:index, :show, :create] do
@@ -212,12 +212,12 @@ Rails.application.routes.draw do
               get :download
             end
             member do
-              patch :update if ChatwootApp.enterprise?
+              patch :update if HdevApp.enterprise?
             end
           end
-          resources :reporting_events, only: [:index] if ChatwootApp.enterprise?
+          resources :reporting_events, only: [:index] if HdevApp.enterprise?
 
-          if ChatwootApp.enterprise?
+          if HdevApp.enterprise?
             resources :calls, only: [:index]
             resources :whatsapp_calls, only: [:show] do
               member do
@@ -249,7 +249,7 @@ Rails.application.routes.draw do
             get :baileys_status, on: :member, controller: 'channels/baileys', action: :status
             post :baileys_connect, on: :member, controller: 'channels/baileys', action: :connect
             post :baileys_logout, on: :member, controller: 'channels/baileys', action: :logout
-            if ChatwootApp.enterprise?
+            if HdevApp.enterprise?
               resource :conference, only: %i[create destroy], controller: 'conference' do
                 get :token, on: :member
               end
@@ -507,7 +507,7 @@ Rails.application.routes.draw do
     end
   end
 
-  if ChatwootApp.enterprise?
+  if HdevApp.enterprise?
     namespace :enterprise, defaults: { format: 'json' } do
       namespace :api do
         namespace :v1 do
@@ -635,7 +635,7 @@ Rails.application.routes.draw do
     resources :callback, only: [:create]
     resources :delivery_status, only: [:create]
 
-    if ChatwootApp.enterprise?
+    if HdevApp.enterprise?
       post 'voice/call/:phone', to: 'voice#call_twiml', as: :voice_call
       post 'voice/status/:phone', to: 'voice#status', as: :voice_status
       post 'voice/conference_status/:phone', to: 'voice#conference_status', as: :voice_conference_status
