@@ -75,7 +75,7 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 - [ ] **ruby / bundler — NÃO instalados nesta máquina**
 - [ ] **docker — NÃO instalado nesta máquina**
 
-**Consequência prática — a verificação tem três níveis, não um:**
+**Consequência prática — a verificação tem quatro níveis, não um:**
 
 1. **JS roda aqui.** `corepack pnpm exec vitest run <caminho>` e
    `corepack pnpm exec eslint --fix <caminho>` fecham o ciclo em segundos. Use
@@ -86,8 +86,17 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 2. **Ruby roda no CI.** Nada de Rails executa localmente — nem `rspec`, nem
    `db:migrate`, nem inspecionar o código de uma gem instalada. O GitHub Actions
    é o interpretador Ruby do projeto (ver seção abaixo).
-3. **O produto se verifica no servidor.** Migration aplicada, integração com o
-   WhatsApp, chave da Anthropic: só o terminal do container no EasyPanel responde.
+3. **O `baileys-service` roda aqui — inclusive contra o WhatsApp de verdade.**
+   É Node puro, sem Ruby no caminho: `npx tsx src/server.ts` com `SESSIONS_DIR`
+   e `BAILEYS_API_KEY` apontados pra uma pasta temporária, e o ciclo
+   `POST /instances` → `POST /instances/:id/connect` → `GET /instances/:id`
+   devolve QR em ~2s. É assim que se prova um bug de conexão sem esperar
+   rebuild — foi o que isolou o `code_405` de 29/07 (A/B de versão do cliente
+   WhatsApp Web na mesma máquina). `npx tsc --noEmit` fecha o typecheck.
+4. **O resto do produto se verifica no servidor.** Migration aplicada, chave da
+   Anthropic, o app em si: só o terminal do container no EasyPanel responde. O
+   container do `baileys` é **alpine sem `curl`** — pra falar com a API interna,
+   `node -e "fetch(...)"` (o `fetch` é nativo) ou o `wget` do busybox.
 
 Quando precisar da API de uma gem, ler a documentação oficial (WebFetch) em vez
 de chutar a assinatura.

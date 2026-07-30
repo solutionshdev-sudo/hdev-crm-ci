@@ -17,6 +17,14 @@
   - `/super_admin` abre, dashboard carrega, e os menus Captain / SLA / Audit Logs
     / Custom Roles não aparecem. Risco baixo: produção já roda com
     `DISABLE_ENTERPRISE=true` desde 26/07, então em runtime a Fase 3 é no-op
+- 🔴 **Rebuild do container `baileys`** — imagem própria, o rebuild acima **não**
+  cobre. É o fix da versão do WhatsApp Web (`fix/baileys-wa-version`, commit
+  `16e5480`, pushado sem PR); sem ele o WhatsApp segue fora do ar com `code_405`.
+  Antes disso, **mergear a branch na `main`**. Depois do rebuild, **reparear o
+  `+5516997223968`**: a auth state foi apagada no diagnóstico de 29/07, a inbox
+  está desconectada. O QR tem que aparecer em ~2s — se voltar a dar 405, olhar
+  no log qual `appVersion` foi negociada (o esperado é a atual do WhatsApp, não
+  a `2.3000.1035194821` que a rc13 hardcoda)
 - ~~Rodar o deploy com `b0e0ed5`~~ — feito em 28/07 (as 9 migrations rodaram,
   `needs_migration?` → `false`, e o menu Copiloto apareceu)
 - Depois do deploy: testar o console super admin **nos dois temas**, página a

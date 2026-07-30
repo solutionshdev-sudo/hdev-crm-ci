@@ -118,7 +118,8 @@ internos Ruby).
 
 Entrega comitada e em produção: login do Super Admin no split-screen, pt-BR
 100%, **WhatsApp não-oficial via microserviço Baileys próprio**
-(`baileys-service/`, baileys `7.0.0-rc13` — o WhatsApp rejeitou a linha 6.x),
+(`baileys-service/`, baileys `7.0.0-rc13` — a versão do cliente WhatsApp Web
+**não** é mais fixada, ver o conserto de 29/07),
 **construtor visual de chatbot** (@vue-flow, 12 nós) e **kanban de Negócios**.
 
 **27/07:** diagnóstico completo das duas frentes (~30 achados) e conserto dos
@@ -181,6 +182,35 @@ função já prometia e o código não fazia, e era o que mantinha as instância
 zumbis gerando QR eterno no mesmo event loop single-thread das instâncias boas.
 **Pendente:** deploy (o frontend precisa de rebuild). As 3 zumbis já foram
 apagadas do volume em 28/07.
+
+**Conserto (29/07, branch `fix/baileys-wa-version`, commit `16e5480` pushado):**
+o WhatsApp caiu de novo — `code_405` no painel e reconexão de 60 em 60 segundos
+a noite toda, sem nunca emitir QR. **A causa não era a sessão:** depois de
+apagar a auth state, o registro novo levava o mesmo 405. É a **versão do cliente
+WhatsApp Web que o Baileys hardcoda**: a rc13 pede `2.3000.1035194821` e o
+WhatsApp já exige `2.3000.1044104838`. Provado em A/B na mesma máquina, um atrás
+do outro — versão velha → `CLOSE statusCode=405`, versão nova → QR em 2s.
+
+**A lição, que é a parte que vale:** esse é o mesmo bug do `5af436b`, que
+"resolveu" subindo 6.x → rc13 e durou dois meses. **Fixar a versão É o bug** —
+subir pra rc14 compraria mais um mês. Agora a versão se pergunta ao WhatsApp no
+`connect()` (`fetchLatestWaWebVersion`, timeout de 5s, fallback pra última boa
+da réplica). Quando o WhatsApp bumpar de novo, não tem nada a fazer.
+
+Dois consertos que o 405 escancarou, na mesma leva:
+- **405, 403 e 411 agora são fechamentos fatais** ao lado do 401: apagam a auth
+  state e param. Sem isso o serviço martelava o WhatsApp para sempre com
+  credencial morta (risco de ban de número não-oficial) e o painel ficava em
+  "Conectando…" eterno — o Baileys **só emite QR quando `creds.registered` é
+  false**, então credencial morta no disco é um beco sem saída pelo painel.
+  Códigos transitórios (428, 408, 515) mantêm o backoff.
+- `teardownSocket()` roda antes do `removeAuthState()` e também remove o
+  listener de `creds.update`: o socket morto reescrevia o `creds.json` em cima
+  do diretório recém-apagado.
+
+**Pendente:** rebuild **do container `baileys`** (é imagem própria, o rebuild do
+app não cobre) e **repareamento do número** — a auth state do
+`+5516997223968` foi apagada no diagnóstico, a inbox está desconectada.
 
 **Feito (27/07, commit `096daf3`):** polish UX do canvas do chatbot estilo Make —
 duplo-clique abre config, drag threshold, snap-to-grid, arestas animadas,
