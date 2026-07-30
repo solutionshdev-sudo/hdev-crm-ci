@@ -11,8 +11,11 @@ class V2::Reports::AgentSummaryBuilder < V2::Reports::BaseSummaryBuilder
   attr_reader :conversations_count, :resolved_count,
               :avg_resolution_time, :avg_first_response_time, :avg_reply_time
 
+  # Sem ORDER BY o Postgres devolve os agentes na ordem que quiser, então a
+  # lista do relatório trocava de posição entre dois carregamentos — e o spec,
+  # que compara o array inteiro com `eq`, passava por sorte.
   def prepare_report
-    account.account_users.map do |account_user|
+    account.account_users.order(:user_id).map do |account_user|
       build_agent_stats(account_user)
     end
   end
