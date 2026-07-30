@@ -50,10 +50,13 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
   upstream). Renomear com cuidado: Zeitwerk exige arquivo e constante
   casados, e há resoluções por string que busca-e-substitui não pega.
   Exceções conhecidas em `_memoria/de-chatwoot.md`.
-- **Nunca reativar o diretório `enterprise/`.** A licença dele exige
-  assinatura paga para uso em produção e proíbe revenda — o oposto do
-  modelo de negócio. O núcleo é MIT e pode ser vendido; nunca alterar
-  o arquivo `LICENSE`.
+- **Nunca reativar o diretório `enterprise/`** — deletado em 29/07 (Fase 3,
+  PR #2). A licença dele exige assinatura paga para uso em produção e proíbe
+  revenda — o oposto do modelo de negócio. Nunca ressuscitar aquele código a
+  partir do histórico do git: o que a licença proíbe é o uso, não o arquivo.
+  Feature enterprise que fizer falta se reconstrói do zero sobre o contrato
+  MIT que ficou no core. O núcleo é MIT e pode ser vendido; nunca alterar o
+  arquivo `LICENSE`.
 - Nunca comitar `.env` nem chaves/tokens (ver seção Segurança nas regras).
 - **Idioma:** o locale padrão do app é `pt_BR` (`config.i18n.default_locale`
   no `application.rb`); os specs rodam em `:en` (fixado no `test.rb`). Texto
@@ -72,7 +75,7 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 - [ ] **ruby / bundler — NÃO instalados nesta máquina**
 - [ ] **docker — NÃO instalado nesta máquina**
 
-**Consequência prática — a verificação tem três níveis, não um:**
+**Consequência prática — a verificação tem quatro níveis, não um:**
 
 1. **JS roda aqui.** `corepack pnpm exec vitest run <caminho>` e
    `corepack pnpm exec eslint --fix <caminho>` fecham o ciclo em segundos. Use
@@ -83,8 +86,17 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 2. **Ruby roda no CI.** Nada de Rails executa localmente — nem `rspec`, nem
    `db:migrate`, nem inspecionar o código de uma gem instalada. O GitHub Actions
    é o interpretador Ruby do projeto (ver seção abaixo).
-3. **O produto se verifica no servidor.** Migration aplicada, integração com o
-   WhatsApp, chave da Anthropic: só o terminal do container no EasyPanel responde.
+3. **O `baileys-service` roda aqui — inclusive contra o WhatsApp de verdade.**
+   É Node puro, sem Ruby no caminho: `npx tsx src/server.ts` com `SESSIONS_DIR`
+   e `BAILEYS_API_KEY` apontados pra uma pasta temporária, e o ciclo
+   `POST /instances` → `POST /instances/:id/connect` → `GET /instances/:id`
+   devolve QR em ~2s. É assim que se prova um bug de conexão sem esperar
+   rebuild — foi o que isolou o `code_405` de 29/07 (A/B de versão do cliente
+   WhatsApp Web na mesma máquina). `npx tsc --noEmit` fecha o typecheck.
+4. **O resto do produto se verifica no servidor.** Migration aplicada, chave da
+   Anthropic, o app em si: só o terminal do container no EasyPanel responde. O
+   container do `baileys` é **alpine sem `curl`** — pra falar com a API interna,
+   `node -e "fetch(...)"` (o `fetch` é nativo) ou o `wget` do busybox.
 
 Quando precisar da API de uma gem, ler a documentação oficial (WebFetch) em vez
 de chutar a assinatura.
@@ -96,8 +108,10 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **A suíte termina VERDE: ~15-16 min de rspec** (5994 exemplos, 0 falhas desde
-  o merge `f0fb6c6` de 28/07 — o primeiro CI 100% verde do repo).
+- **A suíte termina VERDE: ~13-14 min de rspec** (5996 exemplos, 0 falhas,
+  64 pending). Verde desde o merge `f0fb6c6` de 28/07, o primeiro CI 100%
+  verde do repo; ficou mais rápida em 29/07, quando a Fase 3 tirou o
+  `enterprise/` e a suíte passou a rodar inteira, sem exclusão.
   O "travamento eterno" era o autoBuild do Vite disparando DENTRO de um spec de
   request (`vite_javascript_tag` sem manifest) num job sem Node — o vite_ruby
   captura a saída do build, então o processo ficava mudo esperando stdin até o
@@ -110,8 +124,9 @@ Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
   (`lib/tasks/db_enhancements.rake`) e semeia ~106 configs; a linha semeada
   vence o stub de ENV em `GlobalConfigService.load` (lê o DB primeiro) e
   derruba ~70 exemplos em cascata. O workflow trunca a tabela depois do migrate.
-- **`spec/enterprise` não roda** (`--exclude-pattern`): cobre código que a
-  licença proíbe em produção/revenda; a Fase 3 do de-chatwoot deleta o diretório.
+- **Sem `--exclude-pattern` desde 29/07**: a Fase 3 deletou `spec/enterprise`,
+  então a suíte roda inteira. Se algum dia voltar a aparecer exclusão no
+  `ci.yml`, é bug — não há mais nada legítimo a excluir.
 - **`concurrency: cancel-in-progress: true`** — todo push na `main` executa o run
   anterior. Um `cancelled` no histórico quase sempre é isso, não falha de teste;
   a exceção é o run que morre exatamente em 90 min, que é o timeout. Olhar a

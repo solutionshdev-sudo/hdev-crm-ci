@@ -90,10 +90,21 @@ soletram "chatwoot". Detalhes e armadilhas em `_memoria/de-chatwoot.md`.
 **Pendente:** rebuild + teste manual em `/widget_tests` (o SDK não tem nenhum
 teste unitário; o rename está verificado por grep, não por execução).
 
-**Próximo (de-Chatwoot):** remover a pasta `enterprise/` de vez, depois
-textos/links visíveis (parte adiantada em 27/07: links de termos do signup e
-remetente de e-mail já apontam pra hdev.online), depois os identificadores
-internos Ruby (Fase 6).
+**Feito (29/07, PR #2 mergeado em `c4e3f74`):** Fase 3 — `enterprise/` e
+`spec/enterprise/` deletados, 733 arquivos e −51.915 linhas, com a suíte
+rodando **inteira** pela primeira vez (`5989 examples, 0 failures`).
+
+**Feito (29/07, PR #3 mergeado em `59025f0`):** Fase 3-tele — `lib/chatwoot_hub.rb`
+e toda a telemetria cortados (ping diário com contagens, registro da instância no
+onboarding, relay de push, banner de update, changelog e testimonials). Nenhuma
+linha do app fala com `hub.2.chatwoot.com`. As envs `DISABLE_TELEMETRY` e
+`ENABLE_PUSH_RELAY_SERVER` viraram no-op e saíram do compose.
+
+**Próximo (de-Chatwoot):** a **Fase 3b** (textos e links visíveis — parte
+adiantada em 27/07: links de termos do signup e remetente de e-mail já apontam
+pra hdev.online) está **bloqueada** até as páginas de termos e privacidade
+existirem no hdev.online. Sem esse bloqueio, sobra a Fase 6 (identificadores
+internos Ruby).
 
 **Dois azuis que sobraram, achados em 28/07 (não corrigidos):**
 - `app/javascript/.../inbox/channels/Website.vue:21` — `channelWidgetColor: '#009CE0'`
@@ -107,7 +118,8 @@ internos Ruby (Fase 6).
 
 Entrega comitada e em produção: login do Super Admin no split-screen, pt-BR
 100%, **WhatsApp não-oficial via microserviço Baileys próprio**
-(`baileys-service/`, baileys `7.0.0-rc13` — o WhatsApp rejeitou a linha 6.x),
+(`baileys-service/`, baileys `7.0.0-rc13` — a versão do cliente WhatsApp Web
+**não** é mais fixada, ver o conserto de 29/07),
 **construtor visual de chatbot** (@vue-flow, 12 nós) e **kanban de Negócios**.
 
 **27/07:** diagnóstico completo das duas frentes (~30 achados) e conserto dos
@@ -171,6 +183,35 @@ zumbis gerando QR eterno no mesmo event loop single-thread das instâncias boas.
 **Pendente:** deploy (o frontend precisa de rebuild). As 3 zumbis já foram
 apagadas do volume em 28/07.
 
+**Conserto (29/07, branch `fix/baileys-wa-version`, commit `16e5480` pushado):**
+o WhatsApp caiu de novo — `code_405` no painel e reconexão de 60 em 60 segundos
+a noite toda, sem nunca emitir QR. **A causa não era a sessão:** depois de
+apagar a auth state, o registro novo levava o mesmo 405. É a **versão do cliente
+WhatsApp Web que o Baileys hardcoda**: a rc13 pede `2.3000.1035194821` e o
+WhatsApp já exige `2.3000.1044104838`. Provado em A/B na mesma máquina, um atrás
+do outro — versão velha → `CLOSE statusCode=405`, versão nova → QR em 2s.
+
+**A lição, que é a parte que vale:** esse é o mesmo bug do `5af436b`, que
+"resolveu" subindo 6.x → rc13 e durou dois meses. **Fixar a versão É o bug** —
+subir pra rc14 compraria mais um mês. Agora a versão se pergunta ao WhatsApp no
+`connect()` (`fetchLatestWaWebVersion`, timeout de 5s, fallback pra última boa
+da réplica). Quando o WhatsApp bumpar de novo, não tem nada a fazer.
+
+Dois consertos que o 405 escancarou, na mesma leva:
+- **405, 403 e 411 agora são fechamentos fatais** ao lado do 401: apagam a auth
+  state e param. Sem isso o serviço martelava o WhatsApp para sempre com
+  credencial morta (risco de ban de número não-oficial) e o painel ficava em
+  "Conectando…" eterno — o Baileys **só emite QR quando `creds.registered` é
+  false**, então credencial morta no disco é um beco sem saída pelo painel.
+  Códigos transitórios (428, 408, 515) mantêm o backoff.
+- `teardownSocket()` roda antes do `removeAuthState()` e também remove o
+  listener de `creds.update`: o socket morto reescrevia o `creds.json` em cima
+  do diretório recém-apagado.
+
+**Pendente:** rebuild **do container `baileys`** (é imagem própria, o rebuild do
+app não cobre) e **repareamento do número** — a auth state do
+`+5516997223968` foi apagada no diagnóstico, a inbox está desconectada.
+
 **Feito (27/07, commit `096daf3`):** polish UX do canvas do chatbot estilo Make —
 duplo-clique abre config, drag threshold, snap-to-grid, arestas animadas,
 busca na paleta, handles acessíveis (~30px) e fix do viewport inicial.
@@ -224,15 +265,29 @@ nada foi gravado. **Deployado em 28/07** — o item "Copiloto" já aparece no me
 de Configurações. **Pendente:** o teste ponta a ponta (é o único ponto que valida
 o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 
-**Próximo:** multi-provider, depois remover `enterprise/`. RAG só quando um
+**Próximo:** multi-provider (o `enterprise/` já saiu em 29/07). RAG só quando um
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
 ## O que pode esperar
 
 - Definição da estrutura de planos de revenda pras agências (ainda em estudo).
-- Reconstrução das features enterprise com código próprio (SLA, audit logs,
-  custom roles, companies) — só depois da desvinculação terminar.
+- **Reconstrução das features enterprise: virou lista de espera com gatilho por
+  pedido de cliente, não roadmap** (decisão de 29/07). Há zero agências pagantes
+  hoje e cada uma é código a manter sem demanda. **Companies foi cortada de vez**
+  — o Kanban de Negócios cobre o caso, e um atributo customizado "empresa" no
+  contato resolve o resto. Audit logs volta primeiro se alguém pedir compliance
+  (~70 linhas, a gem `audited` faz o trabalho); custom roles e SLA ficam adiados,
+  o primeiro porque o custo real é a matriz de permissões em ~20 policies e o
+  segundo porque são ~600 linhas e 3 tabelas. Voz idem, e é a mais cara de todas
+  (WebRTC + gravação + consentimento LGPD).
+- **Já reconstruída (29/07, PR #4):** transcrição de áudio. Não estava naquela
+  lista e vale mais que as quatro — áudio no WhatsApp é expectativa no Brasil.
+  Saiu barata porque o contrato inteiro era MIT e já estava no core: faltava só
+  quem preenche o `meta['transcribed_text']`.
+- Ainda de pé como candidata barata: os **campos de limite/feature do super
+  admin** (~20 linhas de `Administrate::Field`) — é a UI que liga feature e seta
+  limite por conta, ou seja, a mecânica dos planos de revenda.
 - Skills de marketing/conteúdo do template (carrossel, SEO, ads) — o foco
   agora é produto, não divulgação.
 

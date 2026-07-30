@@ -6,10 +6,25 @@
 
 ## Agora
 
-- 🔴 **Rebuild da imagem** pro rename da superfície do widget (Fase 5, 28/07) —
-  restart não basta, o `assets:precompile` só roda no build. Depois: abrir
-  `/widget_tests`, conferir `hdev:ready` no console e a bolha **abrir E fechar**
-  (se abrir e ficar inerte, o prefixo postMessage dessincronizou)
+- 🔴 **Rebuild da imagem** — hoje ele cobre **quatro** entregas que a `main` já
+  tem e o servidor nunca viu: Fase 3 (`enterprise/` deletado), Fase 3-tele
+  (telemetria cortada), Fase 5 (rename da superfície do widget) e o fix do loop
+  infinito da aba Conexão. Restart não basta, o `assets:precompile` só roda no
+  build. Depois do rebuild:
+  - `/widget_tests`: conferir `hdev:ready` no console e a bolha **abrir E fechar**
+    (se abrir e ficar inerte, o prefixo postMessage dessincronizou). **Purge no
+    Cloudflare** — o `/packs/js/sdk.js` sai sem hash e fica cacheado por 1 ano
+  - `/super_admin` abre, dashboard carrega, e os menus Captain / SLA / Audit Logs
+    / Custom Roles não aparecem. Risco baixo: produção já roda com
+    `DISABLE_ENTERPRISE=true` desde 26/07, então em runtime a Fase 3 é no-op
+- 🔴 **Rebuild do container `baileys`** — imagem própria, o rebuild acima **não**
+  cobre. É o fix da versão do WhatsApp Web (`fix/baileys-wa-version`, commit
+  `16e5480`, pushado sem PR); sem ele o WhatsApp segue fora do ar com `code_405`.
+  Antes disso, **mergear a branch na `main`**. Depois do rebuild, **reparear o
+  `+5516997223968`**: a auth state foi apagada no diagnóstico de 29/07, a inbox
+  está desconectada. O QR tem que aparecer em ~2s — se voltar a dar 405, olhar
+  no log qual `appVersion` foi negociada (o esperado é a atual do WhatsApp, não
+  a `2.3000.1035194821` que a rc13 hardcoda)
 - ~~Rodar o deploy com `b0e0ed5`~~ — feito em 28/07 (as 9 migrations rodaram,
   `needs_migration?` → `false`, e o menu Copiloto apareceu)
 - Depois do deploy: testar o console super admin **nos dois temas**, página a
@@ -28,8 +43,12 @@
 
 ## Em espera
 
-- Fase 3: remover `enterprise/` e `spec/enterprise/`, deletar telemetria e banner de update (após 48h estável)
-- Fase 3b: textos e links visíveis (precisa antes: publicar páginas de Termos e Privacidade próprias)
+- ~~Fase 3: remover `enterprise/` e `spec/enterprise/`~~ — **feita em 29/07**
+  (PR #2, `c4e3f74`)
+- ~~Fase 3-tele: deletar telemetria e banner de update~~ — **feita em 29/07**
+  (PR #3, `59025f0`)
+- Fase 3b: textos e links visíveis — **bloqueada** até publicar as páginas de
+  Termos e Privacidade em hdev.online (o signup já aponta pra elas desde 27/07)
 - ~~Fase 5: rename da superfície do widget~~ — **feita em 28/07** (globais, eventos,
   postMessage, localStorage). Classes `woot-` e cookies `cw_` ficaram de fora por
   decisão: não soletram "chatwoot". Falta rebuild + teste em `/widget_tests`
@@ -37,12 +56,25 @@
   (inclui `window.chatwootConfig`, global do dashboard que a Fase 5 não tocou)
 - Corrigir os dois azuis remanescentes: `Website.vue:21` (`#009CE0`, inbox de site
   nasce azul) e o default de `Label` (`#1f93ff`)
-- DNS `crm.hdev.online` (registro A no Cloudflare, nuvem cinza) + domínio no EasyPanel
+- ~~DNS `crm.hdev.online`~~ — **resolvido em 28/07**, responde 200 atrás do Cloudflare
 - SMTP (convites e recuperação de senha não funcionam sem isso)
 - Rotina de backup diário do Postgres (cron no host)
 
 ## Concluídas recentes
 
+- 2026-07-29 — **Transcrição de áudio reconstruída** (PR #4, CI verde, aguardando
+  merge): o serviço morava no `enterprise/`, mas o contrato inteiro era MIT e já
+  estava no core — faltava só quem preenche o `meta['transcribed_text']`. Precisa
+  da chave da OpenAI no super admin pra funcionar
+- 2026-07-29 — **Fase 3-tele**: telemetria e o hub do Chatwoot cortados (PR #3,
+  `59025f0`) — 107 arquivos, −1.401 linhas
+- 2026-07-29 — **Fase 3**: `enterprise/` deletado (PR #2, `c4e3f74`) — 733
+  arquivos, −51.915 linhas, suíte rodando inteira pela primeira vez
+- 2026-07-28 — **CI rspec destravado e 100% verde** (PR #1, `f0fb6c6`): o
+  travamento eterno era o autoBuild do Vite dentro de spec de request; atrás
+  dele, OOM de heap e o seed do ConfigLoader no banco de teste
+- 2026-07-28 — Aba Conexão travando a página inteira: ciclo fechado entre
+  `BaileysSession`, `Settings.vue` e o `uiFlags` de fetch na raiz do template
 - 2026-07-27 — Aba **Conexão** na inbox WhatsApp: status ao vivo, número pareado, QR de reconexão sem recriar a caixa, selo na lista e banner na conversa; backend reprovisiona sozinho a instância perdida
 - 2026-07-27 — IA própria (tool calling, substituta MIT do Captain) comitada e pushed (`18e879b`)
 - 2026-07-27 — Tradução pt-BR completa do app comitada e pushed (`9617944`)

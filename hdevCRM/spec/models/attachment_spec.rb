@@ -331,4 +331,59 @@ RSpec.describe Attachment do
       expect(attachment.errors[:file]).to include('size is too big')
     end
   end
+
+  describe 'audio transcription callback' do
+    let(:account) { message.account }
+
+    def build_audio_attachment
+      message.attachments.new(account_id: account.id, file_type: :audio)
+    end
+
+    def attach_sample(attachment)
+      attachment.file.attach(io: Rails.root.join('spec/assets/sample.mp3').open, filename: 'sample.mp3', content_type: 'audio/mpeg')
+    end
+
+    context 'when the account has audio transcriptions enabled' do
+      before { account.update!(audio_transcriptions: true) }
+
+      it 'enqueues the job for an audio attachment' do
+        attachment = build_audio_attachment
+        attach_sample(attachment)
+
+        expect { attachment.save! }.to have_enqueued_job(Messages::AudioTranscriptionJob)
+      end
+
+      # Vários builders salvam a linha antes de anexar o blob. O callback tem
+      # que disparar no commit do anexo, senão o job roda sem arquivo.
+      it 'enqueues on the commit that attaches the file, not on create' do
+        attachment = build_audio_attachment
+
+        expect { attachment.save! }.not_to have_enqueued_job(Messages::AudioTranscriptionJob)
+        expect { attach_sample(attachment) }.to have_enqueued_job(Messages::AudioTranscriptionJob)
+      end
+
+      it 'does not enqueue again once the text is stored' do
+        attachment = build_audio_attachment
+        attach_sample(attachment)
+        attachment.save!
+
+        expect { attachment.update!(meta: { 'transcribed_text' => 'pronto' }) }
+          .not_to have_enqueued_job(Messages::AudioTranscriptionJob)
+      end
+
+      it 'does not enqueue for a non audio attachment' do
+        attachment = message.attachments.new(account_id: account.id, file_type: :image)
+        attachment.file.attach(io: Rails.root.join('spec/assets/avatar.png').open, filename: 'avatar.png', content_type: 'image/png')
+
+        expect { attachment.save! }.not_to have_enqueued_job(Messages::AudioTranscriptionJob)
+      end
+    end
+
+    it 'does not enqueue when the account setting is off' do
+      attachment = build_audio_attachment
+      attach_sample(attachment)
+
+      expect { attachment.save! }.not_to have_enqueued_job(Messages::AudioTranscriptionJob)
+    end
+  end
 end

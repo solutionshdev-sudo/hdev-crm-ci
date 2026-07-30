@@ -42,6 +42,10 @@ class Attachment < ApplicationRecord
   belongs_to :message
   has_one_attached :file
   before_save :set_extension
+  # after_commit, e não after_create_commit: vários builders salvam a linha
+  # antes de anexar o blob, então no commit de criação o arquivo ainda não
+  # existe. O anexo persiste a linha de novo e é esse commit que dispara.
+  after_commit :transcribe_audio, if: :pending_audio_transcription?
   validate :acceptable_file
   validates :external_url, length: { maximum: Limits::URL_LENGTH_LIMIT }
   enum file_type: { :image => 0, :audio => 1, :video => 2, :file => 3, :location => 4, :fallback => 5, :share => 6, :story_mention => 7,
@@ -181,6 +185,17 @@ class Attachment < ApplicationRecord
     return if extension.present?
 
     self.extension = File.extname(file.filename.to_s).delete_prefix('.').presence
+  end
+
+  # Só áudio chega a consultar a conta — o `audio?` corta o resto antes.
+  # Guardar pelo texto já gravado torna o callback idempotente: o update que
+  # grava a transcrição não reenfileira o job.
+  def pending_audio_transcription?
+    audio? && file.attached? && meta&.dig('transcribed_text').blank? && account.audio_transcriptions.present?
+  end
+
+  def transcribe_audio
+    Messages::AudioTranscriptionJob.perform_later(id)
   end
 
   def should_validate_file?
