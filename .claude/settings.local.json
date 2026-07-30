@@ -55,7 +55,15 @@
       "Bash(xargs sed -i 's/initializeChatwootEvents/initializeHdevEvents/g')",
       "Bash(xargs sed -i 's/chatwoot_/hdev_/g')",
       "Bash(git mv *)",
-      "Bash(corepack pnpm *)"
+      "Bash(corepack pnpm *)",
+      "Bash(cd \"C:/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Tete Motos/tete motos\" && ls -la && echo \"=== DEPTH 2 ===\" && find . -maxdepth 2 -not -path '*/node_modules*' -not -path '*/.git/*' | head -100)",
+      "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Tete Motos/tete motos/**)",
+      "Bash(cd \"C:/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Tete Motos\" && ls -la)",
+      "Read(//c/Users/hdev/Downloads/backup-20260723T235954Z-1-001/backup/Tete Motos/**)",
+      "Bash(ls -la \"C:/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/b930cb44-baf3-4c99-99b9-e466c8acaa3d/\" 2>&1 | head -50)",
+      "Read(//c/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/b930cb44-baf3-4c99-99b9-e466c8acaa3d/**)",
+      "Bash(ls -la \"C:/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/\" 2>&1 | head -50)",
+      "Read(//c/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/**)"
     ]
   },
   "hooks": {
