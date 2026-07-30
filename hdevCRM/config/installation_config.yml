@@ -173,7 +173,7 @@
 # MARK: Microsoft Email Channel Config
 - name: AZURE_APP_ID
   display_title: 'Azure App ID'
-  description: 'O App ID usado para autenticar com contas Microsoft dos clientes. Veja mais detalhes sobre a configuração do Azure aqui: https://chwt.app/dev/ms'
+  description: 'O App ID usado para autenticar com contas Microsoft dos clientes. Registre o app no portal Azure (Entra ID > Registros de aplicativo) para obter o valor.'
   locked: false
 - name: AZURE_APP_SECRET
   display_title: 'Azure App Secret'
