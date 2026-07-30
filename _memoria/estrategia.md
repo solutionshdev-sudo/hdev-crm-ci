@@ -127,13 +127,22 @@ tradução, que não existe.
 **Feito (30/07, PR #7 mergeado em `5f4d3f9`):** Fase 6, as 7 constantes internas
 Ruby (+220 refs; o namespace sozinho tinha 30, não 2 como a contagem inicial
 dizia). Ficou em draft até o Deploy 1 (Fase 3b) ser confirmado no ar, para não
-misturar rename de constante com mudança de front no mesmo deploy. **Falta o
-rebuild** para valer em produção — enquanto ele não roda, `HdevCrm` não existe no
-container e o `rails runner` responde `uninitialized constant`, o que é sintoma
-de imagem velha e não de rename quebrado. Duas armadilhas de grep, registradas
-em `_memoria/de-chatwoot.md`
+misturar rename de constante com mudança de front no mesmo deploy. **No ar e confirmada
+em 30/07:** `HdevCrm.config[:version]` → `1.0.0` no container, ou seja o app
+boota como `HdevCrm::Application`. Falta exercitar os caminhos que o boot não
+cobre (login, conversa, `/super_admin`, e o log do worker atrás de `NameError`).
+Duas armadilhas de grep, registradas em `_memoria/de-chatwoot.md`
 porque valem além desta fase: `Chatwoot::` não casa `Chatwoot.`, e filtrar por
 extensão esconde ERB dentro de YAML.
+
+**Pendência de verificação (30/07):** os runs de CI dos merges do #6 e do #7 na
+`main` foram **os dois cancelados** pelo push seguinte — é o
+`cancel-in-progress` funcionando como projetado, mas significa que a `main` com
+tudo junto só foi validada pelo run `30578790064` (disparado pelo commit de
+contexto, que contém todo o código). **Conferir o desfecho dele na próxima
+sessão** — cada PR passou verde isolado, mas a combinação nunca teve um run
+completo confirmado. Vale sempre olhar o `conclusion`, não o código de saída:
+`gh run watch --exit-status` devolve 0 até para run cancelado.
 
 **Próximo (de-Chatwoot):** o que resta da Fase 6 **não é código, é coordenação
 com o servidor** — `db:chatwoot_prepare` (5 chamadores; o `command` do compose

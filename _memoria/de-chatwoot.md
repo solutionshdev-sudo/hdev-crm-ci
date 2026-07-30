@@ -517,7 +517,18 @@ PR #7 (`fase6/renames-internos`), 8 commits, **CI verde nos três jobs**:
 `5996 examples, 0 failures, 64 pending` (16m03s). **Mergeado em `5f4d3f9`**,
 depois do Deploy 1 (Fase 3b) ter sido confirmado no ar — a separação em dois
 deploys era justamente para não misturar rename de constante com mudança de
-front. **Falta o rebuild** para a Fase 6 valer em produção.
+front.
+
+**CONFIRMADA NO AR em 30/07, ~20:26.** `rails runner "puts HdevCrm.config[:version]"`
+no container respondeu `1.0.0` — o app boota como `HdevCrm::Application`. Esse é
+**o** teste da Fase 6: ela renomeou o módulo da aplicação e o rastreador de
+exceções, então qualquer referência esquecida impediria o processo de subir.
+
+**Falta exercitar os caminhos que o boot não cobre:** login, abrir conversa,
+responder e `/super_admin` (chamam `HdevExceptionTracker` e `HdevCaptcha`), e
+olhar o log do worker atrás de `NameError` — os jobs (`FetchImapEmailsJob`,
+`Crm::SetupJob`, os builders de Facebook/Instagram) estão entre os 46 arquivos
+tocados e só executam com tráfego real.
 
 | Constante | Refs | Zeitwerk |
 |---|---|---|
@@ -611,11 +622,11 @@ migration pro `ACCOUNT_LEVEL_FEATURE_DEFAULTS` continua obrigatória — o
 
 | Fase | O que é | Pré-requisito |
 |---|---|---|
-| **3** | ✅ **Feita em 29/07** — `enterprise/` e `spec/enterprise/` deletados, PR #2 mergeado em `c4e3f74`, CI verde. Ver o bloco "Fase 3 EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
-| **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
-| **3b** | ✅ **Feita em 30/07** — PR #5 mergeado em `76eddb7`, CI verde. Ver o bloco "Fase 3b EXECUTADA" acima. O pré-requisito registrado aqui (páginas próprias publicadas) era **falso**: os links são configuráveis e o Help Center do produto hospeda. Sobrou do escopo original, de propósito, o que não renderiza (gated por `isOnChatwootCloud`/`showOnCustomBrandedInstance`); `CHATWOOT_INBOX_TOKEN` e `chatwootConfig` no `window.globalConfig` são identificadores internos e ficam pra Fase 6. Falta o rebuild e criar os dois artigos | — |
+| **3** | ✅ **Feita em 29/07** — `enterprise/` e `spec/enterprise/` deletados, PR #2 mergeado em `c4e3f74`, CI verde. Ver o bloco "Fase 3 EXECUTADA" acima. **Deployada e confirmada em produção** | — |
+| **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. **Deployada e confirmada em produção** | — |
+| **3b** | ✅ **Feita em 30/07** — PR #5 mergeado em `76eddb7`, CI verde. Ver o bloco "Fase 3b EXECUTADA" acima. O pré-requisito registrado aqui (páginas próprias publicadas) era **falso**: os links são configuráveis e o Help Center do produto hospeda. Sobrou do escopo original, de propósito, o que não renderiza (gated por `isOnChatwootCloud`/`showOnCustomBrandedInstance`); `CHATWOOT_INBOX_TOKEN` e `chatwootConfig` no `window.globalConfig` são identificadores internos e ficam pra Fase 6. **Deployada e confirmada em 30/07**: os links do signup apontam pra hdev.online/terms e /privacy, e as duas chaves ja estao setadas | — |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
-| **6** | 🟡 **Constantes mergeadas em 30/07** (PR #7 em `5f4d3f9`, CI verde; **falta o rebuild**): as 7 renomeadas, +220 refs — o namespace sozinho tinha 30, não 2. Ver o bloco "Fase 6 — as 7 constantes Ruby FEITAS" acima, inclusive as duas armadilhas de grep. **Falta:** `db:chatwoot_prepare` (5 chamadores, 2 deploys), as 2 feature flags (migration obrigatória) e as chaves `CHATWOOT_*` (o HMAC assina webhooks). Mais 2 decisões de janela: `_chatwoot_session` e o `channel_prefix` do cable.yml | Fases 1-5 estáveis — **satisfeito** |
+| **6** | 🟡 **Constantes NO AR em 30/07** (PR #7 em `5f4d3f9`; `HdevCrm.config[:version]` → `1.0.0` no container): as 7 renomeadas, +220 refs — o namespace sozinho tinha 30, não 2. Ver o bloco "Fase 6 — as 7 constantes Ruby FEITAS" acima, inclusive as duas armadilhas de grep. **Falta:** `db:chatwoot_prepare` (5 chamadores, 2 deploys), as 2 feature flags (migration obrigatória) e as chaves `CHATWOOT_*` (o HMAC assina webhooks). Mais 2 decisões de janela: `_chatwoot_session` e o `channel_prefix` do cable.yml | Fases 1-5 estáveis — **satisfeito** |
 
 Plano detalhado com comandos, armadilhas e verificação por fase:
 `C:\Users\hdev\.claude\plans\crie-um-plano-completo-buzzing-stardust.md`
