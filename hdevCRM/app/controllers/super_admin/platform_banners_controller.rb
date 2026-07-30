@@ -4,6 +4,6 @@ class SuperAdmin::PlatformBannersController < SuperAdmin::ApplicationController
   private
 
   def ensure_chatwoot_cloud
-    raise ActionController::RoutingError, 'Not Found' unless ChatwootApp.chatwoot_cloud?
+    raise ActionController::RoutingError, 'Not Found' unless HdevApp.chatwoot_cloud?
   end
 end

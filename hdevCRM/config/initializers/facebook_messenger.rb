@@ -36,10 +36,6 @@ class HdevFbProvider < Facebook::Messenger::Configuration::Providers::Base
     provider_config = channel.provider_config.to_h.with_indifferent_access
     CHANNEL_APP_SECRET_KEYS.filter_map { |key| provider_config[key].presence }
   end
-
-  def bot
-    Chatwoot::Bot
-  end
 end
 
 Rails.application.reloader.to_prepare do
