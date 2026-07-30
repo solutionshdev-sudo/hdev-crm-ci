@@ -100,11 +100,31 @@ onboarding, relay de push, banner de update, changelog e testimonials). Nenhuma
 linha do app fala com `hub.2.chatwoot.com`. As envs `DISABLE_TELEMETRY` e
 `ENABLE_PUSH_RELAY_SERVER` viraram no-op e saíram do compose.
 
-**Próximo (de-Chatwoot):** a **Fase 3b** (textos e links visíveis — parte
-adiantada em 27/07: links de termos do signup e remetente de e-mail já apontam
-pra hdev.online) está **bloqueada** até as páginas de termos e privacidade
-existirem no hdev.online. Sem esse bloqueio, sobra a Fase 6 (identificadores
-internos Ruby).
+**Feito (30/07, PR #5 mergeado em `76eddb7`):** Fase 3b — textos e links
+visíveis. **O bloqueio registrado aqui antes não existia:** `TERMS_URL` e
+`PRIVACY_URL` são chaves de `installation_configs` e o
+`Agency#global_config_overrides` já as sobrescreve **por agência** — o mecanismo
+de cada revendedora apontar pros próprios termos sempre esteve pronto, e o Help
+Center do produto (`/hc/:slug/:locale/articles/:slug`, MIT, público) hospeda sem
+uma linha de código. Não depende do hdev.online.
+
+O que a fase achou foi um bug de white-label **nosso**: o `Form.vue` aplicava a
+config por `.replace` de string literal, e a tradução pt-BR de 27/07 cravou
+`hdev.online` no texto de `en` e `pt_BR` — o replace parou de casar e o
+`TERMS_URL` virou no-op nos dois locales que usamos, então toda agência
+revendedora exibia os termos da HDEV no próprio cadastro. Agora é interpolação
+do vue-i18n nos 57 locales, com spec que falha se algum voltar a cravar URL.
+Saiu junto a cadeia `feature_help_urls` → `window.globalConfig.helpUrls` (que
+publicava as URLs de documentação do Chatwoot em toda página e não tinha
+consumidor no frontend) e os fallbacks de remetente `accounts@chatwoot.com`.
+
+**Pendente, e é o que segura o resultado prático:** criar os dois artigos no
+Help Center e apontar `TERMS_URL`/`PRIVACY_URL` pra eles. Enquanto valerem `'#'`,
+o link do cadastro não leva a lugar nenhum — o conserto garante que ele *obedece*
+à configuração, não que a configuração exista.
+
+**Próximo (de-Chatwoot):** sobra a **Fase 6** (identificadores internos Ruby),
+com auditoria feita em 30/07 — ver `_memoria/de-chatwoot.md`.
 
 **Dois azuis que sobraram, achados em 28/07 (não corrigidos):**
 - `app/javascript/.../inbox/channels/Website.vue:21` — `channelWidgetColor: '#009CE0'`
@@ -293,9 +313,12 @@ habilitado.
 
 ## Contexto com prazo
 
-- Páginas `hdev.online/termos-de-uso` e `hdev.online/politica-de-privacidade`
-  ainda não existem — o signup já aponta pra elas desde 27/07 (links do
-  chatwoot.com removidos).
+- **Termos e privacidade ainda não existem em lugar nenhum.** Desde 30/07 isso
+  não depende mais do hdev.online: o signup lê `TERMS_URL`/`PRIVACY_URL` de
+  `installation_configs` (hoje `'#'`), e o Help Center do próprio produto
+  hospeda em `crm.hdev.online/hc/<slug>/pt-BR/articles/<slug>` sem código novo.
+  Falta escrever os dois textos, publicar como artigos e setar as duas chaves.
+  Cada agência pode apontar pras dela pelo `Agency` — o override já funciona.
 - ~~Domínio `crm.hdev.online` sem DNS~~ — **resolvido em 28/07**. Responde 200
   servindo o app, atrás do Cloudflare. Como `FRONTEND_URL` já apontava pra ele,
   os links de e-mail deixaram de sair quebrados (falta o SMTP pra testar).

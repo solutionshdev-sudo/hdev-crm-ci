@@ -1,7 +1,7 @@
 # Projeto: desvincular o Hdev CRM do Chatwoot
 
 > Documento de trabalho da migração. Atualizar ao fim de cada fase.
-> Última atualização: **2026-07-27**
+> Última atualização: **2026-07-30**
 
 ---
 
@@ -430,15 +430,126 @@ agora exige `FIREBASE_PROJECT_ID` + `FIREBASE_CREDENTIALS` no super admin.
 Harvey **passam no CI**. São dependentes de data/fuso, não de código — a
 suspeita registrada na Fase 5 está fechada.
 
+### ✅ Fase 3b EXECUTADA E MERGEADA (30/07) — textos e links visíveis
+
+PR #5 (`fase3b/textos-links`), mergeado em `76eddb7` com **CI verde nos três
+jobs**: `5975 examples, 0 failures, 64 pending` (16m42s), lint (2m43s) e vitest
+(12m49s).
+
+**O pré-requisito que travava esta fase era falso.** A tabela abaixo dizia
+"precisa de páginas próprias de Termos e Privacidade publicadas". Não precisa:
+`TERMS_URL` e `PRIVACY_URL` são chaves de `installation_configs`
+(`installation_config.yml:45-52`, hoje valendo `'#'`), lidas pelo
+`dashboard_controller.rb:11-14` e entregues ao front como
+`globalConfig.termsURL`. E `agency.rb:75-76` já as sobrescreve **por agência** —
+o mecanismo de cada revendedora apontar pros próprios termos existe e está
+pronto. Pra hospedar, o Help Center do produto já serve
+`/hc/:slug/:locale/articles/:article_slug` (`routes.rb:585-596`), público e sem
+autenticação: dois artigos pela UI e as duas chaves apontadas resolvem, com
+zero linha de código. **Segundo bloqueio fantasma seguido**, depois do "relay de
+VAPID" da Fase 3-tele — vale desconfiar de pré-requisito registrado sem prova.
+
+**O bug que a fase achou é nosso, não do upstream.** O
+`v3/.../Signup/Form.vue` aplicava a config por substituição de string literal:
+
+```js
+t('REGISTER.TERMS_ACCEPT').replace('https://www.chatwoot.com/terms', globalConfig.value.termsURL)
+```
+
+A tradução pt-BR de 27/07 cravou `hdev.online` no texto de `en` e `pt_BR`. O
+`.replace` deixou de casar e **`TERMS_URL` virou no-op nos dois locales que a
+instância usa** — toda agência revendedora exibia os termos da HDEV no próprio
+cadastro. Nos outros 55 a config ainda funcionava, mas só porque o fallback
+visível continuava sendo `chatwoot.com`. Agora é interpolação do vue-i18n
+(`{termsUrl}`/`{privacyUrl}`) nos 57 locales, o que conserta o override e limpa
+o `chatwoot.com` do signup na mesma linha.
+
+Rede de proteção: `app/javascript/dashboard/i18n/specs/signupTerms.spec.js` lê
+os 57 arquivos e falha se algum voltar a cravar URL. Verificado revertendo um
+locale — falha só nele, 57 passam.
+
+**`helpUrls` era código morto que só publicava a documentação deles.** A cadeia
+`feature_help_urls` (`application_helper.rb`) → `vueapp.html.erb:86` →
+`window.globalConfig.helpUrls` emitia os `chwt.app/hc/*` em toda página servida
+e **não tinha nenhum consumidor no frontend** (grep confirmado). Deletada
+inteira, junto com os 12 `help_url` do `features.yml` — **só as sub-chaves; a
+ordem do bitset não foi tocada**. O mapa do `featureHelper.js` (esse sim vivo,
+consumido pelo `BaseSettingsHeader`) ficou vazio de propósito: o componente já
+gateia em `v-if="helpURL && linkText"`, então o link some sozinho.
+
+**Fallback de remetente tem duas dependências em spec, não uma.** Trocar
+`accounts@chatwoot.com` → `sac@hdev.online` (em `email_address_parseable.rb`,
+`mail_presenter.rb` e `devise.rb`, alinhando ao que os mailers já usavam) quebra:
+1. `reply_mailbox_spec` — usa a fixture `notification.eml`, cujo `From:` precisa
+   casar com o fallback, e **não stuba a env**. Antecipado, corrigido junto.
+2. `confirmation_instructions_spec:20` — assertava o `reply_to`. **Só apareceu
+   no CI**, porque o grep por `accounts@chatwoot` rodou antes da decisão de
+   mexer no `devise.rb`. Foi a única falha do run.
+
+O `mail_presenter_spec:255` **não** quebra: usa `with_modified_env`.
+
+**Critério de escopo (o mesmo das classes `woot-*`):** links atrás de
+`isOnChatwootCloud` e de `showOnCustomBrandedInstance` ficaram de fora. O fork
+força `isACustomBrandedInstance: () => true` e `isAChatwootInstance: () => false`
+em `shared/store/globalConfig.js`, e `deploymentEnv` nunca é `'cloud'` — esse
+código **não renderiza**. Isso cobre `HELP_CENTER_DOCS_URL` (só alcançável pelo
+bloco de upsell do `UpgradePage`), `META_RESTRICTION_STATUS_URL` e os
+`learn-more-url` do Captain. Saíram de graça, por serem deleção pura: o menu
+Docs/Changelog do `SidebarProfileMenu` e o `DOCS_URL` sem consumidor.
+
+Corrigidos por serem visíveis de verdade: link de docs do HMAC
+(`ConfigurationPage.vue`), guia de migração do WhatsApp (banner + dialog), dados
+de amostra das campanhas (`chatwoot.com` → `example.com`, e a mensagem do cupom
+do G2) e a descrição do `AZURE_APP_ID`.
+
+**Achado que não é link e vale mais que a fase:** o **Captain tem rota
+registrada no front** (`captainRoutes` em `dashboard.routes.js`) **mas zero model
+no backend desde a Fase 3** — `app/models/captain*` não existe. Se aquela tela
+abrir, dá 500. Problema separado, maior que texto.
+
+**Falta:** o rebuild no EasyPanel (junto com o acumulado das Fases 5 e 3) e
+criar os dois artigos no Help Center — enquanto `TERMS_URL`/`PRIVACY_URL` valerem
+`'#'`, o link do cadastro obedece à configuração mas não leva a lugar nenhum.
+
+### 📋 Auditoria da Fase 6 (30/07, nada executado)
+
+O plano da Fase 6 é de 26/07 e **está desatualizado** — as Fases 3 e 3-tele
+comeram pedaços dele. Contagem real hoje:
+
+| Constante | Refs | Nota |
+|---|---|---|
+| `ChatwootApp` | 96 | o maior blast radius que restou |
+| `ChatwootExceptionTracker` | 68 | |
+| `ChatwootCaptcha` | 14 | |
+| `ChatwootMarkdownRenderer` | 12 | |
+| `ChatwootDequeuedLogger` | 2 | |
+| `ChatwootFbProvider` | 2 | começar por aqui |
+| `module Chatwoot` | 2 | o namespace da app |
+| ~~`ChatwootHub`~~ | **0** | deletado na Fase 3-tele |
+| ~~`Chatwoot::Application`~~ | **0** | |
+
+**`db:chatwoot_prepare` tem 5 chamadores, não 1.** Além do
+`docker-compose.easypanel.yaml:70` que o `CLAUDE.md` já avisa (renomear sem
+atualizar = restart loop): `.circleci/config.yml:288`,
+`.devcontainer/devcontainer.json:37` e **duas** ocorrências em
+`deployment/setup_20.04.sh` (411 e 706 — a segunda dentro de uma string, que
+busca-e-substitui pega mas revisão por diff passa batido).
+
+**As duas feature flags moram em só 2 arquivos:** `chatwoot_v4` e
+`contact_chatwoot_support_team` em `config/features.yml:138,146` e
+`featureFlags.js:41,45`. Renomear o `name:` não mexe na ordem do bitset, mas a
+migration pro `ACCOUNT_LEVEL_FEATURE_DEFAULTS` continua obrigatória — o
+`ConfigLoader` faz merge por `uniq` e sem ela a flag velha fica órfã no JSON.
+
 ### ⏳ Próximas fases (planejadas, não iniciadas)
 
 | Fase | O que é | Pré-requisito |
 |---|---|---|
 | **3** | ✅ **Feita em 29/07** — `enterprise/` e `spec/enterprise/` deletados, PR #2 mergeado em `c4e3f74`, CI verde. Ver o bloco "Fase 3 EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
 | **3-tele** | ✅ **Feita em 29/07** — `lib/chatwoot_hub.rb` e toda a telemetria deletados, PR #3 mergeado em `59025f0`, CI verde. Ver o bloco "Fase 3-tele EXECUTADA" acima. Falta o rebuild no EasyPanel | — |
-| **3b** | Textos e links visíveis: URLs `chatwoot.com` em `globals.js`, termos/privacidade no signup (~50 locales), `helpCenter.json`, e-mails (`accounts@chatwoot.com`), locales `ja`/`ko`/`sl`. **Achado em 28/07 no HTML servido — grep por `chatwoot.com` não pega:** o `helpUrls` inteiro aponta pra `https://chwt.app/hc/*` (o encurtador deles), então todo link de ajuda do dashboard leva pra documentação do Chatwoot; e o `window.globalConfig` ainda expõe as chaves `CHATWOOT_INBOX_TOKEN` e `chatwootConfig`. **Adiantado em 27/07 (na tradução pt-BR, sem commit): links do signup en+pt_BR → hdev.online/termos-de-uso e /politica-de-privacidade; remetente-fallback → 'Hdev CRM <sac@hdev.online>'. Faltam os outros ~50 locales e publicar as páginas** | precisa de páginas próprias de Termos e Privacidade publicadas |
+| **3b** | ✅ **Feita em 30/07** — PR #5 mergeado em `76eddb7`, CI verde. Ver o bloco "Fase 3b EXECUTADA" acima. O pré-requisito registrado aqui (páginas próprias publicadas) era **falso**: os links são configuráveis e o Help Center do produto hospeda. Sobrou do escopo original, de propósito, o que não renderiza (gated por `isOnChatwootCloud`/`showOnCustomBrandedInstance`); `CHATWOOT_INBOX_TOKEN` e `chatwootConfig` no `window.globalConfig` são identificadores internos e ficam pra Fase 6. Falta o rebuild e criar os dois artigos | — |
 | **5** | ✅ **Feita em 28/07, antecipada à Fase 3** (não havia acoplamento real: o SDK não referencia `enterprise/`). Ver bloco abaixo. Ficaram de fora por decisão: classes `woot-*` (617 refs) e cookies `cw_` — não soletram "chatwoot" | — |
-| **6** | Identificadores internos Ruby (~357 refs), `db:chatwoot_prepare`, feature flags, chaves `CHATWOOT_*` | Fases 1-5 estáveis |
+| **6** | **A única que resta.** Identificadores internos Ruby (196 refs em 7 constantes — o plano de 26/07 dizia ~357, mas `ChatwootHub` e `Chatwoot::Application` zeraram nas Fases 3/3-tele), `db:chatwoot_prepare` (5 chamadores), feature flags, chaves `CHATWOOT_*`. Contagem e armadilhas no bloco "Auditoria da Fase 6" acima | Fases 1-5 estáveis — **satisfeito** |
 
 Plano detalhado com comandos, armadilhas e verificação por fase:
 `C:\Users\hdev\.claude\plans\crie-um-plano-completo-buzzing-stardust.md`
