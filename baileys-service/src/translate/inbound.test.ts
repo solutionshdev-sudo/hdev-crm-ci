@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   buildEchoPayload,
   buildMessagesPayload,
+  messageTimestampSeconds,
+  selectHistoryMessages,
   translateMessageContent,
   type CloudMessage,
 } from './inbound.js';
@@ -65,6 +67,40 @@ test('eco usa field smb_message_echoes com from=negócio e to=contato', () => {
   assert.deepEqual(change.value.message_echoes, [message]);
   assert.equal(change.value.metadata.display_phone_number, '5511888888888');
   assert.ok(!('contacts' in change.value));
+});
+
+test('messageTimestampSeconds aceita number, Long (toNumber) e lixo', () => {
+  assert.equal(messageTimestampSeconds(1722400000), 1722400000);
+  assert.equal(messageTimestampSeconds({ toNumber: () => 1722400000 }), 1722400000);
+  assert.equal(messageTimestampSeconds(undefined), 0);
+  assert.equal(messageTimestampSeconds('abc'), 0);
+});
+
+test('histórico: filtra janela, grupos e sem id; ordena por timestamp', () => {
+  const now = 1_000_000;
+  const hourAgo = now - 3600;
+  const messages = [
+    { key: { remoteJid: 'b@s.whatsapp.net', id: 'B' }, messageTimestamp: hourAgo + 200 },
+    { key: { remoteJid: 'a@s.whatsapp.net', id: 'A' }, messageTimestamp: hourAgo + 100 },
+    { key: { remoteJid: 'velho@s.whatsapp.net', id: 'V' }, messageTimestamp: now - 90_000 },
+    { key: { remoteJid: 'grupo@g.us', id: 'G' }, messageTimestamp: hourAgo + 300 },
+    { key: { remoteJid: 'semid@s.whatsapp.net', id: null }, messageTimestamp: hourAgo + 300 },
+    { key: { remoteJid: 'lid@lid', id: 'L' }, messageTimestamp: { toNumber: () => hourAgo + 50 } },
+  ];
+
+  const selected = selectHistoryMessages(messages, now, 86_400);
+
+  assert.deepEqual(
+    selected.map(item => item.key.id),
+    ['L', 'A', 'B']
+  );
+});
+
+test('histórico: janela zero ou negativa não deixa passar nada relevante', () => {
+  const messages = [
+    { key: { remoteJid: 'a@s.whatsapp.net', id: 'A' }, messageTimestamp: 999 },
+  ];
+  assert.deepEqual(selectHistoryMessages(messages, 1000, 0), []);
 });
 
 test('mensagem recebida mantém o shape messages com contacts', () => {

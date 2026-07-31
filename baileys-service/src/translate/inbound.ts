@@ -26,6 +26,44 @@ export function prefixedId(instanceId: string, rawId: string): string {
   return `${instanceId}:${rawId}`;
 }
 
+// messageTimestamp vem como number OU Long (protobuf); Number(Long) é NaN,
+// então normalizar aqui pra não descartar mensagem boa por engano.
+export function messageTimestampSeconds(ts: unknown): number {
+  if (typeof ts === 'number') return ts;
+  if (ts && typeof (ts as { toNumber?: unknown }).toNumber === 'function') {
+    return (ts as { toNumber: () => number }).toNumber();
+  }
+  return Number(ts) || 0;
+}
+
+interface HistoryMessageShape {
+  key: { remoteJid?: string | null; id?: string | null };
+  messageTimestamp?: unknown;
+}
+
+// Backfill de histórico (messaging-history.set): só chat direto, só mensagens
+// dentro da janela, ordenadas por timestamp pra chegar no Rails na ordem da
+// conversa. O dedupe fica no Rails (source_id) — repetir sync não duplica.
+export function selectHistoryMessages<T extends HistoryMessageShape>(
+  messages: T[],
+  nowSeconds: number,
+  maxAgeSeconds: number
+): T[] {
+  const cutoff = nowSeconds - maxAgeSeconds;
+  return messages
+    .filter(message => {
+      const jid = message.key.remoteJid;
+      if (!jid || !message.key.id) return false;
+      if (!isDirectUserJid(jid) && !jid.endsWith('@lid')) return false;
+      return messageTimestampSeconds(message.messageTimestamp) >= cutoff;
+    })
+    .sort(
+      (a, b) =>
+        messageTimestampSeconds(a.messageTimestamp) -
+        messageTimestampSeconds(b.messageTimestamp)
+    );
+}
+
 interface MediaRef {
   mediaId: string;
   mimetype: string;
