@@ -14,6 +14,7 @@ import { authDir, removeAuthState, saveConfig } from './store.js';
 import { putMedia } from '../media-cache.js';
 import { deliverWebhook } from '../webhook.js';
 import {
+  buildEchoPayload,
   buildMessagesPayload,
   buildStatusesPayload,
   isDirectUserJid,
@@ -318,7 +319,11 @@ export class Instance {
 
   private async handleIncoming(message: WAMessage): Promise<void> {
     try {
-      if (message.key.fromMe) return;
+      // fromMe em upsert 'notify' = enviado por OUTRO aparelho da conta (o
+      // celular). Envios da própria API entram como type 'append' e nunca
+      // chegam aqui; se algum eco escapar, o Rails deduplica pelo source_id
+      // (mesmo id prefixado que o send devolveu).
+      const echo = !!message.key.fromMe;
       // v1: direct user chats only — no groups, no status broadcast, no self.
       const rawJid = message.key.remoteJid;
       const jid = await this.resolveUserJid(rawJid, message.key.remoteJidAlt);
@@ -338,7 +343,18 @@ export class Instance {
       }
       if (!message.message || !message.key.id) return;
 
-      const media = await this.downloadMedia(message);
+      // Mídia que falha no download não derruba a mensagem: segue sem media e
+      // o translate devolve type 'unsupported', que o Rails renderiza como
+      // placeholder — o agente fica sabendo que o cliente mandou algo.
+      let media;
+      try {
+        media = await this.downloadMedia(message);
+      } catch (error) {
+        logger.warn(
+          { id: this.config.id, msgId: message.key.id, error: String(error) },
+          'media download failed; delivering placeholder'
+        );
+      }
       const content = translateMessageContent(message.message, media);
       if (!content) {
         logger.info(
@@ -352,8 +368,14 @@ export class Instance {
         return;
       }
 
+      // No eco os papéis invertem (shape do Cloud): `from` é o número do
+      // negócio e `to` é o contato.
+      const contactNumber = jidToNumber(jid);
       const cloudMessage: CloudMessage = {
-        from: jidToNumber(jid),
+        from: echo
+          ? this.config.phoneNumber.replace(/^\+/, '')
+          : contactNumber,
+        ...(echo ? { to: contactNumber } : {}),
         id: prefixedId(this.config.id, message.key.id),
         timestamp: String(
           Number(message.messageTimestamp) || Math.floor(Date.now() / 1000)
@@ -366,13 +388,15 @@ export class Instance {
         this.config.webhookSecret,
         'messages',
         this.config.id,
-        buildMessagesPayload(
-          this.config.id,
-          this.config.phoneNumber,
-          jidToNumber(jid),
-          message.pushName || undefined,
-          cloudMessage
-        )
+        echo
+          ? buildEchoPayload(this.config.id, this.config.phoneNumber, cloudMessage)
+          : buildMessagesPayload(
+              this.config.id,
+              this.config.phoneNumber,
+              contactNumber,
+              message.pushName || undefined,
+              cloudMessage
+            )
       );
     } catch (error) {
       logger.error(
