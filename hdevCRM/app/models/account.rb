@@ -62,6 +62,9 @@ class Account < ApplicationRecord
 
   belongs_to :agency, optional: true
 
+  has_one :subscription, as: :owner, dependent: :destroy_async
+  has_many :ai_credit_events, as: :owner, dependent: :destroy_async
+
   has_many :account_users, dependent: :destroy_async
   has_many :agent_bot_inboxes, dependent: :destroy_async
   has_many :ai_usage_events, dependent: :destroy_async
@@ -112,7 +115,9 @@ class Account < ApplicationRecord
   has_one_attached :contacts_export
 
   enum :locale, LANGUAGES_CONFIG.map { |key, val| [val[:iso_639_1_code], key] }.to_h, prefix: true
-  enum :status, { active: 0, suspended: 1 }
+  # pending_payment: criada pelo fluxo de venda, aguardando o webhook do Stripe.
+  # Valores só podem ser adicionados no fim (enum por posição no banco).
+  enum :status, { active: 0, suspended: 1, pending_payment: 2 }
 
   scope :with_auto_resolve, -> { where("(settings ->> 'auto_resolve_after')::int IS NOT NULL") }
 
