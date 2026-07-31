@@ -24,8 +24,11 @@ RSpec.describe Whatsapp::IncomingMessageBaileysService do
   end
 
   describe 'echo ingestion (message sent from the account phone)' do
+    # source_id único por exemplo: o MessageDedupLock vive no Redis com TTL de
+    # 1 dia e não é limpo entre exemplos — repetir o id bloqueia o segundo spec.
+    let(:source_id) { "instance-1:ECHO-#{SecureRandom.hex(4)}" }
     let(:message) do
-      { from: '1234567891', to: '919745786257', id: 'instance-1:ECHO1', timestamp: '1722400000',
+      { from: '1234567891', to: '919745786257', id: source_id, timestamp: '1722400000',
         type: 'text', text: { body: 'respondi do celular' } }
     end
 
@@ -37,7 +40,7 @@ RSpec.describe Whatsapp::IncomingMessageBaileysService do
       expect(created.status).to eq('delivered')
       expect(created.sender).to be_nil
       expect(created.content).to eq('respondi do celular')
-      expect(created.source_id).to eq('instance-1:ECHO1')
+      expect(created.source_id).to eq(source_id)
       expect(created.content_attributes['external_echo']).to be(true)
     end
 
@@ -50,16 +53,17 @@ RSpec.describe Whatsapp::IncomingMessageBaileysService do
     it 'is idempotent on source_id, so echoes of API-sent messages never duplicate' do
       2.times { described_class.new(inbox: inbox, params: echo_params(message), outgoing_echo: true).perform }
 
-      expect(inbox.messages.where(source_id: 'instance-1:ECHO1').count).to eq(1)
+      expect(inbox.messages.where(source_id: source_id).count).to eq(1)
     end
   end
 
   describe 'unsupported content (failed media download, contact cards, polls)' do
+    let(:source_id) { "instance-1:MSG-#{SecureRandom.hex(4)}" }
     let(:params) do
       wrap('messages', { messaging_product: 'whatsapp',
                          metadata: { display_phone_number: '1234567891', phone_number_id: 'instance-1' },
                          contacts: [{ profile: { name: 'Cliente' }, wa_id: '919745786257' }],
-                         messages: [{ from: '919745786257', id: 'instance-1:MSG1', timestamp: '1722400000', type: 'unsupported' }] })
+                         messages: [{ from: '919745786257', id: source_id, timestamp: '1722400000', type: 'unsupported' }] })
     end
 
     it 'persists an incoming placeholder instead of dropping the message' do
