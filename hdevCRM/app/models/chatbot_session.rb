@@ -10,6 +10,8 @@ class ChatbotSession < ApplicationRecord
 
   scope :active, -> { where(status: [:running, :waiting_input, :waiting_delay]) }
 
+  after_update_commit :dispatch_flow_status_event, if: :saved_change_to_status?
+
   def active?
     running? || waiting_input? || waiting_delay?
   end
@@ -22,5 +24,16 @@ class ChatbotSession < ApplicationRecord
       event_type: event_type,
       data: data
     )
+  end
+
+  private
+
+  # Cobre os 3 caminhos que levam a completed (end_node, run_loop, resume_job)
+  # e o aborted de uma vez só, no lugar de duplicar o dispatch em cada um.
+  def dispatch_flow_status_event
+    event = { completed: CHATBOT_FLOW_COMPLETED, aborted: CHATBOT_FLOW_ABORTED }[status.to_sym]
+    return if event.blank?
+
+    Rails.configuration.dispatcher.dispatch(event, Time.zone.now, session: self, conversation: conversation, contact: contact)
   end
 end
