@@ -247,4 +247,140 @@ describe AutomationRuleListener do
       end
     end
   end
+
+  describe 'deal_created' do
+    let!(:automation_rule) { create(:automation_rule, event_name: 'deal_created', account: account) }
+    let(:deal) { create(:deal, account: account, conversation: conversation) }
+    let(:event) do
+      Events::Base.new('deal_created', Time.zone.now, { deal: deal, changed_attributes: { deal_stage_id: [nil, deal.deal_stage_id] } })
+    end
+
+    context 'when matching rules are present' do
+      it 'calls AutomationRules::ActionService if conditions match' do
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_created(event)
+        expect(AutomationRules::ActionService).to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'does not call AutomationRules::ActionService if conditions do not match' do
+        allow(condition_match).to receive(:present?).and_return(false)
+        listener.deal_created(event)
+        expect(AutomationRules::ActionService).not_to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'calls AutomationRules::ActionService for each rule when multiple rules are present' do
+        create(:automation_rule, event_name: 'deal_created', account: account)
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_created(event)
+        expect(AutomationRules::ActionService).to have_received(:new).twice
+      end
+
+      # Ao contrário de conversation_created, deal_created NÃO tem o guard de performed_by_automation:
+      # a cadeia de regras que cria negócio -> dispara deal_created -> outra regra reage é intencional (Fase 1, item 3).
+      it 'calls AutomationRules::ActionService even when performed by automation' do
+        event.data[:performed_by] = automation_rule
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_created(event)
+        expect(AutomationRules::ActionService).to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'does not call AutomationRules::ActionService if the deal has no conversation' do
+        deal_without_conversation = create(:deal, account: account)
+        event_without_conversation = Events::Base.new('deal_created', Time.zone.now,
+                                                        { deal: deal_without_conversation, changed_attributes: {} })
+        allow(condition_match).to receive(:present?).and_return(true)
+
+        listener.deal_created(event_without_conversation)
+
+        expect(AutomationRules::ActionService).not_to have_received(:new)
+      end
+    end
+  end
+
+  describe 'deal_stage_changed' do
+    let!(:automation_rule) { create(:automation_rule, event_name: 'deal_stage_changed', account: account) }
+    let(:deal) { create(:deal, account: account, conversation: conversation) }
+    let(:event) do
+      Events::Base.new('deal_stage_changed', Time.zone.now, { deal: deal, changed_attributes: { deal_stage_id: [1, 2] } })
+    end
+
+    context 'when matching rules are present' do
+      it 'calls AutomationRules::ActionService if conditions match' do
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_stage_changed(event)
+        expect(AutomationRules::ActionService).to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'does not call AutomationRules::ActionService if conditions do not match' do
+        allow(condition_match).to receive(:present?).and_return(false)
+        listener.deal_stage_changed(event)
+        expect(AutomationRules::ActionService).not_to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'calls AutomationRules::ActionService for each rule when multiple rules are present' do
+        create(:automation_rule, event_name: 'deal_stage_changed', account: account)
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_stage_changed(event)
+        expect(AutomationRules::ActionService).to have_received(:new).twice
+      end
+    end
+  end
+
+  describe 'deal_won' do
+    let!(:automation_rule) { create(:automation_rule, event_name: 'deal_won', account: account) }
+    let(:deal) { create(:deal, account: account, conversation: conversation) }
+    let(:event) do
+      Events::Base.new('deal_won', Time.zone.now, { deal: deal, changed_attributes: { deal_stage_id: [1, 2] } })
+    end
+
+    context 'when matching rules are present' do
+      it 'calls AutomationRules::ActionService if conditions match' do
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_won(event)
+        expect(AutomationRules::ActionService).to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'does not call AutomationRules::ActionService if conditions do not match' do
+        allow(condition_match).to receive(:present?).and_return(false)
+        listener.deal_won(event)
+        expect(AutomationRules::ActionService).not_to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'calls AutomationRules::ActionService for each rule when multiple rules are present' do
+        create(:automation_rule, event_name: 'deal_won', account: account)
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_won(event)
+        expect(AutomationRules::ActionService).to have_received(:new).twice
+      end
+    end
+  end
+
+  describe 'deal_lost' do
+    let!(:automation_rule) { create(:automation_rule, event_name: 'deal_lost', account: account) }
+    let(:deal) { create(:deal, account: account, conversation: conversation) }
+    let(:event) do
+      Events::Base.new('deal_lost', Time.zone.now, { deal: deal, changed_attributes: { deal_stage_id: [1, 2] } })
+    end
+
+    context 'when matching rules are present' do
+      it 'calls AutomationRules::ActionService if conditions match' do
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_lost(event)
+        expect(AutomationRules::ActionService).to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'does not call AutomationRules::ActionService if conditions do not match' do
+        allow(condition_match).to receive(:present?).and_return(false)
+        listener.deal_lost(event)
+        expect(AutomationRules::ActionService).not_to have_received(:new).with(automation_rule, account, conversation)
+      end
+
+      it 'calls AutomationRules::ActionService for each rule when multiple rules are present' do
+        create(:automation_rule, event_name: 'deal_lost', account: account)
+        allow(condition_match).to receive(:present?).and_return(true)
+        listener.deal_lost(event)
+        expect(AutomationRules::ActionService).to have_received(:new).twice
+      end
+    end
+  end
 end
