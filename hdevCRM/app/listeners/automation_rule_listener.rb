@@ -34,7 +34,45 @@ class AutomationRuleListener < BaseListener
     end
   end
 
+  def deal_created(event)
+    process_deal_event(event, 'deal_created')
+  end
+
+  def deal_stage_changed(event)
+    process_deal_event(event, 'deal_stage_changed')
+  end
+
+  # deal.won substitui deal.stage_changed nessa transicao (ver Deal#stage_change_event).
+  def deal_won(event)
+    process_deal_event(event, 'deal_won')
+  end
+
+  # deal.lost substitui deal.stage_changed nessa transicao (ver Deal#stage_change_event).
+  def deal_lost(event)
+    process_deal_event(event, 'deal_lost')
+  end
+
   private
+
+  # Deal criado/movido sem conversa vinculada fica fora do contrato v1: ConditionsFilterService
+  # e ActionService assumem conversation como objeto central das regras de automacao.
+  def process_deal_event(event, event_name)
+    deal = event.data[:deal]
+    return if deal.conversation.blank?
+
+    conversation = deal.conversation
+    account = conversation.account
+    changed_attributes = event.data[:changed_attributes]
+
+    return unless rule_present?(event_name, account)
+
+    rules = current_account_rules(event_name, account)
+
+    rules.each do |rule|
+      conditions_match = ::AutomationRules::ConditionsFilterService.new(rule, conversation, { changed_attributes: changed_attributes }).perform
+      AutomationRules::ActionService.new(rule, account, conversation).perform if conditions_match.present?
+    end
+  end
 
   def process_conversation_event(event, event_name)
     return if performed_by_automation?(event)

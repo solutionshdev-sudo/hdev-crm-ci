@@ -136,7 +136,11 @@
       "CONVERSATION_UPDATED": "Conversation Updated",
       "MESSAGE_CREATED": "Message Created",
       "CONVERSATION_RESOLVED": "Conversation Resolved",
-      "CONVERSATION_OPENED": "Conversation Opened"
+      "CONVERSATION_OPENED": "Conversation Opened",
+      "DEAL_CREATED": "Deal Created",
+      "DEAL_STAGE_CHANGED": "Deal Stage Changed",
+      "DEAL_WON": "Deal Won",
+      "DEAL_LOST": "Deal Lost"
     },
     "ACTIONS": {
       "ASSIGN_AGENT": "Assign to Agent",
