@@ -24,24 +24,21 @@ class Whatsapp::IncomingMessageBaseService
 
   private
 
+  # Guardas (tipo não suportado, dedupe de webhook, lock atômico e contato bloqueado/ausente)
+  # e a montagem de ingest_message vivem em Whatsapp::IncomingMessageServiceHelpers —
+  # extraído daqui pra manter process_messages abaixo do teto de complexidade
+  # (Metrics/CyclomaticComplexity e PerceivedComplexity) sem estourar o ClassLength
+  # desta classe (a concern tem folga; esta classe já estava perto do teto).
   def process_messages
-    # We don't support reactions & ephemeral message now, we need to skip processing the message
-    # if the webhook event is a reaction or an ephermal message or an unsupported message.
-    return if unprocessable_message_type?(message_type)
+    return if skip_incoming_message?
+    return unless contact_ready_to_process?
 
-    # Multiple webhook events can be received for the same message due to
-    # misconfigurations in the Meta business manager account.
-    # We use an atomic Redis SET NX to prevent concurrent workers from both
-    # processing the same message simultaneously.
-    return if find_message_by_source_id(messages_data.first[:id])
-    return unless lock_message_source_id!
+    ingest_message
+  end
 
-    set_contact
-    return unless @contact
-    return if @contact.blocked? && !outgoing_echo
-
-    # opted_out fica fora da transaction: o job de nota de atividade só é enfileirado
-    # depois do commit, pra não referenciar uma @conversation ainda não persistida.
+  # opted_out fica fora da transaction: o job de nota de atividade só é enfileirado
+  # depois do commit, pra não referenciar uma @conversation ainda não persistida.
+  def ingest_message
     opted_out = false
     ActiveRecord::Base.transaction do
       set_conversation

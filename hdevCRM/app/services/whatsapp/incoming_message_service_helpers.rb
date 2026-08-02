@@ -7,6 +7,25 @@ module Whatsapp::IncomingMessageServiceHelpers
     Down.download(inbox.channel.media_url(attachment_payload[:id]), headers: inbox.channel.api_headers)
   end
 
+  # Extraído de Whatsapp::IncomingMessageBaseService#process_messages (Metrics/CyclomaticComplexity):
+  # tipo não suportado, dedupe de webhook duplicado (Meta manda o mesmo evento mais de uma vez em
+  # contas mal configuradas) e falha no lock atômico (SET NX do Redis contra corrida de workers).
+  def skip_incoming_message?
+    unprocessable_message_type?(message_type) ||
+      find_message_by_source_id(messages_data.first[:id]) ||
+      !lock_message_source_id!
+  end
+
+  # Extraído de Whatsapp::IncomingMessageBaseService#process_messages: contato ausente após
+  # set_contact, ou bloqueado (mute global) fora de eco de mensagem já enviada pelo próprio canal.
+  def contact_ready_to_process?
+    set_contact
+    return false unless @contact
+    return false if @contact.blocked? && !outgoing_echo
+
+    true
+  end
+
   def conversation_params
     {
       account_id: @inbox.account_id,

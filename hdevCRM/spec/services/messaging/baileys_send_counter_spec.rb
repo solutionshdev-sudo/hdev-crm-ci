@@ -19,9 +19,9 @@ describe Messaging::BaileysSendCounter do
   end
   let(:counter) { described_class.new(channel: channel) }
 
-  describe '#increment! and #count' do
+  describe '#record_send! and #count' do
     it 'round-trips through Redis' do
-      expect { counter.increment! }.to change { counter.count }.from(0).to(1)
+      expect { counter.record_send! }.to change(counter, :count).from(0).to(1)
     end
 
     context 'with the first increment of the day' do
@@ -29,7 +29,7 @@ describe Messaging::BaileysSendCounter do
         allow(Redis::Alfred).to receive(:incr).and_return(1)
         allow(Redis::Alfred).to receive(:expire)
 
-        counter.increment!
+        counter.record_send!
 
         expect(Redis::Alfred).to have_received(:expire).with(anything, described_class::EXPIRY)
       end
@@ -40,7 +40,7 @@ describe Messaging::BaileysSendCounter do
         allow(Redis::Alfred).to receive(:incr).and_return(2)
         allow(Redis::Alfred).to receive(:expire)
 
-        counter.increment!
+        counter.record_send!
 
         expect(Redis::Alfred).not_to have_received(:expire)
       end
@@ -48,7 +48,7 @@ describe Messaging::BaileysSendCounter do
   end
 
   it 'keys Redis as baileys:sent:<instance_id>:<yyyymmdd>' do
-    counter.increment!(now: Time.utc(2026, 8, 10, 12, 0, 0))
+    counter.record_send!(now: Time.utc(2026, 8, 10, 12, 0, 0))
 
     expect(Redis::Alfred.get('baileys:sent:instance-1:20260810').to_i).to eq(1)
   end
@@ -71,7 +71,7 @@ describe Messaging::BaileysSendCounter do
       # 01:00 UTC = 22:00 em Sao Paulo (UTC-3) do dia anterior -> datas locais diferentes.
       now = Time.utc(2026, 8, 11, 1, 0, 0)
 
-      described_class.new(channel: utc_channel).increment!(now: now)
+      described_class.new(channel: utc_channel).record_send!(now: now)
 
       expect(described_class.new(channel: sp_channel).count(now: now)).to eq(0)
       expect(described_class.new(channel: utc_channel).count(now: now)).to eq(1)

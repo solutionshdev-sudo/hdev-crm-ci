@@ -43,7 +43,7 @@ class Whatsapp::SendOnWhatsappService < Base::SendOnChannelService
     end
     # Contador diário só sobe quando o envio de fato sai (allow) — nunca em
     # postpone/deny. Não-baileys nunca chega aqui armado (ban_risk: false).
-    Messaging::BaileysSendCounter.new(channel: channel).increment! if channel.baileys?
+    Messaging::BaileysSendCounter.new(channel: channel).record_send! if channel.baileys?
   end
 
   def handle_postponed_message(decision)

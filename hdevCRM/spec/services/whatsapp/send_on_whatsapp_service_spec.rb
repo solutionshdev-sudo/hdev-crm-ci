@@ -416,7 +416,7 @@ describe Whatsapp::SendOnWhatsappService do
     context 'when the gate allows the message' do
       let(:message) { create(:message, conversation: conversation, message_type: :outgoing, content: 'hi', account: account) }
       let(:baileys_client) { instance_double(Whatsapp::BaileysClient) }
-      let(:counter) { instance_double(Messaging::BaileysSendCounter, increment!: 1) }
+      let(:counter) { instance_double(Messaging::BaileysSendCounter, record_send!: 1) }
 
       before do
         allow(gate).to receive(:call).and_return(Messaging::SendGateService::ALLOW)
@@ -429,7 +429,7 @@ describe Whatsapp::SendOnWhatsappService do
         perform(message)
 
         expect(message.reload.source_id).to eq('wa-id')
-        expect(counter).to have_received(:increment!)
+        expect(counter).to have_received(:record_send!)
       end
     end
 

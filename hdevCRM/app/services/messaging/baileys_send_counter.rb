@@ -5,8 +5,12 @@
 # no fechamento do dia). A data usada na chave é o dia local da conta
 # (Channel::Whatsapp#messaging_timezone) — o mesmo fuso que arma a janela 7h-22h.
 #
-# Só chama increment! quando o envio de fato sai (allow) — nunca em postpone/deny;
+# Só chama record_send! quando o envio de fato sai (allow) — nunca em postpone/deny;
 # quem decide isso é o enforcement em Whatsapp::SendOnWhatsappService, não aqui.
+#
+# Nome (record_send!, não increment!): Rails/SkipsModelValidations bate no NOME do método em
+# qualquer receiver, não só em ActiveRecord — increment! aqui é Redis puro, sem validação nenhuma
+# pra pular, mas o cop não sabe disso.
 class Messaging::BaileysSendCounter
   EXPIRY = 48.hours.to_i
 
@@ -16,7 +20,7 @@ class Messaging::BaileysSendCounter
     Redis::Alfred.get(key_for(now)).to_i
   end
 
-  def increment!(now: Time.current)
+  def record_send!(now: Time.current)
     key = key_for(now)
     Redis::Alfred.incr(key).tap do |total|
       Redis::Alfred.expire(key, EXPIRY) if total == 1

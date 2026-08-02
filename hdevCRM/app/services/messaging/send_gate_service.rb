@@ -86,7 +86,7 @@ class Messaging::SendGateService
 
   # Leitura simples — não reserva, não trava. Sob concorrência de workers
   # Sidekiq, duas checagens podem ler o mesmo total antes de qualquer
-  # increment! rodar: o cap é um teto MOLE, limitado pela concorrência
+  # record_send! rodar: o cap é um teto MOLE, limitado pela concorrência
   # configurada, não uma garantia atômica (decisão do controller — nenhuma
   # reserva atômica foi construída de propósito). O `sendChain` do
   # baileys-service serializa o envio real por instância (1s + jitter), então
