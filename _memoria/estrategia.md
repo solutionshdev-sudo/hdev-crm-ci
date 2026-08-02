@@ -332,6 +332,19 @@ regra de fábrica do kanban (o bug conhecido desde 27/07). rspec verde de
 primeira; armadilhas de CI registradas na memória do Claude. Ledger das fases
 futuras em `.superpowers/sdd/merry-mixing-toast/progress.md`.
 
+**Feito (02/08, PR #26 mergeado em `7e8ab69`):** Fase 2 — porta única de
+envio + anti-ban. Coluna `contacts.automation_opted_out` (emenda: NÃO reusa
+`blocked`, que é o mute global — contato que manda PARAR ainda consegue se
+re-engajar), STOP detection (só texto digitado; botão "Cancelar" de menu não
+bloqueia), `Messaging::SendGateService` (opt-out → janela 7h-22h fuso da
+conta → warm-up por idade de pareamento → cap diário 300) com jitter de até
+15min no postpone, e o baileys-service TESTADO pela primeira vez (19 vitest +
+tsc, job `baileys` novo no CI). Veto adia ou registra com nota, nunca perde
+mensagem em silêncio; retida/negada fica `failed`. **Pendente: deploy (a
+migration roda no rebuild do app; o container baileys não mudou) + prova
+nível 3 (chip local, espaçamento) e nível 4 (PARAR + janela em produção,
+§2.6). A Fase 6 (disparo em massa) só abre com a F2 PROVADA.**
+
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
 o funil foi exercitado até Ganho, e o log do worker mostrou o
