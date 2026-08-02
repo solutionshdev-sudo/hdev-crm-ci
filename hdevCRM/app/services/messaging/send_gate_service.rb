@@ -32,14 +32,22 @@ class Messaging::SendGateService
   def call
     return deny(:opted_out) if opted_out?
     return ALLOW unless ban_risk?
+
+    ban_risk_decision
+  end
+
+  private
+
+  # Sequência janela -> warm-up -> cap diário, isolada do opt-out/ban_risk
+  # acima só pra manter a CyclomaticComplexity de `call` baixa — mesma ordem,
+  # mesmo contrato de retorno (`ALLOW` ou `{ postpone_until:, reason: }`).
+  def ban_risk_decision
     return postpone(:outside_window, next_window_start) if automated && outside_window?
     return postpone(:warm_up_limit, next_window_start(skip_today: true)) if automated && warm_up_exceeded?
     return postpone(:daily_cap, next_window_start(skip_today: true)) if daily_cap_exceeded?
 
     ALLOW
   end
-
-  private
 
   # Reusa a MESMA semântica do gate de `Base::SendOnChannelService`
   # (automation_opted_out? OU blocked?) — quem calcula `automated` é o
