@@ -56,6 +56,8 @@ class AutomationRuleListener < BaseListener
 
   # Deal criado/movido sem conversa vinculada fica fora do contrato v1: ConditionsFilterService
   # e ActionService assumem conversation como objeto central das regras de automacao.
+  # Sem guard de performed_by_automation? de proposito: a cadeia regra-cria-negocio ->
+  # deal_created -> outra regra reage precisa disparar (Fase 1, item 3; ver spec).
   def process_deal_event(event, event_name)
     deal = event.data[:deal]
     return if deal.conversation.blank?

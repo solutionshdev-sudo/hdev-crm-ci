@@ -275,6 +275,15 @@ describe AutomationRuleListener do
         expect(AutomationRules::ActionService).to have_received(:new).twice
       end
 
+      it 'passes the conversation and changed attributes to the conditions filter service' do
+        listener.deal_created(event)
+        expect(AutomationRules::ConditionsFilterService).to have_received(:new).with(
+          automation_rule,
+          conversation,
+          { changed_attributes: { deal_stage_id: [nil, deal.deal_stage_id] } }
+        )
+      end
+
       # Ao contrário de conversation_created, deal_created NÃO tem o guard de performed_by_automation:
       # a cadeia de regras que cria negócio -> dispara deal_created -> outra regra reage é intencional (Fase 1, item 3).
       it 'calls AutomationRules::ActionService even when performed by automation' do

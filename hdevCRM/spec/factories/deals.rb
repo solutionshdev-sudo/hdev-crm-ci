@@ -14,7 +14,7 @@ FactoryBot.define do
     stage_type { :open }
 
     after(:build) do |stage|
-      stage.account ||= create(:account)
+      stage.account ||= stage.deal_pipeline&.account || create(:account)
       stage.deal_pipeline ||= create(:deal_pipeline, account: stage.account)
     end
 
@@ -34,7 +34,7 @@ FactoryBot.define do
     value { 100.0 }
 
     after(:build) do |deal|
-      deal.account ||= create(:account)
+      deal.account ||= deal.deal_pipeline&.account || create(:account)
       deal.deal_pipeline ||= create(:deal_pipeline, account: deal.account)
       deal.deal_stage ||= create(:deal_stage, account: deal.account, deal_pipeline: deal.deal_pipeline)
       deal.contact ||= create(:contact, account: deal.account)

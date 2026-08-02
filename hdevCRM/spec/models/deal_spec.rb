@@ -57,7 +57,7 @@ RSpec.describe Deal do
       allow(Rails.configuration.dispatcher).to receive(:dispatch)
     end
 
-    context 'on create' do
+    context 'when the deal is created' do
       it 'dispatches DEAL_CREATED when created into an open stage' do
         deal = create(:deal, account: account, deal_pipeline: pipeline, deal_stage: open_stage, contact: contact, conversation: conversation)
 
@@ -84,7 +84,7 @@ RSpec.describe Deal do
       end
     end
 
-    context 'on update' do
+    context 'when the deal is updated' do
       let!(:deal) { create(:deal, account: account, deal_pipeline: pipeline, deal_stage: open_stage, contact: contact, conversation: conversation) }
 
       it 'dispatches DEAL_STAGE_CHANGED when moved between open stages' do
