@@ -22,8 +22,16 @@ describe Base::SendOnChannelService do
     Email::SendOnEmailService.new(message: message).perform
   end
 
+  # A factory de :message faz `sender ||= create(:user, ...)` pra toda mensagem
+  # outgoing (spec/factories/messages.rb:37-40) — um `sender: nil` explícito na
+  # criação é sobrescrito pelo `||=` do próprio after(:build). O jeito provado
+  # de zerar o sender de fato é atualizar DEPOIS de criada (mesmo idioma de
+  # spec/lib/integrations/slack/send_on_slack_service_spec.rb:282,
+  # `template_message.update!(sender: nil)`).
   def automated_message
-    create(:message, conversation: conversation, message_type: :outgoing, sender: nil, account: account)
+    message = create(:message, conversation: conversation, message_type: :outgoing, account: account)
+    message.update!(sender: nil)
+    message
   end
 
   def human_message
@@ -98,13 +106,14 @@ describe Base::SendOnChannelService do
       end
     end
 
-    context 'when it is outside typical WhatsApp messaging-window hours' do
-      it 'still sends normally, because the base gate applies no time window at all' do
+    context 'when sending through a generic (non-WhatsApp) channel' do
+      it 'never consults Messaging::SendGateService — the anti-ban window/warm-up gate is WhatsApp-only' do
+        allow(Messaging::SendGateService).to receive(:new)
         message = automated_message
 
-        travel_to(Time.utc(2026, 1, 15, 3, 0, 0)) { send_message(message) }
+        send_message(message)
 
-        expect(mailer_context).to have_received(:email_reply).with(message)
+        expect(Messaging::SendGateService).not_to have_received(:new)
       end
     end
   end

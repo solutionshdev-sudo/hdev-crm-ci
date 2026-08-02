@@ -152,13 +152,11 @@ describe Whatsapp::Providers::WhatsappBaileysService do
     end
 
     context 'when instance_id is missing' do
-      let(:whatsapp_channel) do
-        create(:channel_whatsapp,
-               provider: 'baileys',
-               provider_config: { 'webhook_secret' => 'secret' },
-               validate_provider_config: false,
-               sync_templates: false)
-      end
+      # `before_validation :ensure_baileys_instance_config` (app/models/channel/whatsapp.rb:160-165)
+      # backfilla instance_id/webhook_secret com `||=` em TODO save — validate_provider_config: false
+      # só pula a validação remota, não esse callback. Um `create(...)` sem instance_id nasce com um
+      # instance_id gerado mesmo assim. Pra testar a ausência de fato, muta em memória sem salvar.
+      before { whatsapp_channel.provider_config = { 'webhook_secret' => 'secret' } }
 
       it 'returns false' do
         expect(service.validate_provider_config?).to be(false)

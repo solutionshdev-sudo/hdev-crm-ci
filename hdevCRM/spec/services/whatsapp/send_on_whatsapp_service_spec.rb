@@ -434,11 +434,17 @@ describe Whatsapp::SendOnWhatsappService do
     end
 
     context 'when the gate postpones an automated message' do
+      # `sender: nil` na criação é sobrescrito pelo `sender ||= create(:user, ...)` da
+      # própria factory (spec/factories/messages.rb:37-40) — zera de fato só depois de
+      # criada, mesmo idioma de spec/lib/integrations/slack/send_on_slack_service_spec.rb:282.
       let(:message) do
-        create(:message, conversation: conversation, message_type: :outgoing, sender: nil, content: 'hi', account: account)
+        automated_message = create(:message, conversation: conversation, message_type: :outgoing, content: 'hi', account: account)
+        automated_message.update!(sender: nil)
+        automated_message
       end
       let(:postpone_until) { 3.hours.from_now }
       let(:configured_job) { instance_double(ActiveJob::ConfiguredJob, perform_later: true) }
+      let(:delayed_note) { hash_including(content: a_string_including('Message delayed by sending limits')) }
 
       before do
         allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :outside_window })
@@ -450,7 +456,7 @@ describe Whatsapp::SendOnWhatsappService do
 
         expect(configured_job).to have_received(:perform_later).with(message.id)
         expect(message.reload.additional_attributes['antiban_reschedule_count']).to eq(1)
-        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later)
+        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later).with(conversation, delayed_note)
       end
     end
 
@@ -487,6 +493,7 @@ describe Whatsapp::SendOnWhatsappService do
       end
       let(:postpone_until) { 3.hours.from_now }
       let(:configured_job) { instance_double(ActiveJob::ConfiguredJob, perform_later: true) }
+      let(:delayed_note) { hash_including(content: a_string_including('Message delayed by sending limits')) }
 
       before do
         allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :daily_cap })
@@ -496,7 +503,7 @@ describe Whatsapp::SendOnWhatsappService do
       it 'does not notify again, and still bumps the reschedule count' do
         perform(message)
 
-        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later)
+        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later).with(conversation, delayed_note)
         expect(message.reload.additional_attributes['antiban_reschedule_count']).to eq(2)
       end
     end
@@ -536,8 +543,14 @@ describe Whatsapp::SendOnWhatsappService do
       end
     end
 
-    context 'when the gate denies the message outright' do
-      let(:message) { create(:message, conversation: conversation, message_type: :outgoing, sender: nil, content: 'hi', account: account) }
+    context 'when the gate denies an automated message outright' do
+      # sender: nil na criação seria sobrescrito pela factory — zera depois, mesmo
+      # idioma usado acima em 'when the gate postpones an automated message'.
+      let(:message) do
+        automated_message = create(:message, conversation: conversation, message_type: :outgoing, content: 'hi', account: account)
+        automated_message.update!(sender: nil)
+        automated_message
+      end
 
       before { allow(gate).to receive(:call).and_return({ deny: :opted_out }) }
 
