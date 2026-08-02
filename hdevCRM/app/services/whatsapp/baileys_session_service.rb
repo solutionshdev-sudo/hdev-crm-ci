@@ -97,6 +97,7 @@ class Whatsapp::BaileysSessionService
     return if connection_state.blank? || connection_state == previous_state
 
     Rails.configuration.dispatcher.dispatch(WHATSAPP_CONNECTION_CHANGED, Time.zone.now, inbox: channel.inbox,
-                                            connection_state: connection_state, previous_state: previous_state)
+                                                                                        connection_state: connection_state,
+                                                                                        previous_state: previous_state)
   end
 end

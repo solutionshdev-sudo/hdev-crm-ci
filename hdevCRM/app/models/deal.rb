@@ -83,6 +83,6 @@ class Deal < ApplicationRecord
 
   def dispatch_deal_event(event)
     Rails.configuration.dispatcher.dispatch(event, Time.zone.now, deal: self, conversation: conversation,
-                                            changed_attributes: saved_changes)
+                                                                  changed_attributes: saved_changes)
   end
 end
