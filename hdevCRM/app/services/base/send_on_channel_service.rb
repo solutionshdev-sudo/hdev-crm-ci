@@ -16,6 +16,9 @@ class Base::SendOnChannelService
     return if invalid_message?
 
     if blocked_automated_message?
+      # Mesmo desfecho lógico do deny do gate anti-ban (Whatsapp::SendOnWhatsappService#deny_message!):
+      # a mensagem retida não sai, então não fica marcada como enviada.
+      message.update!(status: :failed)
       create_opt_out_blocked_activity_message
       return
     end
@@ -62,7 +65,12 @@ class Base::SendOnChannelService
   # contact.automation_opted_out?/contact.blocked?.
   def automated_message?
     message.content_attributes['chatbot_id'].present? ||
+      # `Current.executed_by` não sobrevive em SendReplyJob (job roda em worker à parte,
+      # sem o Current da request original) — a marca durável é `automation_rule_id` em
+      # content_attributes, gravada no próprio registro (mesmo campo que Message#human_response?
+      # já checa). O Current continua checado: inofensivo, e cobre caminhos síncronos.
       Current.executed_by.instance_of?(AutomationRule) ||
+      message.content_attributes['automation_rule_id'].present? ||
       message.additional_attributes['campaign_id'].present? ||
       !message.sender.is_a?(User)
   end

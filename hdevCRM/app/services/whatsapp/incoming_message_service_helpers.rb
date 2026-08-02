@@ -97,7 +97,11 @@ module Whatsapp::IncomingMessageServiceHelpers
   # (ex.: item de menu do chatbot chamado "Cancelar") não contam como STOP.
   # Retorna true quando o contato acabou de sair (pra quem chamou decidir se grava a nota
   # de atividade só depois que a transaction em volta commitar).
+  #
+  # Idempotente: contato que já saiu não reaciona em cada "PARAR" repetido — sem o guard,
+  # cada repetição regravaria o mesmo valor e enfileiraria outra nota de atividade.
   def detect_opt_out!
+    return false if @contact.automation_opted_out?
     return false unless messages_data.first.dig(:text, :body).to_s.match?(OPT_OUT_REGEX)
 
     @contact.update!(automation_opted_out: true)

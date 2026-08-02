@@ -44,6 +44,13 @@ class Messaging::SendGateService
   # Reusa a MESMA semântica do gate de `Base::SendOnChannelService`
   # (automation_opted_out? OU blocked?) — quem calcula `automated` é o
   # `automated_message?` de lá; aqui só combina com o opt-out do contato.
+  #
+  # Inalcançável a partir do call site atual: Base::SendOnChannelService#perform já
+  # retém (e agora marca failed) a mensagem automatizada opted-out/blocked ANTES de
+  # perform_reply chamar este gate — este branch nunca dispara em produção hoje.
+  # Mantido para reuso standalone deste serviço (ex.: um call site futuro que pule
+  # o guard da base). Não remover o guard da base assumindo que este gate cobre — ele
+  # não roda sem o guard.
   def opted_out?
     automated && (contact.automation_opted_out? || contact.blocked?)
   end

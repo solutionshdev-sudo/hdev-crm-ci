@@ -53,7 +53,8 @@ class Whatsapp::SendOnWhatsappService < Base::SendOnChannelService
     else
       notify_human_postponed(decision[:postpone_until]) if reschedule_count.zero? && !automated_message?
       bump_gate_reschedule_count!(reschedule_count + 1)
-      ::SendReplyJob.set(wait_until: decision[:postpone_until]).perform_later(message.id)
+      # Jitter espalha a manada das 7h; o gate continua determinístico.
+      ::SendReplyJob.set(wait_until: decision[:postpone_until] + rand(0..900).seconds).perform_later(message.id)
     end
   end
 

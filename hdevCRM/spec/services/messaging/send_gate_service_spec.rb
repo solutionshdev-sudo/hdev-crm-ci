@@ -6,7 +6,7 @@ require 'rails_helper'
 # cobre a decisão do gate). Por isso os exemplos abaixo não precisam de
 # `travel_to`: constroem os instantes diretamente e os injetam via `now:`
 # e via `provider_config['paired_at']`.
-RSpec.describe Messaging::SendGateService do
+describe Messaging::SendGateService do
   let(:account) { create(:account) }
   let(:contact) { create(:contact, account: account) }
   let(:baileys_provider_config) { { 'instance_id' => 'instance-1', 'webhook_secret' => 'secret' } }

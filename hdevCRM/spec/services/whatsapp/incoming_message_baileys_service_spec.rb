@@ -110,6 +110,16 @@ describe Whatsapp::IncomingMessageBaileysService do
         expect(whatsapp_channel.inbox.messages.count).to eq(1)
         expect(whatsapp_channel.inbox.messages.first.content).to eq('Hello again')
       end
+
+      it 'repeating the STOP word is idempotent — no re-update, no duplicate activity note' do
+        allow(Conversations::ActivityMessageJob).to receive(:perform_later)
+        contact = create(:contact, account: whatsapp_channel.account, automation_opted_out: true, phone_number: '+2423423243')
+        create(:contact_inbox, contact: contact, inbox: whatsapp_channel.inbox, source_id: '2423423243')
+
+        described_class.new(inbox: whatsapp_channel.inbox, params: text_message_params('Pare')).perform
+
+        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later)
+      end
     end
 
     context 'when a blocked contact sends a new inbound message' do

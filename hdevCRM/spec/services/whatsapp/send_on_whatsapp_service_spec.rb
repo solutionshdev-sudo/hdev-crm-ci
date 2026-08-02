@@ -448,7 +448,10 @@ describe Whatsapp::SendOnWhatsappService do
 
       before do
         allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :outside_window })
-        allow(SendReplyJob).to receive(:set).with(wait_until: postpone_until).and_return(configured_job)
+        # Jitter (0-900s) some ao wait_until — o gate é determinístico, o enforcement não.
+        allow(SendReplyJob).to receive(:set)
+          .with(wait_until: be_between(postpone_until, postpone_until + 900.seconds))
+          .and_return(configured_job)
       end
 
       it 'reschedules the job for the postponed time, silently (no note for automated sends)' do

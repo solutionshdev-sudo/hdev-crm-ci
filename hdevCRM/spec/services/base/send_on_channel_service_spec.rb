@@ -51,9 +51,11 @@ describe Base::SendOnChannelService do
       let(:contact) { create(:contact, account: account, automation_opted_out: true) }
 
       it 'retains the message instead of sending it' do
-        send_message(automated_message)
+        message = automated_message
+        send_message(message)
 
         expect(mailer_context).not_to have_received(:email_reply)
+        expect(message.reload.status).to eq('failed')
       end
 
       it 'creates an opt-out activity note' do
@@ -80,9 +82,11 @@ describe Base::SendOnChannelService do
       let(:contact) { create(:contact, account: account, blocked: true) }
 
       it 'retains the message the same way opt-out does' do
-        send_message(automated_message)
+        message = automated_message
+        send_message(message)
 
         expect(mailer_context).not_to have_received(:email_reply)
+        expect(message.reload.status).to eq('failed')
       end
     end
 
