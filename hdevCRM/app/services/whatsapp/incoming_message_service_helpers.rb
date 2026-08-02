@@ -1,4 +1,8 @@
 module Whatsapp::IncomingMessageServiceHelpers
+  # Opt-out (Fase 2 §2.2): ancorado, só bate se a mensagem inteira (tirando espaços e
+  # pontuação final) for uma das palavras de saída — não um trecho dentro de uma frase maior.
+  OPT_OUT_REGEX = /\A\s*(?:stop|pare|parar|sair|cancelar|descadastrar|unsubscribe)\s*[!.]*\s*\z/i
+
   def download_attachment_file(attachment_payload)
     Down.download(inbox.channel.media_url(attachment_payload[:id]), headers: inbox.channel.api_headers)
   end
@@ -87,5 +91,26 @@ module Whatsapp::IncomingMessageServiceHelpers
     return false if messages_data.blank?
 
     Whatsapp::MessageDedupLock.new(messages_data.first[:id]).acquire!
+  end
+
+  # Opt-out (Fase 2 §2.2): só texto livre digitado aciona — button/interactive replies
+  # (ex.: item de menu do chatbot chamado "Cancelar") não contam como STOP.
+  # Retorna true quando o contato acabou de sair (pra quem chamou decidir se grava a nota
+  # de atividade só depois que a transaction em volta commitar).
+  def detect_opt_out!
+    return false unless messages_data.first.dig(:text, :body).to_s.match?(OPT_OUT_REGEX)
+
+    @contact.update!(automation_opted_out: true)
+    true
+  end
+
+  def create_opt_out_activity_message
+    activity_message_params = {
+      account_id: @conversation.account_id,
+      inbox_id: @conversation.inbox_id,
+      message_type: :activity,
+      content: I18n.t('conversations.activity.opt_out.contact_opted_out')
+    }
+    ::Conversations::ActivityMessageJob.perform_later(@conversation, activity_message_params)
   end
 end
