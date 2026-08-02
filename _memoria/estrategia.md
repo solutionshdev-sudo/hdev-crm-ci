@@ -316,6 +316,27 @@ o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
+## Quarta trilha: Motor Integrado (01/08 — Fase 1 na main)
+
+As peças existem mas não se conversam — o plano de 6 fases
+(`~/.claude/plans/merry-mixing-toast.md`) liga kanban, chatbot, Baileys, IA e
+automação num motor só: **P1** tudo vira evento no barramento; **P2** IA como
+operadora (tools de escrita conversation-scoped); **P3** porta única de envio
+com gates anti-ban; **P4** funil com semântica de venda. Ordem: F1 → (F2 anti-ban,
+F4 kanban) → F3a/3b IA → F5 comercial → F6 disparo em massa (exige F2 provada).
+
+**Feito (01/08, PR #25 mergeado em `712a9c5`):** Fase 1 — 7 eventos novos no
+barramento (deal, chatbot flow, conexão WhatsApp), automação reagindo aos
+eventos de deal, e o fix do `create_deal` no `validations.js` que destrava a
+regra de fábrica do kanban (o bug conhecido desde 27/07). rspec verde de
+primeira; armadilhas de CI registradas na memória do Claude. Ledger das fases
+futuras em `.superpowers/sdd/merry-mixing-toast/progress.md`.
+
+**Gate pra próxima fase (é regra do plano, não burocracia):** prova nível 4 em
+produção — rebuild, criar a regra "QUANDO conversa criada ENTÃO criar negócio"
+pela UI, mensagem de WhatsApp real virando card sem toque humano, card movido
+pra Ganho gerando `deal.won` no log do worker. Só depois começa F2 ou F4.
+
 ## O que pode esperar
 
 - Definição da estrutura de planos de revenda pras agências (ainda em estudo).
