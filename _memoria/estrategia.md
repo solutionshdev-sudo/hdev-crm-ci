@@ -332,10 +332,15 @@ regra de fábrica do kanban (o bug conhecido desde 27/07). rspec verde de
 primeira; armadilhas de CI registradas na memória do Claude. Ledger das fases
 futuras em `.superpowers/sdd/merry-mixing-toast/progress.md`.
 
-**Gate pra próxima fase (é regra do plano, não burocracia):** prova nível 4 em
-produção — rebuild, criar a regra "QUANDO conversa criada ENTÃO criar negócio"
-pela UI, mensagem de WhatsApp real virando card sem toque humano, card movido
-pra Ganho gerando `deal.won` no log do worker. Só depois começa F2 ou F4.
+**Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
+salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
+o funil foi exercitado até Ganho, e o log do worker mostrou o
+`EventDispatcherJob` executando `deal.stage_changed` e `deal.won` com payload
+GlobalID correto (~8ms, sem erro). F2 (anti-ban) e F4 (kanban) estão liberadas —
+são independentes entre si. Minors observados na prova (não bloqueiam):
+timestamp relativo do modal de atividades em inglês ("about 9 hours ago" —
+date-fns sem locale pt-BR naquele componente, herdado) e o card auto-criado
+nascendo com o display_id da conversa como título.
 
 ## O que pode esperar
 
