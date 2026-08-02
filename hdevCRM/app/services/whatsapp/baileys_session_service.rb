@@ -3,6 +3,8 @@
 # update_column: update! would re-run validate_provider_config and fire
 # after_update_commit hooks for what is effectively ephemeral state.
 class Whatsapp::BaileysSessionService
+  include Events::Types
+
   # Sinaliza pro painel que a instância não existe no microserviço: a UI mostra
   # "sessão parada" e o botão de QR resolve, em vez de erro de serviço fora do ar.
   NOT_PROVISIONED = 'not_provisioned'.freeze
@@ -79,9 +81,23 @@ class Whatsapp::BaileysSessionService
   # Carimba a hora sempre que o estado muda: é o que o painel mostra como
   # "última atualização" do selo de conexão.
   def write_state(updates)
+    previous_state = channel.provider_config['connection_state']
     updates = updates.merge('connection_state_updated_at' => Time.current.iso8601)
     # rubocop:disable Rails/SkipsModelValidations
     channel.update_column(:provider_config, channel.provider_config.merge(updates))
     # rubocop:enable Rails/SkipsModelValidations
+
+    dispatch_connection_changed_event(updates['connection_state'], previous_state)
+  end
+
+  # update_column pula os callbacks do model, então o dispatch tem que ser
+  # explícito aqui — e só quando o estado de fato muda (o polling da aba
+  # Conexão chama isso até 20x por minuto).
+  def dispatch_connection_changed_event(connection_state, previous_state)
+    return if connection_state.blank? || connection_state == previous_state
+
+    Rails.configuration.dispatcher.dispatch(WHATSAPP_CONNECTION_CHANGED, Time.zone.now, inbox: channel.inbox,
+                                                                                        connection_state: connection_state,
+                                                                                        previous_state: previous_state)
   end
 end

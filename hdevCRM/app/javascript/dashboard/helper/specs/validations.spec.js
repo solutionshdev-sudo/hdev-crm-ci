@@ -83,4 +83,40 @@ describe('validateAutomation', () => {
     const errors = validateAutomation(automationWithNoParamAction);
     expect(errors).toEqual({});
   });
+
+  it('should not require action params for create_deal', () => {
+    const automationWithCreateDealAction = {
+      name: 'Test',
+      description: 'Test',
+      event_name: 'message_created',
+      conditions: [
+        {
+          attribute_key: 'content',
+          filter_operator: 'contains',
+          values: 'hello',
+        },
+      ],
+      actions: [{ action_name: 'create_deal' }],
+    };
+    const errors = validateAutomation(automationWithCreateDealAction);
+    expect(errors).toEqual({});
+  });
+
+  it('should still require action params for send_message', () => {
+    const automationWithSendMessageAction = {
+      name: 'Test',
+      description: 'Test',
+      event_name: 'message_created',
+      conditions: [
+        {
+          attribute_key: 'content',
+          filter_operator: 'contains',
+          values: 'hello',
+        },
+      ],
+      actions: [{ action_name: 'send_message' }],
+    };
+    const errors = validateAutomation(automationWithSendMessageAction);
+    expect(errors).toHaveProperty('action_0');
+  });
 });

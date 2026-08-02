@@ -48,6 +48,7 @@ class Deal < ApplicationRecord
   def log_creation
     deal_activities.create!(account_id: account_id, user_id: created_by_id, activity_type: :created,
                             to_stage_id: deal_stage_id)
+    dispatch_deal_event(DEAL_CREATED)
   end
 
   def log_changes
@@ -67,11 +68,21 @@ class Deal < ApplicationRecord
                     end
     deal_activities.create!(account_id: account_id, user_id: Current.user&.id, activity_type: activity_type,
                             from_stage_id: from_id, to_stage_id: to_id)
+    dispatch_deal_event(stage_change_event(activity_type))
+  end
+
+  def stage_change_event(activity_type)
+    { won: DEAL_WON, lost: DEAL_LOST }.fetch(activity_type, DEAL_STAGE_CHANGED)
   end
 
   def log_simple_change(activity_type, attribute)
     from, to = saved_changes[attribute.to_s]
     deal_activities.create!(account_id: account_id, user_id: Current.user&.id, activity_type: activity_type,
                             data: { 'from' => from, 'to' => to })
+  end
+
+  def dispatch_deal_event(event)
+    Rails.configuration.dispatcher.dispatch(event, Time.zone.now, deal: self, conversation: conversation,
+                                                                  changed_attributes: saved_changes)
   end
 end

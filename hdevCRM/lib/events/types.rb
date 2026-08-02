@@ -61,4 +61,17 @@ module Events::Types
 
   # copilot events
   COPILOT_MESSAGE_CREATED = 'copilot.message.created'
+
+  # deal events
+  DEAL_CREATED = 'deal.created'
+  DEAL_STAGE_CHANGED = 'deal.stage_changed'
+  DEAL_WON = 'deal.won'
+  DEAL_LOST = 'deal.lost'
+
+  # chatbot events
+  CHATBOT_FLOW_COMPLETED = 'chatbot_flow.completed'
+  CHATBOT_FLOW_ABORTED = 'chatbot_flow.aborted'
+
+  # whatsapp events
+  WHATSAPP_CONNECTION_CHANGED = 'whatsapp.connection_changed'
 end
