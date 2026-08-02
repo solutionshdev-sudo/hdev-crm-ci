@@ -1,17 +1,98 @@
 class Whatsapp::SendOnWhatsappService < Base::SendOnChannelService
   private
 
+  # Teto de reagendamentos do gate anti-ban (Fase 2, plano §2.3): depois de 3
+  # postpones consecutivos ainda barrados, desiste e nega em vez de reagendar
+  # pra sempre (ex.: relógio de servidor torto, conta sem provider_config são).
+  MAX_GATE_RESCHEDULES = 3
+
   def channel_class
     Channel::Whatsapp
   end
 
   def perform_reply
+    decision = send_gate_decision
+
+    if decision.is_a?(Hash) && decision[:deny]
+      deny_message!(decision[:deny])
+    elsif decision.is_a?(Hash) && decision[:postpone_until]
+      handle_postponed_message(decision)
+    else
+      send_via_channel
+    end
+  end
+
+  # Consulta o gate puro (Messaging::SendGateService) — `automated` reusa o
+  # MESMO predicado que já barra opt-out/blocked em Base::SendOnChannelService,
+  # não duplica a decisão do que conta como "automatizado".
+  def send_gate_decision
+    Messaging::SendGateService.new(
+      channel: channel,
+      contact: contact,
+      automated: automated_message?,
+      now: Time.current
+    ).call
+  end
+
+  def send_via_channel
     should_send_template_message = template_params.present? || !message.conversation.can_reply?
     if should_send_template_message
       send_template_message
     else
       send_session_message
     end
+    # Contador diário só sobe quando o envio de fato sai (allow) — nunca em
+    # postpone/deny. Não-baileys nunca chega aqui armado (ban_risk: false).
+    Messaging::BaileysSendCounter.new(channel: channel).increment! if channel.baileys?
+  end
+
+  def handle_postponed_message(decision)
+    reschedule_count = gate_reschedule_count
+    if reschedule_count >= MAX_GATE_RESCHEDULES
+      deny_message!(:reschedule_limit_exceeded, last_reason: decision[:reason])
+    else
+      bump_gate_reschedule_count!(reschedule_count + 1)
+      ::SendReplyJob.set(wait_until: decision[:postpone_until]).perform_later(message.id)
+    end
+  end
+
+  def deny_message!(reason, last_reason: nil)
+    message.update!(status: :failed)
+    create_gate_denied_activity_message(reason, last_reason)
+  end
+
+  def create_gate_denied_activity_message(reason, last_reason)
+    activity_message_params = {
+      account_id: conversation.account_id,
+      inbox_id: conversation.inbox_id,
+      message_type: :activity,
+      content: gate_denied_content(reason, last_reason)
+    }
+    ::Conversations::ActivityMessageJob.perform_later(conversation, activity_message_params)
+  end
+
+  def gate_denied_content(reason, last_reason)
+    I18n.t('conversations.activity.antiban.message_not_sent', reason: gate_denied_reason_text(reason, last_reason))
+  end
+
+  def gate_denied_reason_text(reason, last_reason)
+    return I18n.t("conversations.activity.antiban.reasons.#{reason}") unless reason == :reschedule_limit_exceeded
+
+    I18n.t('conversations.activity.antiban.reasons.reschedule_limit_exceeded',
+           last_reason: I18n.t("conversations.activity.antiban.reasons.#{last_reason}"))
+  end
+
+  # `content_attributes` guarda payload de exibição por canal (email, items,
+  # image_type); `additional_attributes` é o balde de metadado interno de
+  # bookkeeping (ver Avatar::AvatarFromUrlJob) — é aqui que o teto de
+  # reagendamentos do gate vive.
+  def gate_reschedule_count
+    (message.additional_attributes || {})['antiban_reschedule_count'].to_i
+  end
+
+  def bump_gate_reschedule_count!(count)
+    attrs = (message.additional_attributes || {}).merge('antiban_reschedule_count' => count)
+    message.update!(additional_attributes: attrs)
   end
 
   def send_template_message
