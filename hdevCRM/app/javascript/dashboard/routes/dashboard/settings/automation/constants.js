@@ -684,6 +684,289 @@ export const AUTOMATIONS = {
       },
     ],
   },
+  // Deal ganho/perdido/movido de etapa nem sempre tem conversa vinculada (o listener
+  // ignora o evento quando `deal.conversation` estiver em branco), entao as condicoes
+  // aqui ficam restritas ao minimo que a conversa sempre expoe: status e etiquetas.
+  deal_created: {
+    conditions: [
+      {
+        key: 'status',
+        name: 'STATUS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_1,
+      },
+      {
+        key: 'labels',
+        name: 'LABELS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'ASSIGN_AGENT',
+      },
+      {
+        key: 'assign_team',
+        name: 'ASSIGN_TEAM',
+      },
+      {
+        key: 'remove_assigned_agent',
+        name: 'REMOVE_ASSIGNED_AGENT',
+      },
+      {
+        key: 'remove_assigned_team',
+        name: 'REMOVE_ASSIGNED_TEAM',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'SEND_EMAIL_TO_TEAM',
+      },
+      {
+        key: 'send_message',
+        name: 'SEND_MESSAGE',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'SEND_EMAIL_TRANSCRIPT',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'MUTE_CONVERSATION',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'SNOOZE_CONVERSATION',
+      },
+      {
+        key: 'pending_conversation',
+        name: 'PENDING_CONVERSATION',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'RESOLVE_CONVERSATION',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'SEND_WEBHOOK_EVENT',
+      },
+      {
+        key: 'send_attachment',
+        name: 'SEND_ATTACHMENT',
+      },
+    ],
+  },
+  deal_stage_changed: {
+    conditions: [
+      {
+        key: 'status',
+        name: 'STATUS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_1,
+      },
+      {
+        key: 'labels',
+        name: 'LABELS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'ASSIGN_AGENT',
+      },
+      {
+        key: 'assign_team',
+        name: 'ASSIGN_TEAM',
+      },
+      {
+        key: 'remove_assigned_agent',
+        name: 'REMOVE_ASSIGNED_AGENT',
+      },
+      {
+        key: 'remove_assigned_team',
+        name: 'REMOVE_ASSIGNED_TEAM',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'SEND_EMAIL_TO_TEAM',
+      },
+      {
+        key: 'send_message',
+        name: 'SEND_MESSAGE',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'SEND_EMAIL_TRANSCRIPT',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'MUTE_CONVERSATION',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'SNOOZE_CONVERSATION',
+      },
+      {
+        key: 'pending_conversation',
+        name: 'PENDING_CONVERSATION',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'RESOLVE_CONVERSATION',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'SEND_WEBHOOK_EVENT',
+      },
+      {
+        key: 'send_attachment',
+        name: 'SEND_ATTACHMENT',
+      },
+    ],
+  },
+  deal_won: {
+    conditions: [
+      {
+        key: 'status',
+        name: 'STATUS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_1,
+      },
+      {
+        key: 'labels',
+        name: 'LABELS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'ASSIGN_AGENT',
+      },
+      {
+        key: 'assign_team',
+        name: 'ASSIGN_TEAM',
+      },
+      {
+        key: 'remove_assigned_agent',
+        name: 'REMOVE_ASSIGNED_AGENT',
+      },
+      {
+        key: 'remove_assigned_team',
+        name: 'REMOVE_ASSIGNED_TEAM',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'SEND_EMAIL_TO_TEAM',
+      },
+      {
+        key: 'send_message',
+        name: 'SEND_MESSAGE',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'SEND_EMAIL_TRANSCRIPT',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'MUTE_CONVERSATION',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'SNOOZE_CONVERSATION',
+      },
+      {
+        key: 'pending_conversation',
+        name: 'PENDING_CONVERSATION',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'RESOLVE_CONVERSATION',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'SEND_WEBHOOK_EVENT',
+      },
+      {
+        key: 'send_attachment',
+        name: 'SEND_ATTACHMENT',
+      },
+    ],
+  },
+  deal_lost: {
+    conditions: [
+      {
+        key: 'status',
+        name: 'STATUS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_1,
+      },
+      {
+        key: 'labels',
+        name: 'LABELS',
+        inputType: 'multi_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'ASSIGN_AGENT',
+      },
+      {
+        key: 'assign_team',
+        name: 'ASSIGN_TEAM',
+      },
+      {
+        key: 'remove_assigned_agent',
+        name: 'REMOVE_ASSIGNED_AGENT',
+      },
+      {
+        key: 'remove_assigned_team',
+        name: 'REMOVE_ASSIGNED_TEAM',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'SEND_EMAIL_TO_TEAM',
+      },
+      {
+        key: 'send_message',
+        name: 'SEND_MESSAGE',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'SEND_EMAIL_TRANSCRIPT',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'MUTE_CONVERSATION',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'SNOOZE_CONVERSATION',
+      },
+      {
+        key: 'pending_conversation',
+        name: 'PENDING_CONVERSATION',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'RESOLVE_CONVERSATION',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'SEND_WEBHOOK_EVENT',
+      },
+      {
+        key: 'send_attachment',
+        name: 'SEND_ATTACHMENT',
+      },
+    ],
+  },
 };
 
 export const AUTOMATION_RULE_EVENTS = [
@@ -706,6 +989,22 @@ export const AUTOMATION_RULE_EVENTS = [
   {
     key: 'conversation_opened',
     value: 'CONVERSATION_OPENED',
+  },
+  {
+    key: 'deal_created',
+    value: 'DEAL_CREATED',
+  },
+  {
+    key: 'deal_stage_changed',
+    value: 'DEAL_STAGE_CHANGED',
+  },
+  {
+    key: 'deal_won',
+    value: 'DEAL_WON',
+  },
+  {
+    key: 'deal_lost',
+    value: 'DEAL_LOST',
   },
 ];
 

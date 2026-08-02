@@ -71,6 +71,19 @@ RSpec.describe Agency do
       agency.update!(status: 'suspended')
       expect(described_class.resolve_by_host('painel.agencia.com')).to be_nil
     end
+
+    it 'ignores agencies waiting for payment' do
+      agency.update!(status: 'pending_payment')
+      expect(described_class.resolve_by_host('painel.agencia.com')).to be_nil
+    end
+  end
+
+  describe '#apply_branding' do
+    it 'is a no-op while the agency is waiting for payment' do
+      agency = create(:agency, status: 'pending_payment', brand_name: 'Marca Própria')
+      config = { 'BRAND_NAME' => 'Hdev CRM' }
+      expect(agency.apply_branding(config)).to eq(config)
+    end
   end
 
   describe '#global_config_overrides' do

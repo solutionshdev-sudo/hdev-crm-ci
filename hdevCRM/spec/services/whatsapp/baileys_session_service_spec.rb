@@ -112,4 +112,25 @@ RSpec.describe Whatsapp::BaileysSessionService do
       expect(channel.reload.provider_config['last_disconnect_reason']).to eq('logged_out')
     end
   end
+
+  describe 'event dispatch' do
+    before do
+      allow(Rails.configuration.dispatcher).to receive(:dispatch)
+    end
+
+    it 'dispatches WHATSAPP_CONNECTION_CHANGED when the connection state changes' do
+      service.sync_state!({ status: 'connected' })
+
+      expect(Rails.configuration.dispatcher).to have_received(:dispatch)
+        .with(described_class::WHATSAPP_CONNECTION_CHANGED, kind_of(Time), inbox: channel.inbox, connection_state: 'connected', previous_state: nil)
+    end
+
+    it 'dispatches WHATSAPP_CONNECTION_CHANGED only once when the same state is processed twice' do
+      service.sync_state!({ status: 'connected' })
+      service.sync_state!({ status: 'connected' })
+
+      expect(Rails.configuration.dispatcher).to have_received(:dispatch)
+        .with(described_class::WHATSAPP_CONNECTION_CHANGED, kind_of(Time), anything).once
+    end
+  end
 end

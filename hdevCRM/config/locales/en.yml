@@ -355,6 +355,18 @@ en:
         not_sent_due_to_messaging_window: 'CSAT survey not sent due to outgoing message restrictions'
       auto_resolve:
         not_sent_due_to_messaging_window: 'Auto-resolve message not sent due to outgoing message restrictions'
+      opt_out:
+        message_not_sent: 'Automated message not sent: contact opted out'
+        contact_opted_out: 'Contact opted out of automated messages'
+      antiban:
+        message_not_sent: 'Message not sent: %{reason}'
+        message_delayed: 'Message delayed by sending limits; it will be sent automatically at %{time}'
+        reasons:
+          opted_out: 'contact opted out of automated messages'
+          outside_window: 'outside allowed sending hours'
+          warm_up_limit: 'daily warm-up limit reached for a newly paired number'
+          daily_cap: 'daily sending cap reached'
+          reschedule_limit_exceeded: 'gave up after 3 reschedules (last reason: %{last_reason})'
       muted: '%{user_name} has muted the conversation'
       unmuted: '%{user_name} has unmuted the conversation'
       auto_resolution_message: 'Resolving the conversation as it has been inactive for a while. Please start a new conversation if you need further assistance.'

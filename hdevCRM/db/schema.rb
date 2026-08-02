@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_02_000001) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -75,6 +75,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.jsonb "settings", default: {}
     t.bigint "feature_flags_ext_1", default: 0, null: false
     t.bigint "agency_id"
+    t.bigint "ai_extra_tokens", default: 0, null: false
     t.index ["agency_id"], name: "index_accounts_on_agency_id"
     t.index ["status"], name: "index_accounts_on_status"
   end
@@ -132,6 +133,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.jsonb "ssl_settings", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "ai_extra_tokens", default: 0, null: false
     t.index ["custom_domain"], name: "index_agencies_on_custom_domain", unique: true
     t.index ["slug"], name: "index_agencies_on_slug", unique: true
     t.index ["status"], name: "index_agencies_on_status"
@@ -203,6 +205,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.index ["account_id"], name: "index_agent_sessions_on_account_id"
     t.index ["assistant_id"], name: "index_agent_sessions_on_assistant_id"
     t.index ["user_id"], name: "index_agent_sessions_on_user_id"
+  end
+
+  create_table "ai_credit_events", force: :cascade do |t|
+    t.string "owner_type", null: false
+    t.bigint "owner_id", null: false
+    t.bigint "delta", null: false
+    t.integer "reason", default: 0, null: false
+    t.string "stripe_event_id"
+    t.string "description"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id"], name: "index_ai_credit_events_on_owner_type_and_owner_id"
+    t.index ["stripe_event_id"], name: "index_ai_credit_events_on_stripe_event_id", unique: true, where: "(stripe_event_id IS NOT NULL)"
   end
 
   create_table "ai_usage_events", force: :cascade do |t|
@@ -846,12 +862,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.string "country_code", default: ""
     t.boolean "blocked", default: false, null: false
     t.bigint "company_id"
+    t.boolean "automation_opted_out", default: false, null: false
     t.index "lower((email)::text), account_id", name: "index_contacts_on_lower_email_account_id"
     t.index ["account_id", "contact_type"], name: "index_contacts_on_account_id_and_contact_type"
     t.index ["account_id", "email", "phone_number", "identifier"], name: "index_contacts_on_nonempty_fields", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
     t.index ["account_id", "last_activity_at"], name: "index_contacts_on_account_id_and_last_activity_at", order: { last_activity_at: "DESC NULLS LAST" }
     t.index ["account_id"], name: "index_contacts_on_account_id"
     t.index ["account_id"], name: "index_resolved_contact_account_id", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
+    t.index ["automation_opted_out"], name: "index_contacts_on_automation_opted_out"
     t.index ["blocked"], name: "index_contacts_on_blocked"
     t.index ["company_id"], name: "index_contacts_on_company_id"
     t.index ["email", "account_id"], name: "uniq_email_per_account_contact", unique: true
@@ -1403,6 +1421,26 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "plans", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "plan_type", default: 0, null: false
+    t.integer "price_cents", default: 0, null: false
+    t.string "currency", default: "brl", null: false
+    t.string "billing_interval", default: "month", null: false
+    t.string "stripe_price_id"
+    t.integer "max_agents"
+    t.integer "max_inboxes"
+    t.integer "max_baileys_instances"
+    t.integer "max_client_accounts"
+    t.bigint "ai_monthly_tokens"
+    t.boolean "active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["plan_type", "active", "position"], name: "index_plans_on_plan_type_and_active_and_position"
+    t.index ["stripe_price_id"], name: "index_plans_on_stripe_price_id", unique: true, where: "(stripe_price_id IS NOT NULL)"
+  end
+
   create_table "platform_app_permissibles", force: :cascade do |t|
     t.bigint "platform_app_id", null: false
     t.string "permissible_type", null: false
@@ -1531,6 +1569,35 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
     t.string "description"
     t.float "resolution_time_threshold"
     t.index ["account_id"], name: "index_sla_policies_on_account_id"
+  end
+
+  create_table "stripe_webhook_events", force: :cascade do |t|
+    t.string "stripe_event_id", null: false
+    t.string "event_type", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "processed_at"
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status", "created_at"], name: "index_stripe_webhook_events_on_status_and_created_at"
+    t.index ["stripe_event_id"], name: "index_stripe_webhook_events_on_stripe_event_id", unique: true
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.string "owner_type", null: false
+    t.bigint "owner_id", null: false
+    t.bigint "plan_id", null: false
+    t.string "stripe_customer_id"
+    t.string "stripe_subscription_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "current_period_end"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id"], name: "index_subscriptions_on_owner_type_and_owner_id", unique: true
+    t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
+    t.index ["stripe_customer_id"], name: "index_subscriptions_on_stripe_customer_id"
+    t.index ["stripe_subscription_id"], name: "index_subscriptions_on_stripe_subscription_id", unique: true, where: "(stripe_subscription_id IS NOT NULL)"
   end
 
   create_table "taggings", id: :serial, force: :cascade do |t|
@@ -1674,6 +1741,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_27_000008) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "inboxes", "portals"
+  add_foreign_key "subscriptions", "plans"
   add_foreign_key "user_sessions", "users"
   create_trigger("accounts_after_insert_row_tr", :generated => true, :compatibility => 1).
       on("accounts").

@@ -3,6 +3,8 @@
 # update_column: update! would re-run validate_provider_config and fire
 # after_update_commit hooks for what is effectively ephemeral state.
 class Whatsapp::BaileysSessionService
+  include Events::Types
+
   # Sinaliza pro painel que a instância não existe no microserviço: a UI mostra
   # "sessão parada" e o botão de QR resolve, em vez de erro de serviço fora do ar.
   NOT_PROVISIONED = 'not_provisioned'.freeze
@@ -79,9 +81,36 @@ class Whatsapp::BaileysSessionService
   # Carimba a hora sempre que o estado muda: é o que o painel mostra como
   # "última atualização" do selo de conexão.
   def write_state(updates)
+    previous_state = channel.provider_config['connection_state']
+    previous_jid = channel.provider_config['connected_jid']
     updates = updates.merge('connection_state_updated_at' => Time.current.iso8601)
+    updates['paired_at'] = Time.current.iso8601 if newly_paired?(updates, previous_jid)
     # rubocop:disable Rails/SkipsModelValidations
     channel.update_column(:provider_config, channel.provider_config.merge(updates))
     # rubocop:enable Rails/SkipsModelValidations
+
+    dispatch_connection_changed_event(updates['connection_state'], previous_state)
+  end
+
+  # Primeira transição pra "connected" (o baileys-service NUNCA emite "open" —
+  # `InstanceStatus` em baileys-service/src/types.ts é connecting|pairing|qr|
+  # connected|disconnected; o `connection === 'open'` interno do Baileys vira
+  # "connected" antes de chegar aqui, ver instance.ts) com um connected_jid
+  # novo = pareamento novo (ou re-pareamento com número diferente) — zera o
+  # relógio do warm-up do Messaging::SendGateService. Reconectar com o MESMO
+  # jid (drop de rede, restart do container baileys) não reseta nada.
+  def newly_paired?(updates, previous_jid)
+    updates['connection_state'] == 'connected' && updates['connected_jid'].present? && updates['connected_jid'] != previous_jid
+  end
+
+  # update_column pula os callbacks do model, então o dispatch tem que ser
+  # explícito aqui — e só quando o estado de fato muda (o polling da aba
+  # Conexão chama isso até 20x por minuto).
+  def dispatch_connection_changed_event(connection_state, previous_state)
+    return if connection_state.blank? || connection_state == previous_state
+
+    Rails.configuration.dispatcher.dispatch(WHATSAPP_CONNECTION_CHANGED, Time.zone.now, inbox: channel.inbox,
+                                                                                        connection_state: connection_state,
+                                                                                        previous_state: previous_state)
   end
 end

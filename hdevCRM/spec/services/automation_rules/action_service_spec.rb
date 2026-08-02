@@ -217,5 +217,96 @@ RSpec.describe AutomationRules::ActionService do
         expect(conversation.reload.assignee).to eq(agent)
       end
     end
+
+    describe '#perform with create_deal action' do
+      let!(:pipeline) { create(:deal_pipeline, account: account) }
+      let!(:stage) { create(:deal_stage, account: account, deal_pipeline: pipeline, position: 1) }
+
+      before do
+        rule.actions = [{ action_name: 'create_deal', action_params: [stage.id] }]
+        rule.save!
+      end
+
+      it 'creates a deal linked to the conversation and contact in the given stage' do
+        described_class.new(rule, account, conversation).perform
+
+        deal = account.deals.last
+        expect(deal.conversation).to eq(conversation)
+        expect(deal.contact).to eq(conversation.contact)
+        expect(deal.deal_stage).to eq(stage)
+        expect(deal.deal_pipeline).to eq(pipeline)
+      end
+
+      it 'does not duplicate the deal if an open deal already exists for the conversation' do
+        expect do
+          described_class.new(rule, account, conversation).perform
+          described_class.new(rule, account, conversation).perform
+        end.to change(Deal, :count).by(1)
+      end
+
+      it 'does not create a deal if the conversation has no contact' do
+        allow(conversation).to receive(:contact).and_return(nil)
+
+        expect do
+          described_class.new(rule, account, conversation).perform
+        end.not_to change(Deal, :count)
+      end
+
+      context 'without an explicit stage id' do
+        before do
+          rule.actions = [{ action_name: 'create_deal', action_params: [] }]
+          rule.save!
+        end
+
+        it 'falls back to the first stage of the account default pipeline' do
+          described_class.new(rule, account, conversation).perform
+
+          deal = account.deals.last
+          expect(deal.deal_pipeline).to eq(pipeline)
+          expect(deal.deal_stage).to eq(pipeline.deal_stages.order(:position).first)
+        end
+      end
+    end
+
+    describe '#perform with move_deal_stage action' do
+      let!(:pipeline) { create(:deal_pipeline, account: account) }
+      let!(:from_stage) { create(:deal_stage, account: account, deal_pipeline: pipeline, position: 1) }
+      let!(:to_stage) { create(:deal_stage, account: account, deal_pipeline: pipeline, position: 2) }
+      let!(:deal) do
+        create(:deal, account: account, deal_pipeline: pipeline, deal_stage: from_stage,
+                      contact: conversation.contact, conversation: conversation)
+      end
+
+      before do
+        rule.actions = [{ action_name: 'move_deal_stage', action_params: [to_stage.id] }]
+        rule.save!
+      end
+
+      it 'moves the open deal linked to the conversation to the given stage' do
+        described_class.new(rule, account, conversation).perform
+
+        expect(deal.reload.deal_stage).to eq(to_stage)
+      end
+
+      it 'does not move the deal if the target stage belongs to a different pipeline' do
+        other_pipeline = create(:deal_pipeline, account: account)
+        other_stage = create(:deal_stage, account: account, deal_pipeline: other_pipeline)
+        rule.actions = [{ action_name: 'move_deal_stage', action_params: [other_stage.id] }]
+        rule.save!
+
+        described_class.new(rule, account, conversation).perform
+
+        expect(deal.reload.deal_stage).to eq(from_stage)
+      end
+
+      it 'does nothing if there is no deal for the conversation' do
+        other_conversation = create(:conversation, account: account)
+
+        expect do
+          described_class.new(rule, account, other_conversation).perform
+        end.not_to change(Deal, :count)
+        expect(deal.reload.deal_stage).to eq(from_stage)
+      end
+    end
   end
 end

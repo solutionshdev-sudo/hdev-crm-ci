@@ -35,12 +35,17 @@ class Agency < ApplicationRecord
   has_many :agency_users, dependent: :destroy_async
   has_many :users, through: :agency_users
   has_many :ai_usage_events, dependent: :nullify
+  has_one :subscription, as: :owner, dependent: :destroy_async
+  has_many :ai_credit_events, as: :owner, dependent: :destroy_async
 
   has_one_attached :logo
   has_one_attached :logo_dark
   has_one_attached :logo_thumbnail
 
-  enum :status, { active: 0, suspended: 1 }
+  # pending_payment: criada pelo fluxo de venda, aguardando o webhook do Stripe.
+  # apply_branding exige active?, então pending também cai no brand da plataforma.
+  # Valores só podem ser adicionados no fim (enum por posição no banco).
+  enum :status, { active: 0, suspended: 1, pending_payment: 2 }
 
   before_validation :normalize_domain
   before_validation :ensure_slug

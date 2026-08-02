@@ -103,4 +103,10 @@ module Redis::RedisKeys
 
   ## Account Email Rate Limiting
   ACCOUNT_OUTBOUND_EMAIL_COUNT_KEY = 'OUTBOUND_EMAIL_COUNT::%<account_id>d::%<date>s'.freeze
+
+  ## Baileys anti-ban (Motor Fase 2 - Messaging::SendGateService)
+  # Contador diario de envios por instancia; INCR + expire 48h, mesmo padrao do
+  # ACCOUNT_OUTBOUND_EMAIL_COUNT_KEY acima. Formato fixado pelo plano (lowercase,
+  # ':' em vez de '::') -- nao alinhar com a convencao do resto do arquivo.
+  BAILEYS_DAILY_SENT_COUNT = 'baileys:sent:%<instance_id>s:%<date>s'.freeze
 end

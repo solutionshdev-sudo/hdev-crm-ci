@@ -205,6 +205,13 @@ describe('useAutomation', () => {
     automationTypes.conversation_updated = { conditions: [] };
     automationTypes.conversation_opened = { conditions: [] };
     automationTypes.conversation_resolved = { conditions: [] };
+    // Eventos de deal ficam fora da lista de manifesto (ver comentario em
+    // constants.js): condicoes restritas a status/labels de proposito, entao
+    // zeramos aqui igual ao conversation_resolved pra manter a asserção final.
+    automationTypes.deal_created = { conditions: [] };
+    automationTypes.deal_stage_changed = { conditions: [] };
+    automationTypes.deal_won = { conditions: [] };
+    automationTypes.deal_lost = { conditions: [] };
 
     automationHelper.generateCustomAttributeTypes.mockReturnValue([]);
     automationHelper.generateCustomAttributes.mockReturnValue([]);
