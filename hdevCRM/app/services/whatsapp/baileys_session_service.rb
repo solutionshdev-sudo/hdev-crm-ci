@@ -82,12 +82,22 @@ class Whatsapp::BaileysSessionService
   # "última atualização" do selo de conexão.
   def write_state(updates)
     previous_state = channel.provider_config['connection_state']
+    previous_jid = channel.provider_config['connected_jid']
     updates = updates.merge('connection_state_updated_at' => Time.current.iso8601)
+    updates['paired_at'] = Time.current.iso8601 if newly_paired?(updates, previous_jid)
     # rubocop:disable Rails/SkipsModelValidations
     channel.update_column(:provider_config, channel.provider_config.merge(updates))
     # rubocop:enable Rails/SkipsModelValidations
 
     dispatch_connection_changed_event(updates['connection_state'], previous_state)
+  end
+
+  # Primeira transição pra "open" com um connected_jid novo = pareamento novo
+  # (ou re-pareamento com número diferente) — zera o relógio do warm-up do
+  # Messaging::SendGateService. Reconectar com o MESMO jid (drop de rede,
+  # restart do container baileys) não reseta nada.
+  def newly_paired?(updates, previous_jid)
+    updates['connection_state'] == 'open' && updates['connected_jid'].present? && updates['connected_jid'] != previous_jid
   end
 
   # update_column pula os callbacks do model, então o dispatch tem que ser
