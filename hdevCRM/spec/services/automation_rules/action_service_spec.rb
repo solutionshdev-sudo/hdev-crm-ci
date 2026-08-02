@@ -304,7 +304,8 @@ RSpec.describe AutomationRules::ActionService do
 
         expect do
           described_class.new(rule, account, other_conversation).perform
-        end.not_to raise_error
+        end.not_to change(Deal, :count)
+        expect(deal.reload.deal_stage).to eq(from_stage)
       end
     end
   end

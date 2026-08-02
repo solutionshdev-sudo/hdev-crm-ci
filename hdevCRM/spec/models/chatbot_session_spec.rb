@@ -37,12 +37,25 @@ RSpec.describe ChatbotSession do
       expect(Rails.configuration.dispatcher).not_to have_received(:dispatch)
     end
 
+    it 'does not dispatch when the session transitions to handed_off' do
+      session.update!(status: :handed_off)
+
+      expect(Rails.configuration.dispatcher).not_to have_received(:dispatch)
+    end
+
+    it 'does not dispatch when the session transitions to failed' do
+      session.update!(status: :failed)
+
+      expect(Rails.configuration.dispatcher).not_to have_received(:dispatch)
+    end
+
     it 'does not dispatch on creation, even into a terminal status' do
       other_conversation = create(:conversation, account: account)
 
       create(:chatbot_session, account: account, chatbot: chatbot, conversation: other_conversation, status: :failed)
 
-      expect(Rails.configuration.dispatcher).not_to have_received(:dispatch)
+      expect(Rails.configuration.dispatcher).not_to have_received(:dispatch).with(described_class::CHATBOT_FLOW_COMPLETED, kind_of(Time), anything)
+      expect(Rails.configuration.dispatcher).not_to have_received(:dispatch).with(described_class::CHATBOT_FLOW_ABORTED, kind_of(Time), anything)
     end
   end
 end

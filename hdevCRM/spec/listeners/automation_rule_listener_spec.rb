@@ -287,7 +287,7 @@ describe AutomationRuleListener do
       it 'does not call AutomationRules::ActionService if the deal has no conversation' do
         deal_without_conversation = create(:deal, account: account)
         event_without_conversation = Events::Base.new('deal_created', Time.zone.now,
-                                                        { deal: deal_without_conversation, changed_attributes: {} })
+                                                      { deal: deal_without_conversation, changed_attributes: {} })
         allow(condition_match).to receive(:present?).and_return(true)
 
         listener.deal_created(event_without_conversation)

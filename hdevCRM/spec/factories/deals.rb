@@ -14,8 +14,8 @@ FactoryBot.define do
     stage_type { :open }
 
     after(:build) do |stage|
-      stage.deal_pipeline ||= create(:deal_pipeline)
-      stage.account ||= stage.deal_pipeline.account
+      stage.account ||= create(:account)
+      stage.deal_pipeline ||= create(:deal_pipeline, account: stage.account)
     end
 
     trait :won do

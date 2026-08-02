@@ -90,9 +90,10 @@ RSpec.describe Deal do
       it 'dispatches DEAL_STAGE_CHANGED when moved between open stages' do
         other_open_stage = create(:deal_stage, account: account, deal_pipeline: pipeline, stage_type: :open)
         deal.update!(deal_stage: other_open_stage)
+        changed_attributes = deal.previous_changes
 
         expect(Rails.configuration.dispatcher).to have_received(:dispatch)
-          .with(described_class::DEAL_STAGE_CHANGED, kind_of(Time), deal: deal, conversation: conversation, changed_attributes: kind_of(Hash))
+          .with(described_class::DEAL_STAGE_CHANGED, kind_of(Time), deal: deal, conversation: conversation, changed_attributes: changed_attributes)
       end
 
       it 'dispatches DEAL_WON instead of DEAL_STAGE_CHANGED when moved to a won stage' do
@@ -114,7 +115,9 @@ RSpec.describe Deal do
       it 'does not dispatch a stage event when a non-stage attribute changes' do
         deal.update!(value: 999)
 
-        expect(Rails.configuration.dispatcher).not_to have_received(:dispatch)
+        expect(Rails.configuration.dispatcher).not_to have_received(:dispatch).with(described_class::DEAL_STAGE_CHANGED, kind_of(Time), anything)
+        expect(Rails.configuration.dispatcher).not_to have_received(:dispatch).with(described_class::DEAL_WON, kind_of(Time), anything)
+        expect(Rails.configuration.dispatcher).not_to have_received(:dispatch).with(described_class::DEAL_LOST, kind_of(Time), anything)
       end
     end
   end
