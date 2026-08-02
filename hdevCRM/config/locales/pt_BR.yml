@@ -344,6 +344,7 @@ pt_BR:
         contact_opted_out: 'Contato optou por não receber mensagens automáticas'
       antiban:
         message_not_sent: 'Mensagem não enviada: %{reason}'
+        message_delayed: 'Mensagem atrasada por limites de envio; será enviada automaticamente às %{time}'
         reasons:
           opted_out: 'contato optou por não receber mensagens automáticas'
           outside_window: 'fora do horário permitido de envio'

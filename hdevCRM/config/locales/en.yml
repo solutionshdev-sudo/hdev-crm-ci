@@ -360,6 +360,7 @@ en:
         contact_opted_out: 'Contact opted out of automated messages'
       antiban:
         message_not_sent: 'Message not sent: %{reason}'
+        message_delayed: 'Message delayed by sending limits; it will be sent automatically at %{time}'
         reasons:
           opted_out: 'contact opted out of automated messages'
           outside_window: 'outside allowed sending hours'

@@ -51,9 +51,25 @@ class Whatsapp::SendOnWhatsappService < Base::SendOnChannelService
     if reschedule_count >= MAX_GATE_RESCHEDULES
       deny_message!(:reschedule_limit_exceeded, last_reason: decision[:reason])
     else
+      notify_human_postponed(decision[:postpone_until]) if reschedule_count.zero? && !automated_message?
       bump_gate_reschedule_count!(reschedule_count + 1)
       ::SendReplyJob.set(wait_until: decision[:postpone_until]).perform_later(message.id)
     end
+  end
+
+  # Cap diário vale pra mensagem humana também (o número banido não distingue
+  # quem mandou) — mas só avisa uma vez, no PRIMEIRO reagendamento (não a cada
+  # retry), pra não spammar a conversa. Postpone de mensagem automatizada fica
+  # silencioso de propósito: é volume esperado do motor, não uma exceção que o
+  # agente precise ver.
+  def notify_human_postponed(postpone_until)
+    activity_message_params = {
+      account_id: conversation.account_id,
+      inbox_id: conversation.inbox_id,
+      message_type: :activity,
+      content: I18n.t('conversations.activity.antiban.message_delayed', time: I18n.l(postpone_until, format: :short))
+    }
+    ::Conversations::ActivityMessageJob.perform_later(conversation, activity_message_params)
   end
 
   def deny_message!(reason, last_reason: nil)

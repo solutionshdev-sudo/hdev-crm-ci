@@ -69,28 +69,55 @@ class Messaging::SendGateService
     today_count >= daily_cap
   end
 
+  # Leitura simples — não reserva, não trava. Sob concorrência de workers
+  # Sidekiq, duas checagens podem ler o mesmo total antes de qualquer
+  # increment! rodar: o cap é um teto MOLE, limitado pela concorrência
+  # configurada, não uma garantia atômica (decisão do controller — nenhuma
+  # reserva atômica foi construída de propósito). O `sendChain` do
+  # baileys-service serializa o envio real por instância (1s + jitter), então
+  # o estouro prático fica limitado a poucas mensagens por rodada de workers
+  # concorrentes, não a uma corrida generalizada.
   def today_count
     @today_count ||= Messaging::BaileysSendCounter.new(channel: channel).count(now: now)
   end
 
+  # `daily_send_cap: 0` no provider_config é válido e intencional: vira kill
+  # switch (today_count >= 0 é sempre verdadeiro, então todo envio — automatizado
+  # ou humano — cai em postpone, e depois de 3 reagendamentos em deny).
   def daily_cap
     configured = channel.provider_config['daily_send_cap']
     configured.present? ? configured.to_i : DEFAULT_DAILY_CAP
   end
 
+  # `|| WARM_UP_SCHEDULE.last` cobre idade negativa (paired_at no futuro por
+  # clock skew entre containers): sem isso, `find` devolveria nil e `.last`
+  # explodiria em NoMethodError — cai no degrau mais restrito (20/dia) em vez
+  # de derrubar o job.
   def warm_up_limit
-    WARM_UP_SCHEDULE.find { |min_age, _limit| pairing_age_days >= min_age }.last
+    (WARM_UP_SCHEDULE.find { |min_age, _limit| pairing_age_days >= min_age } || WARM_UP_SCHEDULE.last).last
   end
 
+  # Idade do pareamento em dias completos. `paired_at` é o carimbo novo
+  # (BaileysSessionService#write_state, só a partir desta feature). Canal
+  # pareado ANTES dela existir não tem `paired_at` mas TEM `connected_jid` —
+  # pra esse caso cai pro `created_at` do canal como epoch (decisão do
+  # controller: evita prender pra sempre um número já estabelecido no teto de
+  # 20/dia). Só um canal que nunca pareou (sem connected_jid) fica no
+  # age = 0 estrito.
   def pairing_age_days
-    return 0 if paired_at.blank?
+    epoch = paired_at || legacy_pairing_epoch
+    return 0 if epoch.blank?
 
-    ((now - paired_at) / 1.day).floor
+    ((now - epoch) / 1.day).floor
   end
 
   def paired_at
     raw = channel.provider_config['paired_at']
     Time.zone.parse(raw) if raw.present?
+  end
+
+  def legacy_pairing_epoch
+    channel.created_at if channel.provider_config['connected_jid'].present?
   end
 
   # Próxima abertura da janela (7h local). `skip_today: true` pula direto pro
