@@ -5,6 +5,10 @@ class Whatsapp::IncomingMessageBaseService
   include ::Whatsapp::IncomingMessageServiceHelpers
   include ::Whatsapp::IncomingMessageIdentifierHelper
 
+  # Opt-out (Fase 2 §2.2): texto inbound inteiro (ignorando espaços e pontuação final)
+  # igual a uma das palavras de saída, em qualquer combinação de maiúsculas/minúsculas.
+  OPT_OUT_REGEX = /\A\s*(stop|pare?|parar|sair|cancelar|descadastrar|unsubscribe)\s*[!.]*\s*\z/i
+
   pattr_initialize [:inbox!, :params!, :outgoing_echo]
 
   def perform
@@ -42,8 +46,33 @@ class Whatsapp::IncomingMessageBaseService
 
     ActiveRecord::Base.transaction do
       set_conversation
+      # STOP precisa rodar antes de create_messages: é o create_messages que salva a
+      # mensagem e dispara (via after_create_commit) o evento assíncrono que aciona o
+      # chatbot. Bloqueando o contato aqui, a resposta automática do bot já nasce
+      # retida pelo guard de opt-out em Base::SendOnChannelService#perform.
+      detect_opt_out! unless outgoing_echo
       create_messages
     end
+  end
+
+  # Opt-out (Fase 2 §2.2): o texto inbound bate com o STOP_REGEX -> contato sai de todos
+  # os envios automatizados. `@contact.blocked?` já é falso aqui (checado em process_messages
+  # antes da transaction), então não precisamos guardar contra bloqueio duplicado.
+  def detect_opt_out!
+    return unless message_content(messages_data.first).to_s.match?(OPT_OUT_REGEX)
+
+    @contact.update!(blocked: true)
+    create_opt_out_activity_message
+  end
+
+  def create_opt_out_activity_message
+    activity_message_params = {
+      account_id: @conversation.account_id,
+      inbox_id: @conversation.inbox_id,
+      message_type: :activity,
+      content: I18n.t('conversations.activity.opt_out.contact_opted_out')
+    }
+    ::Conversations::ActivityMessageJob.perform_later(@conversation, activity_message_params)
   end
 
   def process_statuses
