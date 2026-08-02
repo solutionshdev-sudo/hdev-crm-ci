@@ -103,8 +103,10 @@ de chutar a assinatura.
 
 ## CI (`.github/workflows/ci.yml`)
 
-Na raiz do repo, fora de `hdevCRM/`. Três jobs: `rspec`, `lint`
-(rubocop + eslint) e `vitest`. Roda em push na `main`, em PR e sob demanda.
+Na raiz do repo, fora de `hdevCRM/`. Quatro jobs: `rspec`, `lint`
+(rubocop + eslint), `vitest` e `baileys` (desde 02/08 — `tsc --noEmit` +
+`vitest run` do microserviço, node 22 = imagem de produção). Roda em push na
+`main`, em PR e sob demanda.
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.

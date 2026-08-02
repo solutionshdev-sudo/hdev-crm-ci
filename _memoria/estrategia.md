@@ -11,8 +11,9 @@ Chatwoot antes de abrir pra agências.
 
 ## Infra de desenvolvimento (28/07)
 
-**Existe CI**: `.github/workflows/ci.yml`, na raiz do repo. Três jobs — `rspec`,
-`lint` (rubocop + eslint) e `vitest`. Isso muda como o trabalho é planejado:
+**Existe CI**: `.github/workflows/ci.yml`, na raiz do repo. Quatro jobs — `rspec`,
+`lint` (rubocop + eslint), `vitest` e `baileys` (desde 02/08, cobre o
+microserviço: tsc + 19 testes vitest, node 22). Isso muda como o trabalho é planejado:
 antes o código saía daqui sem nunca ter sido executado e a primeira verificação
 era o deploy. Agora o Ruby é verificado antes, e o JS roda direto nesta máquina
 (`corepack pnpm`). Detalhes de uso no `CLAUDE.md`.
@@ -340,10 +341,27 @@ bloqueia), `Messaging::SendGateService` (opt-out → janela 7h-22h fuso da
 conta → warm-up por idade de pareamento → cap diário 300) com jitter de até
 15min no postpone, e o baileys-service TESTADO pela primeira vez (19 vitest +
 tsc, job `baileys` novo no CI). Veto adia ou registra com nota, nunca perde
-mensagem em silêncio; retida/negada fica `failed`. **Pendente: deploy (a
-migration roda no rebuild do app; o container baileys não mudou) + prova
-nível 3 (chip local, espaçamento) e nível 4 (PARAR + janela em produção,
-§2.6). A Fase 6 (disparo em massa) só abre com a F2 PROVADA.**
+mensagem em silêncio; retida/negada fica `failed`. **Deploy feito em 02/08 — número
+conectado** (log: versão WA buscada em runtime funcionando + LID session OK;
+2 erros benignos de JSON no backlog offline, upstream da lib Baileys, sem
+crash). **Provas da F2 ADIADAS e adaptadas à realidade (02/08):** o teste
+"PARAR cala o bot" precisa de bot ativo e NÃO há chave de IA configurada
+ainda; o teste da janela de horário também fica pra depois. Regra combinada:
+o que der pra testar por script, o Claude escreve e testa direto; o que for
+manual, o Harvey testa com roteiro do Claude. **A Fase 6 (disparo em massa)
+só abre com a F2 PROVADA.**
+
+**Bug em produção reportado em 02/08 — eco do celular:** mensagem que o
+Harvey manda pro cliente DIRETO pelo WhatsApp do celular NÃO aparece no CRM
+(só as enviadas pelo CRM e as recebidas do cliente carregam). **O conserto já
+existe e está parado:** PR #11 (`feat/baileys-eco-confiabilidade`, verde
+desde 31/07) implementa exatamente o eco + retry longo do webhook +
+placeholders; exige merge + deploy dos DOIS containers, env
+`HISTORY_SYNC_MAX_AGE_HOURS`, e o backfill de histórico exige re-parear o
+chip (detalhes na memória do Claude, `baileys-eco-historico-pr11`).
+**Próximo passo da trilha: analisar o PR #11 contra a main atual — a Fase 2
+mexeu no incoming do Baileys (`process_messages`/helpers), então pode haver
+conflito real, não só textual — e só então mergear, deployar e testar.**
 
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
