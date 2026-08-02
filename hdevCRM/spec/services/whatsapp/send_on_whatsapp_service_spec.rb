@@ -381,4 +381,182 @@ describe Whatsapp::SendOnWhatsappService do
       end
     end
   end
+
+  # Fase 2 (motor anti-ban, plano §2.3): a decisão em si mora em
+  # Messaging::SendGateService, que já tem spec próprio
+  # (spec/services/messaging/send_gate_service_spec.rb). Aqui cobrimos só a
+  # orquestração em perform_reply — o que este serviço FAZ com cada decisão
+  # (allow/postpone/deny) — mockando o gate pra não re-testá-lo.
+  describe '#perform (antiban gate enforcement)' do
+    let(:account) { create(:account) }
+    let(:whatsapp_channel) do
+      create(:channel_whatsapp,
+             provider: 'baileys',
+             provider_config: { 'instance_id' => 'instance-1', 'webhook_secret' => 'secret' },
+             validate_provider_config: false,
+             sync_templates: false,
+             account: account)
+    end
+    let(:contact) { create(:contact, account: account) }
+    let(:contact_inbox) { create(:contact_inbox, contact: contact, inbox: whatsapp_channel.inbox, source_id: '5511999999999') }
+    let(:conversation) do
+      create(:conversation, account: account, inbox: whatsapp_channel.inbox, contact: contact, contact_inbox: contact_inbox)
+    end
+    let(:gate) { instance_double(Messaging::SendGateService) }
+
+    def perform(message)
+      described_class.new(message: message).perform
+    end
+
+    before do
+      allow(Messaging::SendGateService).to receive(:new).and_return(gate)
+      allow(Conversations::ActivityMessageJob).to receive(:perform_later)
+    end
+
+    context 'when the gate allows the message' do
+      let(:message) { create(:message, conversation: conversation, message_type: :outgoing, content: 'hi', account: account) }
+      let(:baileys_client) { instance_double(Whatsapp::BaileysClient) }
+      let(:counter) { instance_double(Messaging::BaileysSendCounter, increment!: 1) }
+
+      before do
+        allow(gate).to receive(:call).and_return(Messaging::SendGateService::ALLOW)
+        allow(Whatsapp::BaileysClient).to receive(:new).and_return(baileys_client)
+        allow(baileys_client).to receive(:send_message).and_return({ 'messages' => [{ 'id' => 'wa-id' }] })
+        allow(Messaging::BaileysSendCounter).to receive(:new).with(channel: whatsapp_channel).and_return(counter)
+      end
+
+      it 'sends through the channel, persists the source id and bumps the daily counter' do
+        perform(message)
+
+        expect(message.reload.source_id).to eq('wa-id')
+        expect(counter).to have_received(:increment!)
+      end
+    end
+
+    context 'when the gate postpones an automated message' do
+      let(:message) do
+        create(:message, conversation: conversation, message_type: :outgoing, sender: nil, content: 'hi', account: account)
+      end
+      let(:postpone_until) { 3.hours.from_now }
+      let(:configured_job) { instance_double(ActiveJob::ConfiguredJob, perform_later: true) }
+
+      before do
+        allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :outside_window })
+        allow(SendReplyJob).to receive(:set).with(wait_until: postpone_until).and_return(configured_job)
+      end
+
+      it 'reschedules the job for the postponed time, silently (no note for automated sends)' do
+        perform(message)
+
+        expect(configured_job).to have_received(:perform_later).with(message.id)
+        expect(message.reload.additional_attributes['antiban_reschedule_count']).to eq(1)
+        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when the gate postpones a human-authored message for the first time' do
+      let(:message) { create(:message, conversation: conversation, message_type: :outgoing, content: 'hi', account: account) }
+      let(:postpone_until) { 3.hours.from_now }
+      let(:configured_job) { instance_double(ActiveJob::ConfiguredJob, perform_later: true) }
+
+      before do
+        allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :daily_cap })
+        allow(SendReplyJob).to receive(:set).and_return(configured_job)
+      end
+
+      it 'notifies the conversation with a delayed-message activity note' do
+        expected_time = I18n.l(postpone_until, format: :short)
+        expected_content = I18n.t('conversations.activity.antiban.message_delayed', time: expected_time)
+
+        perform(message)
+
+        expect(Conversations::ActivityMessageJob).to have_received(:perform_later).with(
+          conversation, hash_including(content: expected_content)
+        )
+      end
+    end
+
+    context 'when a human-authored message is postponed for a second time' do
+      let(:message) do
+        create(:message,
+               conversation: conversation,
+               message_type: :outgoing,
+               content: 'hi',
+               account: account,
+               additional_attributes: { 'antiban_reschedule_count' => 1 })
+      end
+      let(:postpone_until) { 3.hours.from_now }
+      let(:configured_job) { instance_double(ActiveJob::ConfiguredJob, perform_later: true) }
+
+      before do
+        allow(gate).to receive(:call).and_return({ postpone_until: postpone_until, reason: :daily_cap })
+        allow(SendReplyJob).to receive(:set).and_return(configured_job)
+      end
+
+      it 'does not notify again, and still bumps the reschedule count' do
+        perform(message)
+
+        expect(Conversations::ActivityMessageJob).not_to have_received(:perform_later)
+        expect(message.reload.additional_attributes['antiban_reschedule_count']).to eq(2)
+      end
+    end
+
+    context 'when the reschedule count already reached the cap of 3' do
+      let(:message) do
+        create(:message,
+               conversation: conversation,
+               message_type: :outgoing,
+               content: 'hi',
+               account: account,
+               additional_attributes: { 'antiban_reschedule_count' => 3 })
+      end
+
+      before do
+        allow(gate).to receive(:call).and_return({ postpone_until: 1.hour.from_now, reason: :daily_cap })
+        allow(SendReplyJob).to receive(:set)
+      end
+
+      it 'gives up and denies instead of rescheduling again' do
+        perform(message)
+
+        expect(SendReplyJob).not_to have_received(:set)
+        expect(message.reload.status).to eq('failed')
+      end
+
+      it 'notes that reschedules were exhausted, naming the last reason' do
+        expected_last_reason = I18n.t('conversations.activity.antiban.reasons.daily_cap')
+        expected_reason = I18n.t('conversations.activity.antiban.reasons.reschedule_limit_exceeded', last_reason: expected_last_reason)
+        expected_content = I18n.t('conversations.activity.antiban.message_not_sent', reason: expected_reason)
+
+        perform(message)
+
+        expect(Conversations::ActivityMessageJob).to have_received(:perform_later).with(
+          conversation, hash_including(content: expected_content)
+        )
+      end
+    end
+
+    context 'when the gate denies the message outright' do
+      let(:message) { create(:message, conversation: conversation, message_type: :outgoing, sender: nil, content: 'hi', account: account) }
+
+      before { allow(gate).to receive(:call).and_return({ deny: :opted_out }) }
+
+      it 'marks the message as failed' do
+        perform(message)
+
+        expect(message.reload.status).to eq('failed')
+      end
+
+      it 'notes the deny reason' do
+        expected_reason = I18n.t('conversations.activity.antiban.reasons.opted_out')
+        expected_content = I18n.t('conversations.activity.antiban.message_not_sent', reason: expected_reason)
+
+        perform(message)
+
+        expect(Conversations::ActivityMessageJob).to have_received(:perform_later).with(
+          conversation, hash_including(content: expected_content)
+        )
+      end
+    end
+  end
 end
