@@ -49,6 +49,14 @@ class Channel::Whatsapp < ApplicationRecord
     provider == 'baileys'
   end
 
+  # Fuso usado pelo motor anti-ban (janela 7h-22h e contador diario de
+  # Messaging::SendGateService/BaileysSendCounter): mesma fonte que os
+  # relatorios da conta (reporting_timezone), com fallback pra UTC quando a
+  # conta nao configurou nada.
+  def messaging_timezone
+    ActiveSupport::TimeZone[account.reporting_timezone] || ActiveSupport::TimeZone['UTC']
+  end
+
   # Mirrors Channel::TwilioSms#voice_enabled? so the call subsystem can duck-type across providers.
   # Meta's Calling API is available to any whatsapp_cloud inbox (embedded-signup or manual keys);
   # only 360dialog (default provider) can't reach the call APIs.
