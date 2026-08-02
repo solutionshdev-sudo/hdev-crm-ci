@@ -14,7 +14,11 @@ class Base::SendOnChannelService
     validate_target_channel
     return unless outgoing_message?
     return if invalid_message?
-    return if opted_out_message_blocked?
+
+    if blocked_automated_message?
+      create_opt_out_blocked_activity_message
+      return
+    end
 
     perform_reply
   end
@@ -54,7 +58,8 @@ class Base::SendOnChannelService
   # Contract (reused by the F2-T3 anti-ban gate service): true when `message` was not
   # authored by a human agent — it was produced by a chatbot flow, an automation rule,
   # a campaign, or its sender is anything other than a User (AgentBot, Captain::Assistant,
-  # nil, etc). Doesn't know about opt-out on its own; callers combine it with contact.blocked?.
+  # nil, etc). Doesn't know about opt-out on its own; callers combine it with
+  # contact.automation_opted_out?/contact.blocked?.
   def automated_message?
     message.content_attributes['chatbot_id'].present? ||
       Current.executed_by.instance_of?(AutomationRule) ||
@@ -62,14 +67,21 @@ class Base::SendOnChannelService
       !message.sender.is_a?(User)
   end
 
-  # Opt-out gate (todos os canais, Fase 2 §2.2): mensagens automatizadas nunca saem para
-  # um contato que pediu para sair (contact.blocked?). Mensagem de agente humano continua
-  # saindo (decisão consciente, padrão Deskcomm) — só o cruzamento blocked + automated é retido.
-  def opted_out_message_blocked?
-    return false unless contact.blocked? && automated_message?
+  # Opt-out gate (todos os canais, Fase 2 §2.2 — amendment): mensagens automatizadas nunca
+  # saem para um contato que optou por sair (automation_opted_out) OU está com o mute
+  # global herdado (blocked). Mensagem de agente humano continua saindo (decisão consciente,
+  # padrão Deskcomm) — só o cruzamento opt-out/blocked + automated é retido. Predicado puro:
+  # quem chama decide o que fazer com a nota de atividade (ver `perform`).
+  def blocked_automated_message?
+    contact_opted_out_of_automation? && automated_message?
+  end
 
-    create_opt_out_blocked_activity_message
-    true
+  # `automation_opted_out`: reversível via API (contato pode voltar a receber automação).
+  # `blocked`: mute global herdado — hoje só reversível via unmute!/UI, mas também barra
+  # mensagem automatizada aqui (fechando o buraco do plano original, que só olhava blocked
+  # no incoming do WhatsApp e não no envio de nenhum canal).
+  def contact_opted_out_of_automation?
+    contact.automation_opted_out? || contact.blocked?
   end
 
   def create_opt_out_blocked_activity_message
