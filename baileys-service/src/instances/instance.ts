@@ -14,9 +14,12 @@ import { authDir, removeAuthState, saveConfig } from './store.js';
 import { putMedia } from '../media-cache.js';
 import { deliverWebhook } from '../webhook.js';
 import {
+  buildEchoPayload,
   buildMessagesPayload,
   buildStatusesPayload,
   isDirectUserJid,
+  messageTimestampSeconds,
+  selectHistoryMessages,
   jidToNumber,
   prefixedId,
   translateMessageContent,
@@ -31,6 +34,14 @@ const logger = pino({ name: 'instance' });
 // Outbound pacing: ~1 msg/s with jitter. Blasting at machine speed is the
 // fastest way to get an unofficial number banned.
 const SEND_DELAY_MS = 1000;
+
+// Janela do backfill de histórico no pareamento/reconexão (messaging-history.set).
+// Curta de propósito: backfill longo reabre conversa resolvida, dispara bot em
+// mensagem velha e chega com created_at de agora no Rails (o pipeline Cloud
+// ignora o timestamp do payload). 0 desliga o backfill.
+const HISTORY_MAX_AGE_HOURS = Number(
+  process.env.HISTORY_SYNC_MAX_AGE_HOURS ?? 24
+);
 
 // Fechamentos em que a credencial salva não serve mais. Reconectar com ela só
 // repete o mesmo erro — e prende a instância num beco sem saída, porque o
@@ -170,6 +181,14 @@ export class Instance {
     socket.ev.on('messages.upsert', upsert => {
       if (upsert.type !== 'notify') return;
       for (const message of upsert.messages) void this.handleIncoming(message);
+    });
+
+    // Opção B: catch-up de histórico no pareamento/reconexão. O WhatsApp manda
+    // um snapshot recente mesmo com syncFullHistory: false; cada mensagem passa
+    // pelo mesmo handleIncoming (inbound OU eco fromMe) e o Rails deduplica por
+    // source_id — sync repetido não cria nada de novo.
+    socket.ev.on('messaging-history.set', ({ messages }) => {
+      void this.handleHistorySync(messages);
     });
 
     socket.ev.on('messages.update', updates => {
@@ -318,7 +337,11 @@ export class Instance {
 
   private async handleIncoming(message: WAMessage): Promise<void> {
     try {
-      if (message.key.fromMe) return;
+      // fromMe em upsert 'notify' = enviado por OUTRO aparelho da conta (o
+      // celular). Envios da própria API entram como type 'append' e nunca
+      // chegam aqui; se algum eco escapar, o Rails deduplica pelo source_id
+      // (mesmo id prefixado que o send devolveu).
+      const echo = !!message.key.fromMe;
       // v1: direct user chats only — no groups, no status broadcast, no self.
       const rawJid = message.key.remoteJid;
       const jid = await this.resolveUserJid(rawJid, message.key.remoteJidAlt);
@@ -338,7 +361,18 @@ export class Instance {
       }
       if (!message.message || !message.key.id) return;
 
-      const media = await this.downloadMedia(message);
+      // Mídia que falha no download não derruba a mensagem: segue sem media e
+      // o translate devolve type 'unsupported', que o Rails renderiza como
+      // placeholder — o agente fica sabendo que o cliente mandou algo.
+      let media;
+      try {
+        media = await this.downloadMedia(message);
+      } catch (error) {
+        logger.warn(
+          { id: this.config.id, msgId: message.key.id, error: String(error) },
+          'media download failed; delivering placeholder'
+        );
+      }
       const content = translateMessageContent(message.message, media);
       if (!content) {
         logger.info(
@@ -352,11 +386,18 @@ export class Instance {
         return;
       }
 
+      // No eco os papéis invertem (shape do Cloud): `from` é o número do
+      // negócio e `to` é o contato.
+      const contactNumber = jidToNumber(jid);
       const cloudMessage: CloudMessage = {
-        from: jidToNumber(jid),
+        from: echo
+          ? this.config.phoneNumber.replace(/^\+/, '')
+          : contactNumber,
+        ...(echo ? { to: contactNumber } : {}),
         id: prefixedId(this.config.id, message.key.id),
         timestamp: String(
-          Number(message.messageTimestamp) || Math.floor(Date.now() / 1000)
+          messageTimestampSeconds(message.messageTimestamp) ||
+            Math.floor(Date.now() / 1000)
         ),
         ...content,
       } as CloudMessage;
@@ -366,19 +407,40 @@ export class Instance {
         this.config.webhookSecret,
         'messages',
         this.config.id,
-        buildMessagesPayload(
-          this.config.id,
-          this.config.phoneNumber,
-          jidToNumber(jid),
-          message.pushName || undefined,
-          cloudMessage
-        )
+        echo
+          ? buildEchoPayload(this.config.id, this.config.phoneNumber, cloudMessage)
+          : buildMessagesPayload(
+              this.config.id,
+              this.config.phoneNumber,
+              contactNumber,
+              message.pushName || undefined,
+              cloudMessage
+            )
       );
     } catch (error) {
       logger.error(
         { id: this.config.id, error: String(error) },
         'incoming message failed'
       );
+    }
+  }
+
+  // Sequencial de propósito: preserva a ordem cronológica por conversa no
+  // Rails. Volume é limitado pela janela; o resto do snapshot é ignorado.
+  private async handleHistorySync(messages: WAMessage[]): Promise<void> {
+    if (HISTORY_MAX_AGE_HOURS <= 0 || !messages?.length) return;
+    const recent = selectHistoryMessages(
+      messages,
+      Math.floor(Date.now() / 1000),
+      HISTORY_MAX_AGE_HOURS * 3600
+    );
+    if (!recent.length) return;
+    logger.info(
+      { id: this.config.id, snapshot: messages.length, delivering: recent.length },
+      'history sync backfill'
+    );
+    for (const message of recent) {
+      await this.handleIncoming(message);
     }
   }
 
@@ -431,7 +493,20 @@ export class Instance {
       | undefined;
     if (!mediaNode) return undefined;
 
-    const buffer = (await downloadMediaMessage(message, 'buffer', {})) as Buffer;
+    // Mídia de histórico costuma ter a URL de download vencida; o
+    // reuploadRequest pede pro celular reenviar antes de desistir.
+    const socket = this.socket;
+    const buffer = (await downloadMediaMessage(
+      message,
+      'buffer',
+      {},
+      socket
+        ? {
+            logger: logger.child({ instance: this.config.id, level: 'warn' }),
+            reuploadRequest: msg => socket.updateMediaMessage(msg),
+          }
+        : undefined
+    )) as Buffer;
     const mediaId = prefixedId(this.config.id, message.key.id as string);
     const mimetype = mediaNode.mimetype || 'application/octet-stream';
     putMedia(mediaId, buffer, mimetype, mediaNode.fileName);
@@ -478,6 +553,7 @@ export class Instance {
       this.socket.ev.removeAllListeners('connection.update');
       this.socket.ev.removeAllListeners('messages.upsert');
       this.socket.ev.removeAllListeners('messages.update');
+      this.socket.ev.removeAllListeners('messaging-history.set');
       this.socket.end(undefined);
     } catch {
       // socket already dead

@@ -3,7 +3,10 @@ import pino from 'pino';
 
 const logger = pino({ name: 'webhook' });
 
-const MAX_ATTEMPTS = 5;
+// Backoff 2s→30s: ~14 min de janela total, o suficiente pra atravessar um
+// deploy/restart do Rails sem perder mensagem. ponytail: fila durável em disco
+// só se o próprio serviço precisar sobreviver a restart com webhook pendente.
+const MAX_ATTEMPTS = 32;
 
 // Fire-and-forget with retry. Rails answers 200 as soon as the signature
 // checks out (processing happens in Sidekiq), so failures here mean network

@@ -1,7 +1,9 @@
-# Mirrors Webhooks::WhatsappEventsJob for the baileys provider. Message and
-# status payloads come pre-translated to Meta Cloud API shape, so they flow
-# straight into the Cloud ingestion pipeline; connection events update the
-# channel's provider_config instead.
+# Mirrors Webhooks::WhatsappEventsJob for the baileys provider. Message,
+# status and echo payloads come pre-translated to Meta Cloud API shape, so
+# they flow straight into the Cloud ingestion pipeline; connection events
+# update the channel's provider_config instead. Echoes (field
+# smb_message_echoes) are messages sent from the account's own phone and
+# become outgoing messages, exactly like Cloud coexistence.
 class Webhooks::BaileysEventsJob < MutexApplicationJob
   queue_as :low
   retry_on LockAcquisitionError, wait: 2.seconds, attempts: 20
@@ -16,7 +18,7 @@ class Webhooks::BaileysEventsJob < MutexApplicationJob
       return
     end
 
-    sender_id = params.dig(:entry, 0, :changes, 0, :value, :messages, 0, :from)
+    sender_id = contact_sender_id(params)
     if sender_id.blank?
       process_messages(channel, params)
       return
@@ -48,6 +50,21 @@ class Webhooks::BaileysEventsJob < MutexApplicationJob
   end
 
   def process_messages(channel, params)
-    Whatsapp::IncomingMessageBaileysService.new(inbox: channel.inbox, params: params).perform
+    Whatsapp::IncomingMessageBaileysService.new(
+      inbox: channel.inbox,
+      params: params,
+      outgoing_echo: message_echo_event?(params)
+    ).perform
+  end
+
+  def message_echo_event?(params)
+    params.dig(:entry, 0, :changes, 0, :field) == 'smb_message_echoes'
+  end
+
+  # No eco os papéis invertem: `to` aponta pro contato. Serializa no mesmo
+  # mutex das mensagens recebidas do mesmo contato.
+  def contact_sender_id(params)
+    value = params.dig(:entry, 0, :changes, 0, :value) || {}
+    value.dig(:messages, 0, :from) || value.dig(:message_echoes, 0, :to)
   end
 end

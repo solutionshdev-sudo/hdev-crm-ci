@@ -26,15 +26,65 @@ export function prefixedId(instanceId: string, rawId: string): string {
   return `${instanceId}:${rawId}`;
 }
 
+// messageTimestamp vem como number OU Long (protobuf); Number(Long) é NaN,
+// então normalizar aqui pra não descartar mensagem boa por engano.
+export function messageTimestampSeconds(ts: unknown): number {
+  if (typeof ts === 'number') return ts;
+  if (ts && typeof (ts as { toNumber?: unknown }).toNumber === 'function') {
+    return (ts as { toNumber: () => number }).toNumber();
+  }
+  return Number(ts) || 0;
+}
+
+interface HistoryMessageShape {
+  key: { remoteJid?: string | null; id?: string | null };
+  messageTimestamp?: unknown;
+}
+
+// Backfill de histórico (messaging-history.set): só chat direto, só mensagens
+// dentro da janela, ordenadas por timestamp pra chegar no Rails na ordem da
+// conversa. O dedupe fica no Rails (source_id) — repetir sync não duplica.
+export function selectHistoryMessages<T extends HistoryMessageShape>(
+  messages: T[],
+  nowSeconds: number,
+  maxAgeSeconds: number
+): T[] {
+  const cutoff = nowSeconds - maxAgeSeconds;
+  return messages
+    .filter(message => {
+      const jid = message.key.remoteJid;
+      if (!jid || !message.key.id) return false;
+      if (!isDirectUserJid(jid) && !jid.endsWith('@lid')) return false;
+      return messageTimestampSeconds(message.messageTimestamp) >= cutoff;
+    })
+    .sort(
+      (a, b) =>
+        messageTimestampSeconds(a.messageTimestamp) -
+        messageTimestampSeconds(b.messageTimestamp)
+    );
+}
+
 interface MediaRef {
   mediaId: string;
   mimetype: string;
   filename?: string;
 }
 
+// Tipos sem conteúdo visível pro agente: descartar em silêncio (um placeholder
+// por reação/recibo de protocolo viraria spam na conversa).
+const SILENT_TYPES = new Set([
+  'protocolMessage',
+  'reactionMessage',
+  'pollUpdateMessage',
+  'messageContextInfo',
+  'senderKeyDistributionMessage',
+]);
+
 // Maps the Baileys message content to the Cloud API `messages[0]` entry.
-// Returns null for content we deliberately skip in v1 (reactions, polls,
-// group system messages, protocol messages).
+// Returns null only for the silent types above; anything else we can't
+// translate (contact card, poll, media whose download failed) becomes
+// type 'unsupported' — the Rails pipeline already renders that as an I18n
+// placeholder, so the agent knows something arrived instead of losing it.
 export function translateMessageContent(
   message: proto.IMessage,
   media?: MediaRef
@@ -152,7 +202,9 @@ export function translateMessageContent(
     };
   }
 
-  return null;
+  const visible = Object.keys(message).filter(key => !SILENT_TYPES.has(key));
+  if (visible.length === 0) return null;
+  return { type: 'unsupported' };
 }
 
 export function buildMessagesPayload(
@@ -183,6 +235,38 @@ export function buildMessagesPayload(
                 },
               ],
               messages: [cloudMessage],
+            },
+          },
+        ],
+      },
+    ],
+  };
+}
+
+// Eco: mensagem enviada pelo celular da própria conta. Mesmo shape do evento
+// de coexistence do Cloud (field smb_message_echoes, `from` = número do
+// negócio, `to` = contato, sem array contacts) — o Rails já ingere esse
+// formato com outgoing_echo e cria a mensagem como outgoing.
+export function buildEchoPayload(
+  instanceId: string,
+  phoneNumber: string,
+  cloudMessage: CloudMessage
+) {
+  return {
+    object: 'whatsapp_business_account',
+    entry: [
+      {
+        id: instanceId,
+        changes: [
+          {
+            field: 'smb_message_echoes',
+            value: {
+              messaging_product: 'whatsapp',
+              metadata: {
+                display_phone_number: phoneNumber.replace(/^\+/, ''),
+                phone_number_id: instanceId,
+              },
+              message_echoes: [cloudMessage],
             },
           },
         ],
