@@ -183,3 +183,27 @@ jobs:
 
       - name: vitest
         run: pnpm test
+
+  baileys:
+    name: baileys
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: baileys-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: baileys-service/package-lock.json
+
+      - run: npm ci
+
+      - name: typecheck
+        run: npx tsc --noEmit
+
+      - name: vitest
+        run: npx vitest run
