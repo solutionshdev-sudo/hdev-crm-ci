@@ -20,6 +20,10 @@ module AccountSettingsSchema
           'type': %w[array null],
           'items': { 'type': 'string' }
         },
+        'deal_lost_reasons': {
+          'type': %w[array null],
+          'items': { 'type': 'string' }
+        },
         'captain_models': {
           'type': %w[object null],
           'properties': CAPTAIN_MODEL_PROPERTIES,

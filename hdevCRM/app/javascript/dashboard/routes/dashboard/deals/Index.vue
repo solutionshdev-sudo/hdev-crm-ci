@@ -2,14 +2,17 @@
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
+import { useAccount } from 'dashboard/composables/useAccount';
 import { useAlert } from 'dashboard/composables';
 import DealColumn from './DealColumn.vue';
 import DealForm from './DealForm.vue';
 import DealActivityFeed from './DealActivityFeed.vue';
+import DealLostReasonModal from './DealLostReasonModal.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 
 const store = useStore();
 const { t } = useI18n();
+const { currentAccount } = useAccount();
 
 const pipelines = useMapGetter('dealPipelines/getPipelines');
 const getDealsByStage = useMapGetter('deals/getDealsByStage');
@@ -17,12 +20,31 @@ const getDealsByStage = useMapGetter('deals/getDealsByStage');
 const selectedPipelineId = ref(null);
 const showCreateModal = ref(false);
 const openDeal = ref(null);
+// Confirmação pendente de motivo de perda: card solto (drag) ou form editado
+// apontando pra uma etapa perdida, aguardando o motivo antes de persistir.
+// `kind` distingue os dois fluxos porque o "desfazer" de cada um é diferente
+// (drag reidrata o board; form só fecha o modal de motivo e deixa o form
+// aberto do jeito que o usuário deixou).
+const pendingLostReason = ref(null);
+
+const lostReasons = computed(
+  () => currentAccount.value?.settings?.deal_lost_reasons || []
+);
 
 const selectedPipeline = computed(() =>
   pipelines.value.find(pipeline => pipeline.id === selectedPipelineId.value)
 );
 
 const stages = computed(() => selectedPipeline.value?.stages || []);
+
+// Rótulo do botão/modal de criação: vira "Novo {label}" quando o funil
+// selecionado customizou o vocabulário de negócio; senão cai no texto fixo.
+const newDealLabel = computed(() => {
+  const label = selectedPipeline.value?.vocabulary?.deal;
+  return label
+    ? t('DEALS.BOARD.NEW_WITH_LABEL', { label })
+    : t('DEALS.BOARD.NEW_DEAL');
+});
 
 const loadDeals = async () => {
   if (!selectedPipelineId.value) return;
@@ -35,6 +57,18 @@ const selectPipeline = async pipelineId => {
 };
 
 const onMove = async ({ dealId, stageId, beforeDealId, afterDealId }) => {
+  const targetStage = stages.value.find(stage => stage.id === Number(stageId));
+
+  // Etapa perdida sempre exige motivo: intercepta antes de persistir e abre
+  // o modal. Etapa comum segue o fluxo normal de drag-and-drop.
+  if (targetStage?.stage_type === 'lost') {
+    pendingLostReason.value = {
+      kind: 'move',
+      payload: { id: dealId, deal_stage_id: Number(stageId) },
+    };
+    return;
+  }
+
   try {
     await store.dispatch('deals/move', {
       id: dealId,
@@ -48,6 +82,44 @@ const onMove = async ({ dealId, stageId, beforeDealId, afterDealId }) => {
   }
 };
 
+const confirmLostReason = async lostReason => {
+  const pending = pendingLostReason.value;
+  pendingLostReason.value = null;
+
+  try {
+    await store.dispatch('deals/update', {
+      ...pending.payload,
+      lost_reason: lostReason,
+    });
+    if (pending.kind === 'update') {
+      openDeal.value = null;
+      useAlert(t('DEALS.BOARD.UPDATE_SUCCESS'));
+    }
+  } catch (error) {
+    useAlert(
+      pending.kind === 'update'
+        ? error.message || t('DEALS.BOARD.UPDATE_ERROR')
+        : t('DEALS.BOARD.MOVE_ERROR')
+    );
+  } finally {
+    if (pending.kind === 'move') {
+      // O drag já moveu o card na tela antes do evento chegar aqui; recarrega
+      // pra refletir o estado real (persistido ou não).
+      await loadDeals();
+    }
+  }
+};
+
+const cancelLostReason = async () => {
+  const pending = pendingLostReason.value;
+  pendingLostReason.value = null;
+  if (pending?.kind === 'move') {
+    await loadDeals();
+  }
+  // kind === 'update': só fecha o modal de motivo, o form de edição continua
+  // aberto do jeito que o usuário deixou — nada foi persistido.
+};
+
 const createDeal = async dealObj => {
   try {
     await store.dispatch('deals/create', dealObj);
@@ -59,6 +131,27 @@ const createDeal = async dealObj => {
 };
 
 const updateDeal = async dealObj => {
+  const targetStage = stages.value.find(
+    stage => stage.id === Number(dealObj.deal_stage_id)
+  );
+  // Motivo já existente (a etapa era perdida e o negócio já tinha motivo)
+  // dispensa o modal: a validação do model só cobra motivo quando não há um.
+  const existingReason = (
+    dealObj.lost_reason ??
+    openDeal.value?.lost_reason ??
+    ''
+  )
+    .toString()
+    .trim();
+
+  if (targetStage?.stage_type === 'lost' && !existingReason) {
+    pendingLostReason.value = {
+      kind: 'update',
+      payload: { id: openDeal.value.id, ...dealObj },
+    };
+    return;
+  }
+
   try {
     await store.dispatch('deals/update', { id: openDeal.value.id, ...dealObj });
     openDeal.value = null;
@@ -117,7 +210,8 @@ onMounted(async () => {
         solid
         blue
         icon="i-lucide-plus"
-        :label="t('DEALS.BOARD.NEW_DEAL')"
+        data-test-id="new-deal-button"
+        :label="newDealLabel"
         @click="showCreateModal = true"
       />
     </header>
@@ -140,7 +234,7 @@ onMounted(async () => {
       v-model:show="showCreateModal"
       :on-close="() => (showCreateModal = false)"
     >
-      <woot-modal-header :header-title="t('DEALS.BOARD.NEW_DEAL')" />
+      <woot-modal-header :header-title="newDealLabel" />
       <DealForm
         v-if="selectedPipeline"
         :pipeline="selectedPipeline"
@@ -170,6 +264,16 @@ onMounted(async () => {
           </div>
         </div>
       </template>
+    </woot-modal>
+
+    <woot-modal :show="Boolean(pendingLostReason)" :on-close="cancelLostReason">
+      <DealLostReasonModal
+        v-if="pendingLostReason"
+        :reasons="lostReasons"
+        :lost-label="selectedPipeline?.vocabulary?.lost || ''"
+        @confirm="confirmLostReason"
+        @cancel="cancelLostReason"
+      />
     </woot-modal>
   </div>
 </template>

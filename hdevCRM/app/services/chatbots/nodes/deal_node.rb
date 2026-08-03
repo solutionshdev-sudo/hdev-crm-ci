@@ -22,7 +22,12 @@ class Chatbots::Nodes::DealNode < Chatbots::Nodes::BaseNode
       assignee_id: data['assignee_id'].presence,
       title: interpolate(data['title_template'].presence || conversation.contact&.name.to_s.presence || 'Novo negócio'),
       value: interpolate(data['value_template'].to_s).to_f,
-      position: stage.deals.minimum(:position).to_f - 1024
+      position: stage.deals.minimum(:position).to_f - 1024,
+      lost_reason: default_lost_reason(stage)
     )
+  end
+
+  def default_lost_reason(stage)
+    I18n.t('automation.default_lost_reason') if stage.lost?
   end
 end

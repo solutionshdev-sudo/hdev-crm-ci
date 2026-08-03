@@ -49,6 +49,9 @@ pt_BR:
         unsupported_import_types: 'contém valores não suportados: %{invalid_types}'
       deal:
         stage_not_in_pipeline: 'deve pertencer ao pipeline do negócio'
+        lost_reason_required: 'é obrigatório quando o negócio é marcado como perdido'
+      deal_pipeline:
+        vocabulary_length: 'deve ter entre 1 e 40 caracteres (%{key})'
       email_template:
         account_mismatch: 'deve corresponder à conta da caixa de entrada'
         invalid_liquid: 'tem sintaxe Liquid inválida: %{message}'

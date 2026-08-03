@@ -565,6 +565,7 @@ pt_BR:
     policy_actor: 'Sistema de Automação via %{policy_name}'
   automation:
     system_name: 'Sistema de Automação'
+    default_lost_reason: 'Movido por automação'
   crm:
     no_message: 'Nenhuma mensagem na conversa'
     attachment: '[Anexo: %{type}]'

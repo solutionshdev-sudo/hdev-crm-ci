@@ -49,7 +49,7 @@ class Api::V1::Accounts::DealPipelinesController < Api::V1::Accounts::BaseContro
   end
 
   def permitted_params
-    params.permit(:name, :description, :position, :is_default)
+    params.permit(:name, :description, :position, :is_default, vocabulary: {})
   end
 
   def stage_params(stage)

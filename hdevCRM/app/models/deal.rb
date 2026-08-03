@@ -13,6 +13,7 @@ class Deal < ApplicationRecord
   validates :title, presence: true
   validates :value, numericality: { greater_than_or_equal_to: 0 }
   validate :stage_belongs_to_pipeline
+  validate :lost_reason_required_when_entering_lost_stage
 
   before_save :apply_stage_outcome, if: :deal_stage_id_changed?
   after_create_commit :log_creation
@@ -27,6 +28,18 @@ class Deal < ApplicationRecord
     return if deal_stage.deal_pipeline_id == deal_pipeline_id
 
     errors.add(:deal_stage, I18n.t('errors.models.deal.stage_not_in_pipeline'))
+  end
+
+  # Entrar numa etapa perdida (criação direta ou mudança de etapa) sempre exige
+  # motivo. Caminhos programáticos (ActionService) preenchem um motivo padrão
+  # antes de chegar aqui; humano pela UI preenche via modal; API direta sem
+  # motivo recebe 422 — comportamento correto, não é pra contornar.
+  def lost_reason_required_when_entering_lost_stage
+    return if deal_stage.blank? || !deal_stage.lost?
+    return unless new_record? || deal_stage_id_changed?
+    return if lost_reason.present?
+
+    errors.add(:lost_reason, I18n.t('errors.models.deal.lost_reason_required'))
   end
 
   # Entrar em etapa ganha/perdida fecha o negócio; voltar pra etapa aberta reabre.
