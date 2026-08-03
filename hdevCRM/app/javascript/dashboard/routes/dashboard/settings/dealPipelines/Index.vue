@@ -12,9 +12,23 @@ const { t } = useI18n();
 const pipelines = useMapGetter('dealPipelines/getPipelines');
 const editedPipeline = ref(null);
 
+// Espelha DealPipeline::DEFAULT_VOCABULARY (app/models/deal_pipeline.rb) —
+// rótulos que o produto usa hoje pra cada conceito, usados quando o funil
+// ainda não customizou aquela chave.
+const DEFAULT_VOCABULARY = {
+  lead: 'Lead',
+  deal: 'Negócio',
+  won: 'Ganho',
+  lost: 'Perdido',
+};
+
 const startEditing = pipeline => {
   // Cópia profunda editável — só persiste no salvar.
   editedPipeline.value = JSON.parse(JSON.stringify(pipeline));
+  editedPipeline.value.vocabulary = {
+    ...DEFAULT_VOCABULARY,
+    ...(pipeline.vocabulary || {}),
+  };
 };
 
 const addStage = () => {
@@ -37,6 +51,7 @@ const save = async () => {
       name: editedPipeline.value.name,
       description: editedPipeline.value.description,
       stages: editedPipeline.value.stages,
+      vocabulary: editedPipeline.value.vocabulary,
     });
     await store.dispatch('dealPipelines/get');
     editedPipeline.value = null;
@@ -77,6 +92,7 @@ onMounted(() => {
           <NextButton
             faded
             slate
+            data-test-id="edit-pipeline"
             :label="t('DEAL_PIPELINES.EDIT')"
             @click="startEditing(pipeline)"
           />
@@ -139,6 +155,50 @@ onMounted(() => {
             </div>
           </div>
 
+          <div class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-n-slate-12">
+              {{ t('DEAL_PIPELINES.FORM.VOCABULARY.TITLE') }}
+            </span>
+            <div class="grid grid-cols-2 gap-3">
+              <label>
+                {{ t('DEAL_PIPELINES.FORM.VOCABULARY.LEAD') }}
+                <input
+                  v-model="editedPipeline.vocabulary.lead"
+                  type="text"
+                  data-test-id="vocabulary-lead"
+                  maxlength="40"
+                />
+              </label>
+              <label>
+                {{ t('DEAL_PIPELINES.FORM.VOCABULARY.DEAL') }}
+                <input
+                  v-model="editedPipeline.vocabulary.deal"
+                  type="text"
+                  data-test-id="vocabulary-deal"
+                  maxlength="40"
+                />
+              </label>
+              <label>
+                {{ t('DEAL_PIPELINES.FORM.VOCABULARY.WON') }}
+                <input
+                  v-model="editedPipeline.vocabulary.won"
+                  type="text"
+                  data-test-id="vocabulary-won"
+                  maxlength="40"
+                />
+              </label>
+              <label>
+                {{ t('DEAL_PIPELINES.FORM.VOCABULARY.LOST') }}
+                <input
+                  v-model="editedPipeline.vocabulary.lost"
+                  type="text"
+                  data-test-id="vocabulary-lost"
+                  maxlength="40"
+                />
+              </label>
+            </div>
+          </div>
+
           <div class="flex justify-end gap-2">
             <NextButton
               faded
@@ -149,6 +209,7 @@ onMounted(() => {
             <NextButton
               solid
               blue
+              data-test-id="save-pipeline"
               :label="t('DEAL_PIPELINES.FORM.SAVE')"
               @click="save"
             />
