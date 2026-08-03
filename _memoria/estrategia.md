@@ -13,7 +13,7 @@ Chatwoot antes de abrir pra agências.
 
 **Existe CI**: `.github/workflows/ci.yml`, na raiz do repo. Quatro jobs — `rspec`,
 `lint` (rubocop + eslint), `vitest` e `baileys` (desde 02/08, cobre o
-microserviço: tsc + 19 testes vitest, node 22). Isso muda como o trabalho é planejado:
+microserviço: tsc + 29 testes vitest, node 22). Isso muda como o trabalho é planejado:
 antes o código saía daqui sem nunca ter sido executado e a primeira verificação
 era o deploy. Agora o Ruby é verificado antes, e o JS roda direto nesta máquina
 (`corepack pnpm`). Detalhes de uso no `CLAUDE.md`.
@@ -351,17 +351,23 @@ o que der pra testar por script, o Claude escreve e testa direto; o que for
 manual, o Harvey testa com roteiro do Claude. **A Fase 6 (disparo em massa)
 só abre com a F2 PROVADA.**
 
-**Bug em produção reportado em 02/08 — eco do celular:** mensagem que o
-Harvey manda pro cliente DIRETO pelo WhatsApp do celular NÃO aparece no CRM
-(só as enviadas pelo CRM e as recebidas do cliente carregam). **O conserto já
-existe e está parado:** PR #11 (`feat/baileys-eco-confiabilidade`, verde
-desde 31/07) implementa exatamente o eco + retry longo do webhook +
-placeholders; exige merge + deploy dos DOIS containers, env
-`HISTORY_SYNC_MAX_AGE_HOURS`, e o backfill de histórico exige re-parear o
-chip (detalhes na memória do Claude, `baileys-eco-historico-pr11`).
-**Próximo passo da trilha: analisar o PR #11 contra a main atual — a Fase 2
-mexeu no incoming do Baileys (`process_messages`/helpers), então pode haver
-conflito real, não só textual — e só então mergear, deployar e testar.**
+**Eco do celular RESOLVIDO (02-03/08, PRs #11 e #27 mergeados):** a análise
+F2×eco não achou conflito de comportamento (helpers usam `messages_data`,
+STOP guardado com `unless outgoing_echo`, eco não dispara gates); PR #11
+mergeado, deployado nos 2 containers e **backfill provado em produção**
+(snapshot de 4.951 mensagens → 8 dentro da janela de 24h entregues no
+re-pareamento). O sintoma que a prova revelou — mensagens com horário de
+"agora" e fora de ordem — virou o **PR #27**: `created_at` de mensagem
+WhatsApp entrante agora vem do timestamp real do payload (futuro clampa em
+agora) e o `default_scope` de `Message` desempata por `id` (created_at igual
+era ordem arbitrária do Postgres). A caçada do PR #27 também matou um bug
+latente de suíte: deletar chave DENTRO de `scan_each` do Redis pula chave
+(rehash) — lock órfão de dedupe engolia mensagem em spec sem erro; os 5
+cleanups migraram pra coleta-antes-de-deletar (memória
+`rspec-redis-scan-delete-armadilha`). **Pendente: deploy do container Rails**
+(só ele — o Node já manda timestamp certo). As 8 mensagens backfilladas com
+horário errado não têm conserto retroativo; se incomodarem, apagar e
+re-parear depois do deploy.
 
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
