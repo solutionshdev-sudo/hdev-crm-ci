@@ -342,7 +342,7 @@ RSpec.describe AutomationRules::ActionService do
         end
 
         it 'does not overwrite an already set lost_reason' do
-          deal.update_column(:lost_reason, 'já tinha motivo')
+          deal.update_column(:lost_reason, 'já tinha motivo') # rubocop:disable Rails/SkipsModelValidations
 
           described_class.new(rule, account, conversation).perform
 

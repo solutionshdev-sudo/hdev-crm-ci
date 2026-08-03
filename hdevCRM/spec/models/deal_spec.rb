@@ -93,7 +93,8 @@ RSpec.describe Deal do
 
     it 'does not require a lost_reason on saves that do not change the stage' do
       deal.update!(deal_stage: lost_stage, lost_reason: 'preço')
-      deal.update_column(:lost_reason, nil) # simula um registro antigo sem motivo, sem passar pela validação
+      # simula um registro antigo sem motivo, sem passar pela validação
+      deal.update_column(:lost_reason, nil) # rubocop:disable Rails/SkipsModelValidations
 
       expect(deal.update(value: 999)).to be true
     end
