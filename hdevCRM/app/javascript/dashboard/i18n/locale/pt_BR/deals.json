@@ -13,6 +13,17 @@
       "DELETE_SUCCESS": "Negócio excluído.",
       "DELETE_ERROR": "Não foi possível excluir o negócio."
     },
+    "LOST_REASON": {
+      "TITLE": "Por que este negócio foi perdido?",
+      "SELECT_LABEL": "Motivo",
+      "SELECT_PLACEHOLDER": "Selecione um motivo",
+      "OTHER_OPTION": "Outro",
+      "REASON_LABEL": "Motivo",
+      "REASON_PLACEHOLDER": "Descreva o motivo",
+      "ERROR": "O motivo é obrigatório.",
+      "CONFIRM": "Confirmar",
+      "CANCEL": "Cancelar"
+    },
     "FORM": {
       "TITLE": {
         "LABEL": "Título",

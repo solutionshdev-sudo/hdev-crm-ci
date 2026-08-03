@@ -13,6 +13,17 @@
       "DELETE_SUCCESS": "Deal deleted.",
       "DELETE_ERROR": "Could not delete the deal."
     },
+    "LOST_REASON": {
+      "TITLE": "Why was this deal lost?",
+      "SELECT_LABEL": "Reason",
+      "SELECT_PLACEHOLDER": "Select a reason",
+      "OTHER_OPTION": "Other",
+      "REASON_LABEL": "Reason",
+      "REASON_PLACEHOLDER": "Describe the reason",
+      "ERROR": "A reason is required.",
+      "CONFIRM": "Confirm",
+      "CANCEL": "Cancel"
+    },
     "FORM": {
       "TITLE": {
         "LABEL": "Title",

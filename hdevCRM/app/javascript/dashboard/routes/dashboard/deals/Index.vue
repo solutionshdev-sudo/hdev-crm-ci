@@ -2,14 +2,17 @@
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
+import { useAccount } from 'dashboard/composables/useAccount';
 import { useAlert } from 'dashboard/composables';
 import DealColumn from './DealColumn.vue';
 import DealForm from './DealForm.vue';
 import DealActivityFeed from './DealActivityFeed.vue';
+import DealLostReasonModal from './DealLostReasonModal.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 
 const store = useStore();
 const { t } = useI18n();
+const { currentAccount } = useAccount();
 
 const pipelines = useMapGetter('dealPipelines/getPipelines');
 const getDealsByStage = useMapGetter('deals/getDealsByStage');
@@ -17,6 +20,13 @@ const getDealsByStage = useMapGetter('deals/getDealsByStage');
 const selectedPipelineId = ref(null);
 const showCreateModal = ref(false);
 const openDeal = ref(null);
+// Movimento pendente de confirmação: solto numa etapa perdida, aguardando o
+// motivo antes de persistir (ou volta pro lugar se cancelado).
+const pendingLostMove = ref(null);
+
+const lostReasons = computed(
+  () => currentAccount.value?.settings?.deal_lost_reasons || []
+);
 
 const selectedPipeline = computed(() =>
   pipelines.value.find(pipeline => pipeline.id === selectedPipelineId.value)
@@ -35,6 +45,15 @@ const selectPipeline = async pipelineId => {
 };
 
 const onMove = async ({ dealId, stageId, beforeDealId, afterDealId }) => {
+  const targetStage = stages.value.find(stage => stage.id === Number(stageId));
+
+  // Etapa perdida sempre exige motivo: intercepta antes de persistir e abre
+  // o modal. Etapa comum segue o fluxo normal de drag-and-drop.
+  if (targetStage?.stage_type === 'lost') {
+    pendingLostMove.value = { dealId, stageId, beforeDealId, afterDealId };
+    return;
+  }
+
   try {
     await store.dispatch('deals/move', {
       id: dealId,
@@ -46,6 +65,30 @@ const onMove = async ({ dealId, stageId, beforeDealId, afterDealId }) => {
     useAlert(t('DEALS.BOARD.MOVE_ERROR'));
     await loadDeals();
   }
+};
+
+const confirmLostReason = async lostReason => {
+  const move = pendingLostMove.value;
+  pendingLostMove.value = null;
+
+  try {
+    await store.dispatch('deals/update', {
+      id: move.dealId,
+      deal_stage_id: Number(move.stageId),
+      lost_reason: lostReason,
+    });
+  } catch (error) {
+    useAlert(t('DEALS.BOARD.MOVE_ERROR'));
+  } finally {
+    // O drag já moveu o card na tela antes do evento chegar aqui; recarrega
+    // pra refletir o estado real (persistido ou não).
+    await loadDeals();
+  }
+};
+
+const cancelLostReason = async () => {
+  pendingLostMove.value = null;
+  await loadDeals();
 };
 
 const createDeal = async dealObj => {
@@ -170,6 +213,15 @@ onMounted(async () => {
           </div>
         </div>
       </template>
+    </woot-modal>
+
+    <woot-modal :show="Boolean(pendingLostMove)" :on-close="cancelLostReason">
+      <DealLostReasonModal
+        v-if="pendingLostMove"
+        :reasons="lostReasons"
+        @confirm="confirmLostReason"
+        @cancel="cancelLostReason"
+      />
     </woot-modal>
   </div>
 </template>
