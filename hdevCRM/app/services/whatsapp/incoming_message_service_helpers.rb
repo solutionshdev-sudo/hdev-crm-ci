@@ -100,10 +100,8 @@ module Whatsapp::IncomingMessageServiceHelpers
     message[:referral]&.to_h&.deep_stringify_keys || {}
   end
 
-  # O webhook traz o timestamp real da mensagem (epoch em segundos); sem ele, mensagem
-  # de backfill de histórico nasce com horário do processamento e aparece fora de ordem
-  # na conversa (a tela ordena por created_at). Futuro = relógio torto do aparelho: trava
-  # em agora. Ausente/zero: nil deixa o Rails carimbar a hora atual, como antes.
+  # Timestamp real do webhook (epoch s) vira created_at — sem ele, backfill de histórico
+  # nasce com hora de agora e fora de ordem. Futuro trava em agora; ausente → Rails carimba.
   def message_timestamp(message)
     ts = message[:timestamp].to_i
     return if ts <= 0

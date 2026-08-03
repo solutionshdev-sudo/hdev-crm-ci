@@ -356,7 +356,9 @@ describe Whatsapp::IncomingMessageWhatsappCloudService do
 
           described_class.new(inbox: whatsapp_channel.inbox, params: reply_params).perform
 
-          reply_message = whatsapp_channel.inbox.messages.last
+          # created_at agora vem do timestamp do payload, então `.last` (ordenado por
+          # created_at) devolveria a mensagem da factory, carimbada com o relógio de agora.
+          reply_message = whatsapp_channel.inbox.messages.find_by(source_id: 'wamid.REPLY_MESSAGE_ID')
           expect(reply_message.content).to eq('This is a reply')
           expect(reply_message.content_attributes['in_reply_to']).to eq(original_message.id)
           expect(reply_message.content_attributes['in_reply_to_external_id']).to eq('wamid.ORIGINAL_MESSAGE_ID')
