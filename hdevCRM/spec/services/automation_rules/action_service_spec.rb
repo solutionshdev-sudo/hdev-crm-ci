@@ -266,6 +266,23 @@ RSpec.describe AutomationRules::ActionService do
           expect(deal.deal_stage).to eq(pipeline.deal_stages.order(:position).first)
         end
       end
+
+      context 'when the resolved stage is a lost stage' do
+        let!(:lost_first_stage) { create(:deal_stage, :lost, account: account, deal_pipeline: pipeline, position: 0) }
+
+        before do
+          rule.actions = [{ action_name: 'create_deal', action_params: [lost_first_stage.id] }]
+          rule.save!
+        end
+
+        it 'fills the default lost reason instead of failing validation' do
+          described_class.new(rule, account, conversation).perform
+
+          deal = account.deals.last
+          expect(deal.deal_stage).to eq(lost_first_stage)
+          expect(deal.lost_reason).to eq(I18n.t('automation.default_lost_reason'))
+        end
+      end
     end
 
     describe '#perform with move_deal_stage action' do
@@ -306,6 +323,31 @@ RSpec.describe AutomationRules::ActionService do
           described_class.new(rule, account, other_conversation).perform
         end.not_to change(Deal, :count)
         expect(deal.reload.deal_stage).to eq(from_stage)
+      end
+
+      context 'when the target stage is a lost stage' do
+        let!(:lost_stage) { create(:deal_stage, :lost, account: account, deal_pipeline: pipeline) }
+
+        before do
+          rule.actions = [{ action_name: 'move_deal_stage', action_params: [lost_stage.id] }]
+          rule.save!
+        end
+
+        it 'fills the default lost reason via I18n when the deal has none' do
+          described_class.new(rule, account, conversation).perform
+
+          deal.reload
+          expect(deal.deal_stage).to eq(lost_stage)
+          expect(deal.lost_reason).to eq(I18n.t('automation.default_lost_reason'))
+        end
+
+        it 'does not overwrite an already set lost_reason' do
+          deal.update_column(:lost_reason, 'já tinha motivo')
+
+          described_class.new(rule, account, conversation).perform
+
+          expect(deal.reload.lost_reason).to eq('já tinha motivo')
+        end
       end
     end
   end

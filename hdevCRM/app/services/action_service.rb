@@ -87,7 +87,8 @@ class ActionService
       contact: @conversation.contact,
       conversation: @conversation,
       title: @conversation.contact.name.presence || "Conversa ##{@conversation.display_id}",
-      position: stage.deals.minimum(:position).to_f - 1024
+      position: stage.deals.minimum(:position).to_f - 1024,
+      lost_reason: (I18n.t('automation.default_lost_reason') if stage.lost?)
     )
   end
 
@@ -97,7 +98,11 @@ class ActionService
     deal = @account.deals.open.find_by(conversation_id: @conversation.id)
     return if stage.blank? || deal.blank? || deal.deal_pipeline_id != stage.deal_pipeline_id
 
-    deal.update!(deal_stage: stage, position: stage.deals.minimum(:position).to_f - 1024)
+    attributes = { deal_stage: stage, position: stage.deals.minimum(:position).to_f - 1024 }
+    # Caminho programático nunca deve travar na validação de motivo: preenche
+    # um motivo padrão, sem sobrescrever um motivo já existente no negócio.
+    attributes[:lost_reason] = I18n.t('automation.default_lost_reason') if stage.lost? && deal.lost_reason.blank?
+    deal.update!(attributes)
   end
 
   def remove_assigned_agent(_params)
