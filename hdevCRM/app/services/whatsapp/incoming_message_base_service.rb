@@ -91,12 +91,9 @@ class Whatsapp::IncomingMessageBaseService
   end
 
   def create_contact_messages(message)
-    message['contacts'].each_with_index do |contact, index|
+    message['contacts'].each do |contact|
       # Pass source_id from parent message since contact objects don't have :id
       create_message(contact, source_id: message[:id], content_attributes_source: message)
-      # Vcards do mesmo webhook compartilham o timestamp do pai; +index µs desempata a
-      # ordenação por created_at (o default_scope de Message não desempata por id).
-      @message.created_at += index * 0.000001 if @message.created_at
       attach_contact(contact)
       @message.save!
     end

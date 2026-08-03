@@ -124,7 +124,9 @@ class Message < ApplicationRecord
   # TODO: Get rid of default scope
   # https://stackoverflow.com/a/1834250/939299
   # if you want to change order, use `reorder`
-  default_scope { order(created_at: :asc) }
+  # id desempata created_at igual (vcards do mesmo webhook, backfill de histórico
+  # no mesmo segundo) — sem ele a ordem do empate fica a critério do Postgres.
+  default_scope { order(created_at: :asc, id: :asc) }
 
   belongs_to :account
   belongs_to :inbox

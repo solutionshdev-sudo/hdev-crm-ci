@@ -36,14 +36,16 @@ describe Whatsapp::IncomingMessageService do
         contact_inbox = create(:contact_inbox, inbox: whatsapp_channel.inbox, source_id: params[:messages].first[:from])
         2.times.each { create(:conversation, inbox: whatsapp_channel.inbox, contact_inbox: contact_inbox, contact: contact_inbox.contact) }
         last_conversation = create(:conversation, inbox: whatsapp_channel.inbox, contact_inbox: contact_inbox, contact: contact_inbox.contact)
+        # DEBUG-APPENDS (temporário): lock preso ANTES do perform? TTL revela a idade.
+        warn "DEBUG-APPENDS-PRE lock=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
+             "ttl=#{Redis::Alfred.ttl('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa')}"
         described_class.new(inbox: whatsapp_channel.inbox, params: params).perform
         # no new conversation should be created
         expect(whatsapp_channel.inbox.conversations.count).to eq(3)
         # DEBUG-APPENDS (temporário): onde a mensagem foi parar?
-        warn "DEBUG-APPENDS msgs=#{Message.where(source_id: 'SDFADSf23sfasdafasdfa').pluck(:id, :conversation_id, :created_at).inspect} " \
-             "convs=#{whatsapp_channel.inbox.conversations.pluck(:id, :status).inspect} last_conv=#{last_conversation.id} " \
-             "lock=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
-             "contact=#{Contact.where(account: whatsapp_channel.account).pluck(:id, :name, :blocked).inspect}"
+        warn "DEBUG-APPENDS-POS msgs=#{Message.where(source_id: 'SDFADSf23sfasdafasdfa').pluck(:id, :conversation_id, :created_at).inspect} " \
+             "ttl=#{Redis::Alfred.ttl('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa')} " \
+             "contact_inboxes=#{whatsapp_channel.inbox.contact_inboxes.pluck(:id, :source_id, :contact_id).inspect}"
         # message appended to the last conversation
         expect(last_conversation.messages.last.content).to eq(params[:messages].first[:text][:body])
       end
