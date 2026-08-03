@@ -3,30 +3,6 @@ require 'rails_helper'
 RSpec.describe DealPipeline do
   let(:account) { create(:account) }
 
-  describe '#vocabulary_label' do
-    it 'returns the product default for each concept when vocabulary is empty' do
-      pipeline = create(:deal_pipeline, account: account)
-
-      expect(pipeline.vocabulary_label(:lead)).to eq('Lead')
-      expect(pipeline.vocabulary_label(:deal)).to eq('Negócio')
-      expect(pipeline.vocabulary_label(:won)).to eq('Ganho')
-      expect(pipeline.vocabulary_label(:lost)).to eq('Perdido')
-    end
-
-    it 'returns the custom label when the key is overridden, keeping the others at default' do
-      pipeline = create(:deal_pipeline, account: account, vocabulary: { 'lost' => 'Cancelado' })
-
-      expect(pipeline.vocabulary_label(:lost)).to eq('Cancelado')
-      expect(pipeline.vocabulary_label(:deal)).to eq('Negócio')
-    end
-
-    it 'accepts a string key just like a symbol' do
-      pipeline = create(:deal_pipeline, account: account, vocabulary: { 'deal' => 'Oportunidade' })
-
-      expect(pipeline.vocabulary_label('deal')).to eq('Oportunidade')
-    end
-  end
-
   describe 'vocabulary validation' do
     it 'is valid with an empty vocabulary' do
       pipeline = build(:deal_pipeline, account: account)
@@ -64,6 +40,12 @@ RSpec.describe DealPipeline do
       pipeline = build(:deal_pipeline, account: account, vocabulary: { 'unknown' => '' })
 
       expect(pipeline).to be_valid
+    end
+
+    it 'persists only the keys given, without injecting a default for the others' do
+      pipeline = create(:deal_pipeline, account: account, vocabulary: { 'lost' => 'Cancelado' })
+
+      expect(pipeline.reload.vocabulary).to eq('lost' => 'Cancelado')
     end
   end
 end

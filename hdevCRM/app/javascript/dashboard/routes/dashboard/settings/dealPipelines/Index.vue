@@ -12,23 +12,21 @@ const { t } = useI18n();
 const pipelines = useMapGetter('dealPipelines/getPipelines');
 const editedPipeline = ref(null);
 
-// Espelha DealPipeline::DEFAULT_VOCABULARY (app/models/deal_pipeline.rb) —
-// rótulos que o produto usa hoje pra cada conceito, usados quando o funil
-// ainda não customizou aquela chave.
-const DEFAULT_VOCABULARY = {
-  lead: 'Lead',
-  deal: 'Negócio',
-  won: 'Ganho',
-  lost: 'Perdido',
-};
+// As 4 chaves de conceito do vocabulário. Não têm valor-default aqui: o
+// rótulo "de fábrica" de cada conceito já existe como fallback I18n (board,
+// modal de motivo de perda) — se pré-preenchêssemos o campo com esse texto,
+// qualquer salvamento do funil gravaria esse texto no jsonb PARA SEMPRE,
+// hardcoded num idioma só, mesmo pra quem nunca customizou nada.
+const VOCABULARY_KEYS = ['lead', 'deal', 'won', 'lost'];
 
 const startEditing = pipeline => {
   // Cópia profunda editável — só persiste no salvar.
   editedPipeline.value = JSON.parse(JSON.stringify(pipeline));
-  editedPipeline.value.vocabulary = {
-    ...DEFAULT_VOCABULARY,
-    ...(pipeline.vocabulary || {}),
-  };
+  const vocabulary = pipeline.vocabulary || {};
+  editedPipeline.value.vocabulary = VOCABULARY_KEYS.reduce((acc, key) => {
+    acc[key] = vocabulary[key] || '';
+    return acc;
+  }, {});
 };
 
 const addStage = () => {
@@ -46,12 +44,22 @@ const removeStage = index => {
 
 const save = async () => {
   try {
+    // Só entram no payload as chaves que o usuário de fato preencheu — campo
+    // vazio (nunca tocado ou limpo de propósito) não vira override: o rótulo
+    // continua caindo no fallback I18n do locale ativo (board/modal), em vez
+    // de congelar um idioma só no jsonb.
+    const vocabulary = Object.fromEntries(
+      Object.entries(editedPipeline.value.vocabulary).filter(([, value]) =>
+        value.trim()
+      )
+    );
+
     await store.dispatch('dealPipelines/update', {
       id: editedPipeline.value.id,
       name: editedPipeline.value.name,
       description: editedPipeline.value.description,
       stages: editedPipeline.value.stages,
-      vocabulary: editedPipeline.value.vocabulary,
+      vocabulary,
     });
     await store.dispatch('dealPipelines/get');
     editedPipeline.value = null;
@@ -167,6 +175,9 @@ onMounted(() => {
                   type="text"
                   data-test-id="vocabulary-lead"
                   maxlength="40"
+                  :placeholder="
+                    t('DEAL_PIPELINES.FORM.VOCABULARY.PLACEHOLDERS.LEAD')
+                  "
                 />
               </label>
               <label>
@@ -176,6 +187,9 @@ onMounted(() => {
                   type="text"
                   data-test-id="vocabulary-deal"
                   maxlength="40"
+                  :placeholder="
+                    t('DEAL_PIPELINES.FORM.VOCABULARY.PLACEHOLDERS.DEAL')
+                  "
                 />
               </label>
               <label>
@@ -185,6 +199,9 @@ onMounted(() => {
                   type="text"
                   data-test-id="vocabulary-won"
                   maxlength="40"
+                  :placeholder="
+                    t('DEAL_PIPELINES.FORM.VOCABULARY.PLACEHOLDERS.WON')
+                  "
                 />
               </label>
               <label>
@@ -194,6 +211,9 @@ onMounted(() => {
                   type="text"
                   data-test-id="vocabulary-lost"
                   maxlength="40"
+                  :placeholder="
+                    t('DEAL_PIPELINES.FORM.VOCABULARY.PLACEHOLDERS.LOST')
+                  "
                 />
               </label>
             </div>

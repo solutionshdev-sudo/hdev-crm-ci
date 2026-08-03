@@ -17,14 +17,12 @@ class DealPipeline < ApplicationRecord
     { name: 'Perdido', color: '#E5484D', position: 6, probability: 0, stage_type: :lost }
   ].freeze
 
-  # Rótulos que o produto usa hoje pra cada conceito do funil — servem de
-  # fallback quando o funil ainda não customizou aquela chave em `vocabulary`.
-  DEFAULT_VOCABULARY = {
-    'lead' => 'Lead',
-    'deal' => 'Negócio',
-    'won' => 'Ganho',
-    'lost' => 'Perdido'
-  }.freeze
+  # As 4 chaves de conceito válidas em `vocabulary`. Sem valor-default aqui:
+  # o rótulo "de fábrica" de cada conceito é o fallback I18n já usado no
+  # board/modal (locale-aware, en e pt_BR). Um default fixo num idioma só
+  # (ex.: sempre pt_BR) vazaria pro jsonb no primeiro save do frontend e
+  # travaria o rótulo nesse idioma pra sempre — por isso não existe aqui.
+  VOCABULARY_KEYS = %w[lead deal won lost].freeze
 
   # Pipeline padrão da conta, criado sob demanda na primeira visita ao módulo.
   def self.ensure_default!(account)
@@ -38,12 +36,6 @@ class DealPipeline < ApplicationRecord
       end
   end
 
-  # Rótulo customizado do funil pra esse conceito, ou o default do produto
-  # quando o funil não tiver essa chave em `vocabulary`.
-  def vocabulary_label(key)
-    vocabulary[key.to_s].presence || DEFAULT_VOCABULARY[key.to_s]
-  end
-
   private
 
   # Valida só o tamanho das 4 chaves conhecidas (lead/deal/won/lost); chave
@@ -51,7 +43,7 @@ class DealPipeline < ApplicationRecord
   # JsonbAttributesLengthValidator, que valida por valor presente e não
   # impõe um schema fechado de chaves.
   def vocabulary_values_length
-    DEFAULT_VOCABULARY.each_key do |key|
+    VOCABULARY_KEYS.each do |key|
       next unless vocabulary.key?(key)
       next if vocabulary[key].to_s.length.between?(1, 40)
 

@@ -92,7 +92,13 @@
         "LEAD": "Lead label",
         "DEAL": "Deal label",
         "WON": "Won label",
-        "LOST": "Lost label"
+        "LOST": "Lost label",
+        "PLACEHOLDERS": {
+          "LEAD": "Lead",
+          "DEAL": "Deal",
+          "WON": "Won",
+          "LOST": "Lost"
+        }
       }
     }
   }

@@ -92,7 +92,13 @@
         "LEAD": "Rótulo de lead",
         "DEAL": "Rótulo de negócio",
         "WON": "Rótulo de ganho",
-        "LOST": "Rótulo de perdido"
+        "LOST": "Rótulo de perdido",
+        "PLACEHOLDERS": {
+          "LEAD": "Lead",
+          "DEAL": "Negócio",
+          "WON": "Ganho",
+          "LOST": "Perdido"
+        }
       }
     }
   }

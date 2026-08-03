@@ -64,7 +64,7 @@ describe('DealPipelines Index', () => {
   };
 
   describe('vocabulário do funil', () => {
-    it('pre-fills the vocabulary fields with the product defaults when the pipeline has none', async () => {
+    it('leaves the vocabulary fields empty (locale-aware placeholder only) when the pipeline has none', async () => {
       setupPipelines([pipelineWithoutVocabulary]);
       const wrapper = mountIndex();
       await flushPromises();
@@ -74,16 +74,22 @@ describe('DealPipelines Index', () => {
 
       expect(
         wrapper.find('[data-test-id="vocabulary-lead"]').element.value
-      ).toBe('Lead');
+      ).toBe('');
       expect(
         wrapper.find('[data-test-id="vocabulary-deal"]').element.value
-      ).toBe('Negócio');
+      ).toBe('');
       expect(
         wrapper.find('[data-test-id="vocabulary-won"]').element.value
-      ).toBe('Ganho');
+      ).toBe('');
       expect(
         wrapper.find('[data-test-id="vocabulary-lost"]').element.value
-      ).toBe('Perdido');
+      ).toBe('');
+      // Placeholder é só dica visual (chave I18n, não é salvo).
+      expect(
+        wrapper
+          .find('[data-test-id="vocabulary-deal"]')
+          .attributes('placeholder')
+      ).toBe('DEAL_PIPELINES.FORM.VOCABULARY.PLACEHOLDERS.DEAL');
     });
 
     it('pre-fills the vocabulary fields with the pipeline current vocabulary when set', async () => {
@@ -108,7 +114,7 @@ describe('DealPipelines Index', () => {
       ).toBe('Cancelado');
     });
 
-    it('sends the edited vocabulary in the update dispatch on save', async () => {
+    it('sends only the field the user actually edited, no unrelated defaults', async () => {
       setupPipelines([pipelineWithoutVocabulary]);
       const wrapper = mountIndex();
       await flushPromises();
@@ -126,12 +132,49 @@ describe('DealPipelines Index', () => {
         'dealPipelines/update',
         expect.objectContaining({
           id: 10,
-          vocabulary: expect.objectContaining({
-            lead: 'Lead',
-            deal: 'Negócio',
-            won: 'Ganho',
-            lost: 'Cancelado',
-          }),
+          vocabulary: { lost: 'Cancelado' },
+        })
+      );
+    });
+
+    it('sends no vocabulary keys when the pipeline had none and the user does not touch the fields', async () => {
+      setupPipelines([pipelineWithoutVocabulary]);
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="edit-pipeline"]').trigger('click');
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="save-pipeline"]').trigger('click');
+      await flushPromises();
+
+      expect(dispatch).toHaveBeenCalledWith(
+        'dealPipelines/update',
+        expect.objectContaining({ id: 10, vocabulary: {} })
+      );
+    });
+
+    it('removes the override (falls back to I18n again) when a set field is cleared', async () => {
+      setupPipelines([pipelineWithVocabulary]);
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="edit-pipeline"]').trigger('click');
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="vocabulary-lost"]').setValue('');
+      await wrapper.find('[data-test-id="save-pipeline"]').trigger('click');
+      await flushPromises();
+
+      expect(dispatch).toHaveBeenCalledWith(
+        'dealPipelines/update',
+        expect.objectContaining({
+          id: 11,
+          vocabulary: {
+            lead: 'Prospect',
+            deal: 'Oportunidade',
+            won: 'Fechado',
+          },
         })
       );
     });
