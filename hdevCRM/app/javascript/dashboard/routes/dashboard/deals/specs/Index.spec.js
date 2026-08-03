@@ -16,6 +16,13 @@ const pipeline = {
   id: 10,
   name: 'Funil',
   stages: [openStage, lostStage],
+  vocabulary: {},
+};
+const pipelineWithVocabulary = {
+  id: 11,
+  name: 'Funil com vocabulário',
+  stages: [openStage, lostStage],
+  vocabulary: { deal: 'Oportunidade', lost: 'Cancelado' },
 };
 
 // Stub minúsculo do DealColumn: expõe um botão por coluna que dispara o
@@ -126,5 +133,59 @@ describe('Deals Index', () => {
     expect(
       wrapper.findComponent({ name: 'DealLostReasonModal' }).exists()
     ).toBe(false);
+  });
+
+  describe('vocabulary do funil selecionado', () => {
+    it('shows the fallback I18n title when the pipeline has no custom vocabulary', async () => {
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      expect(wrapper.find('h1').text()).toBe('DEALS.BOARD.TITLE');
+    });
+
+    it('shows the vocabulary label as the board title when the pipeline sets one', async () => {
+      useMapGetter.mockImplementation(getter => {
+        const map = {
+          'dealPipelines/getPipelines': [pipelineWithVocabulary],
+          'deals/getDealsByStage': () => [],
+        };
+        return computed(() => map[getter]);
+      });
+
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      expect(wrapper.find('h1').text()).toBe('Oportunidade');
+    });
+
+    it('passes the fallback (empty) lost label to the modal when the pipeline has no custom vocabulary', async () => {
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="move-to-2"]').trigger('click');
+      await flushPromises();
+
+      const modal = wrapper.findComponent({ name: 'DealLostReasonModal' });
+      expect(modal.props('lostLabel')).toBe('');
+    });
+
+    it('passes the vocabulary lost label to the modal when the pipeline sets one', async () => {
+      useMapGetter.mockImplementation(getter => {
+        const map = {
+          'dealPipelines/getPipelines': [pipelineWithVocabulary],
+          'deals/getDealsByStage': () => [],
+        };
+        return computed(() => map[getter]);
+      });
+
+      const wrapper = mountIndex();
+      await flushPromises();
+
+      await wrapper.find('[data-test-id="move-to-2"]').trigger('click');
+      await flushPromises();
+
+      const modal = wrapper.findComponent({ name: 'DealLostReasonModal' });
+      expect(modal.props('lostLabel')).toBe('Cancelado');
+    });
   });
 });

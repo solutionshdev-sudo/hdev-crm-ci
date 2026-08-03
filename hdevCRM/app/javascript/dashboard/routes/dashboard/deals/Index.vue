@@ -139,7 +139,7 @@ onMounted(async () => {
     >
       <div class="flex items-center gap-3">
         <h1 class="text-xl font-medium text-n-slate-12">
-          {{ t('DEALS.BOARD.TITLE') }}
+          {{ selectedPipeline?.vocabulary?.deal || t('DEALS.BOARD.TITLE') }}
         </h1>
         <select
           v-if="pipelines.length > 1"
@@ -219,6 +219,7 @@ onMounted(async () => {
       <DealLostReasonModal
         v-if="pendingLostMove"
         :reasons="lostReasons"
+        :lost-label="selectedPipeline?.vocabulary?.lost || ''"
         @confirm="confirmLostReason"
         @cancel="cancelLostReason"
       />
