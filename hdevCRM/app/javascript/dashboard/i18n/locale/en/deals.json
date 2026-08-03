@@ -3,6 +3,7 @@
     "BOARD": {
       "TITLE": "Kanban",
       "NEW_DEAL": "New deal",
+      "NEW_WITH_LABEL": "New {label}",
       "EMPTY": "No stages in this pipeline yet.",
       "MOVE_ERROR": "Could not move the deal. Try again.",
       "CREATE_SUCCESS": "Deal created.",

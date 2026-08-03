@@ -3,6 +3,7 @@
     "BOARD": {
       "TITLE": "Kanban",
       "NEW_DEAL": "Novo negócio",
+      "NEW_WITH_LABEL": "Novo {label}",
       "EMPTY": "Nenhuma etapa neste funil ainda.",
       "MOVE_ERROR": "Não foi possível mover o negócio. Tente de novo.",
       "CREATE_SUCCESS": "Negócio criado.",
