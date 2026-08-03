@@ -15,6 +15,7 @@
     },
     "LOST_REASON": {
       "TITLE": "Why was this deal lost?",
+      "TITLE_VOCAB": "Why was this marked as {lost}?",
       "SELECT_LABEL": "Reason",
       "SELECT_PLACEHOLDER": "Select a reason",
       "OTHER_OPTION": "Other",
@@ -85,6 +86,13 @@
         "OPEN": "Open",
         "WON": "Won",
         "LOST": "Lost"
+      },
+      "VOCABULARY": {
+        "TITLE": "Terminology",
+        "LEAD": "Lead label",
+        "DEAL": "Deal label",
+        "WON": "Won label",
+        "LOST": "Lost label"
       }
     }
   }

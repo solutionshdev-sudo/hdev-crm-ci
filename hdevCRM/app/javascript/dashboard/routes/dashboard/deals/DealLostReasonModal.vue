@@ -8,6 +8,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // Rótulo de "perdido" do vocabulário do funil selecionado. Vazio quando o
+  // funil não customizou essa chave — o título cai pro texto fixo de sempre.
+  lostLabel: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['confirm', 'cancel']);
@@ -19,6 +25,12 @@ const OTHER_VALUE = '__other__';
 const { t } = useI18n();
 
 const hasConfiguredReasons = computed(() => props.reasons.length > 0);
+
+const title = computed(() =>
+  props.lostLabel
+    ? t('DEALS.LOST_REASON.TITLE_VOCAB', { lost: props.lostLabel })
+    : t('DEALS.LOST_REASON.TITLE')
+);
 
 const selectedReason = ref(hasConfiguredReasons.value ? '' : OTHER_VALUE);
 const customReason = ref('');
@@ -44,7 +56,7 @@ const confirm = () => {
 
 <template>
   <div class="flex flex-col">
-    <woot-modal-header :header-title="t('DEALS.LOST_REASON.TITLE')" />
+    <woot-modal-header :header-title="title" />
     <div class="flex flex-col gap-4 p-6">
       <label v-if="hasConfiguredReasons">
         {{ t('DEALS.LOST_REASON.SELECT_LABEL') }}
