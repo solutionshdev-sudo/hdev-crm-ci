@@ -104,9 +104,7 @@ module Whatsapp::IncomingMessageServiceHelpers
   # nasce com hora de agora e fora de ordem. Futuro trava em agora; ausente → Rails carimba.
   def message_timestamp(message)
     ts = message[:timestamp].to_i
-    return if ts <= 0
-
-    [Time.zone.at(ts), Time.zone.now].min
+    [Time.zone.at(ts), Time.zone.now].min if ts.positive?
   end
 
   def find_message_by_source_id(source_id)

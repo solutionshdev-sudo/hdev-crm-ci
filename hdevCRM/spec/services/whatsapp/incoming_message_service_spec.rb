@@ -39,6 +39,11 @@ describe Whatsapp::IncomingMessageService do
         described_class.new(inbox: whatsapp_channel.inbox, params: params).perform
         # no new conversation should be created
         expect(whatsapp_channel.inbox.conversations.count).to eq(3)
+        # DEBUG-APPENDS (temporário): onde a mensagem foi parar?
+        warn "DEBUG-APPENDS msgs=#{Message.where(source_id: 'SDFADSf23sfasdafasdfa').pluck(:id, :conversation_id, :created_at).inspect} " \
+             "convs=#{whatsapp_channel.inbox.conversations.pluck(:id, :status).inspect} last_conv=#{last_conversation.id} " \
+             "lock=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
+             "contact=#{Contact.where(account: whatsapp_channel.account).pluck(:id, :name, :blocked).inspect}"
         # message appended to the last conversation
         expect(last_conversation.messages.last.content).to eq(params[:messages].first[:text][:body])
       end
@@ -433,6 +438,9 @@ describe Whatsapp::IncomingMessageService do
         expect(m1.attachments.first.fallback_title).to eq('+911800')
         expect(m1.attachments.first.meta).to eq({})
 
+        # DEBUG-VCARD (temporário): os µs de desempate chegaram no banco?
+        warn "DEBUG-VCARD #{whatsapp_channel.inbox.messages.pluck(:id, :content).inspect} " \
+             "times=#{whatsapp_channel.inbox.messages.map { |m| m.created_at.strftime('%H:%M:%S.%6N') }.inspect}"
         m2 = whatsapp_channel.inbox.messages.last
         expect(m2.content).to eq('Chatwoot')
         expect(m2.attachments.first.meta).to eq({ 'firstName' => 'Chatwoot' })
