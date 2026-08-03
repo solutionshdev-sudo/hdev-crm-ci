@@ -10,7 +10,10 @@ require 'rails_helper'
 describe Whatsapp::IncomingMessageBaileysService do
   describe '#perform' do
     after do
-      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| Redis::Alfred.delete(key) }
+      # Coletar antes de deletar — apagar no meio do SCAN pode pular chave (CI 02/08).
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
     end
 
     let!(:whatsapp_channel) do
@@ -140,6 +143,15 @@ describe Whatsapp::IncomingMessageBaileysService do
   # no Node): eco do celular (field smb_message_echoes) e placeholder de
   # conteúdo não suportado (mídia que falhou no download, contact card, poll).
   describe 'baileys-service payloads (echo + unsupported)' do
+    after do
+      # Sem esta varredura os locks (ids aleatórios) acumulam no Redis e mudam a
+      # geometria do keyspace — foi o que expôs a aresta do SCAN nos cleanups de
+      # outros arquivos (CI 02/08). Coletar antes de deletar, pela mesma razão.
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
+    end
+
     let!(:channel) do
       create(:channel_whatsapp,
              provider: 'baileys',

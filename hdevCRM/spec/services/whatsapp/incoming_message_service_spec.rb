@@ -9,14 +9,12 @@ describe Whatsapp::IncomingMessageService do
     after do
       # The atomic dedup lock lives in Redis and is not rolled back by
       # transactional fixtures. Clean up any keys created during the test.
-      deleted = 0
-      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') do |key|
-        Redis::Alfred.delete(key)
-        deleted += 1
-      end
-      # DEBUG temporário: o cleanup apagou mesmo? sobrou a chave do appends?
-      warn "DEBUG-CLEAN deleted=#{deleted} still=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
-           "at=#{Process.clock_gettime(Process::CLOCK_MONOTONIC).round(2)}"
+      # Coletar ANTES de deletar: apagar no meio do SCAN pode pular chave quando o
+      # rehash encolhe a tabela (provado no CI em 02/08 — o lock fresco sobrevivia
+      # à varredura e o exemplo seguinte era barrado pelo dedupe).
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
     end
 
     let!(:whatsapp_channel) { create(:channel_whatsapp, sync_templates: false) }
@@ -41,16 +39,9 @@ describe Whatsapp::IncomingMessageService do
         contact_inbox = create(:contact_inbox, inbox: whatsapp_channel.inbox, source_id: params[:messages].first[:from])
         2.times.each { create(:conversation, inbox: whatsapp_channel.inbox, contact_inbox: contact_inbox, contact: contact_inbox.contact) }
         last_conversation = create(:conversation, inbox: whatsapp_channel.inbox, contact_inbox: contact_inbox, contact: contact_inbox.contact)
-        # DEBUG-APPENDS (temporário): lock preso ANTES do perform? TTL revela a idade.
-        warn "DEBUG-APPENDS-PRE lock=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
-             "ttl=#{Redis::Alfred.ttl('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa')}"
         described_class.new(inbox: whatsapp_channel.inbox, params: params).perform
         # no new conversation should be created
         expect(whatsapp_channel.inbox.conversations.count).to eq(3)
-        # DEBUG-APPENDS (temporário): onde a mensagem foi parar?
-        warn "DEBUG-APPENDS-POS msgs=#{Message.where(source_id: 'SDFADSf23sfasdafasdfa').pluck(:id, :conversation_id, :created_at).inspect} " \
-             "ttl=#{Redis::Alfred.ttl('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa')} " \
-             "contact_inboxes=#{whatsapp_channel.inbox.contact_inboxes.pluck(:id, :source_id, :contact_id).inspect}"
         # message appended to the last conversation
         expect(last_conversation.messages.last.content).to eq(params[:messages].first[:text][:body])
       end
