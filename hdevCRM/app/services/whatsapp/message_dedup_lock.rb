@@ -14,6 +14,11 @@ class Whatsapp::MessageDedupLock
   # Returns true when the lock is acquired (caller should proceed).
   # Returns false when another worker already holds the lock.
   def acquire!
-    ::Redis::Alfred.set(@key, true, nx: true, ex: @ttl)
+    result = ::Redis::Alfred.set(@key, true, nx: true, ex: @ttl)
+    # DEBUG temporário: quem toca o lock do spec 'appends'?
+    if @key == 'MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa'
+      warn "DEBUG-LOCK acquire result=#{result.inspect} at=#{Process.clock_gettime(Process::CLOCK_MONOTONIC).round(2)}\n#{caller.first(6).join("\n")}"
+    end
+    result
   end
 end

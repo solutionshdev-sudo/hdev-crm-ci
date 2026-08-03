@@ -9,9 +9,14 @@ describe Whatsapp::IncomingMessageService do
     after do
       # The atomic dedup lock lives in Redis and is not rolled back by
       # transactional fixtures. Clean up any keys created during the test.
+      deleted = 0
       Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') do |key|
         Redis::Alfred.delete(key)
+        deleted += 1
       end
+      # DEBUG temporário: o cleanup apagou mesmo? sobrou a chave do appends?
+      warn "DEBUG-CLEAN deleted=#{deleted} still=#{Redis::Alfred.get('MESSAGE_SOURCE_KEY::SDFADSf23sfasdafasdfa').inspect} " \
+           "at=#{Process.clock_gettime(Process::CLOCK_MONOTONIC).round(2)}"
     end
 
     let!(:whatsapp_channel) { create(:channel_whatsapp, sync_templates: false) }
