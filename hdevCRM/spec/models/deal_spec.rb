@@ -20,7 +20,7 @@ RSpec.describe Deal do
     end
 
     it 'marks the deal as lost and sets closed_at when moved to a lost stage' do
-      deal.update!(deal_stage: lost_stage)
+      deal.update!(deal_stage: lost_stage, lost_reason: 'preço')
 
       expect(deal.reload).to be_lost
       expect(deal.closed_at).to be_present
@@ -52,6 +52,53 @@ RSpec.describe Deal do
     end
   end
 
+  describe 'lost_reason validation' do
+    let(:deal) { create(:deal, account: account, deal_pipeline: pipeline, deal_stage: open_stage, contact: contact) }
+
+    it 'is invalid when moved to a lost stage without a lost_reason' do
+      deal.deal_stage = lost_stage
+
+      expect(deal).to be_invalid
+      expect(deal.errors[:lost_reason]).to include(I18n.t('errors.models.deal.lost_reason_required'))
+    end
+
+    it 'is valid when moved to a lost stage with a lost_reason' do
+      deal.deal_stage = lost_stage
+      deal.lost_reason = 'preço'
+
+      expect(deal).to be_valid
+    end
+
+    it 'is invalid when created directly into a lost stage without a lost_reason' do
+      new_deal = build(:deal, account: account, deal_pipeline: pipeline, deal_stage: lost_stage, contact: contact)
+
+      expect(new_deal).to be_invalid
+      expect(new_deal.errors[:lost_reason]).to include(I18n.t('errors.models.deal.lost_reason_required'))
+    end
+
+    it 'is valid when created directly into a lost stage with a lost_reason' do
+      new_deal = build(:deal, account: account, deal_pipeline: pipeline, deal_stage: lost_stage, contact: contact,
+                              lost_reason: 'sem orçamento')
+
+      expect(new_deal).to be_valid
+    end
+
+    it 'clears the lost_reason when the deal is reopened' do
+      deal.update!(deal_stage: lost_stage, lost_reason: 'preço')
+
+      deal.update!(deal_stage: open_stage)
+
+      expect(deal.reload.lost_reason).to be_nil
+    end
+
+    it 'does not require a lost_reason on saves that do not change the stage' do
+      deal.update!(deal_stage: lost_stage, lost_reason: 'preço')
+      deal.update_column(:lost_reason, nil) # simula um registro antigo sem motivo, sem passar pela validação
+
+      expect(deal.update(value: 999)).to be true
+    end
+  end
+
   describe 'event dispatch' do
     before do
       allow(Rails.configuration.dispatcher).to receive(:dispatch)
@@ -75,7 +122,8 @@ RSpec.describe Deal do
       end
 
       it 'dispatches only DEAL_CREATED, never a stage event, when created directly into a lost stage' do
-        deal = create(:deal, account: account, deal_pipeline: pipeline, deal_stage: lost_stage, contact: contact, conversation: conversation)
+        deal = create(:deal, account: account, deal_pipeline: pipeline, deal_stage: lost_stage, contact: contact, conversation: conversation,
+                             lost_reason: 'preço')
 
         expect(Rails.configuration.dispatcher).to have_received(:dispatch)
           .with(described_class::DEAL_CREATED, kind_of(Time), deal: deal, conversation: conversation, changed_attributes: kind_of(Hash))
@@ -105,7 +153,7 @@ RSpec.describe Deal do
       end
 
       it 'dispatches DEAL_LOST instead of DEAL_STAGE_CHANGED when moved to a lost stage' do
-        deal.update!(deal_stage: lost_stage)
+        deal.update!(deal_stage: lost_stage, lost_reason: 'preço')
 
         expect(Rails.configuration.dispatcher).to have_received(:dispatch)
           .with(described_class::DEAL_LOST, kind_of(Time), deal: deal, conversation: conversation, changed_attributes: kind_of(Hash))

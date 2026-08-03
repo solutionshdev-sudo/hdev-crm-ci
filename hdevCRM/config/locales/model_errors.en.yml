@@ -49,6 +49,7 @@ en:
         unsupported_import_types: 'contains unsupported values: %{invalid_types}'
       deal:
         stage_not_in_pipeline: 'must belong to the deal pipeline'
+        lost_reason_required: 'is required when the deal is marked as lost'
       email_template:
         account_mismatch: 'must match inbox account'
         invalid_liquid: 'has invalid Liquid syntax: %{message}'
