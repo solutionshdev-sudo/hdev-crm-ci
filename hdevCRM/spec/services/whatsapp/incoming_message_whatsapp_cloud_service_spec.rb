@@ -3,7 +3,10 @@ require 'rails_helper'
 describe Whatsapp::IncomingMessageWhatsappCloudService do
   describe '#perform' do
     after do
-      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| Redis::Alfred.delete(key) }
+      # Coletar antes de deletar — apagar no meio do SCAN pode pular chave (CI 02/08).
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
     end
 
     let!(:whatsapp_channel) { create(:channel_whatsapp, provider: 'whatsapp_cloud', sync_templates: false, validate_provider_config: false) }
