@@ -5,7 +5,10 @@ require 'rails_helper'
 # stub de Redis::Alfred só pros dois testes de TTL.
 describe Messaging::BaileysSendCounter do
   after do
-    Redis::Alfred.scan_each(match: 'baileys:sent:*') { |key| Redis::Alfred.delete(key) }
+    # Coletar antes de deletar — apagar no meio do SCAN pode pular chave (CI 02/08).
+    keys = []
+    Redis::Alfred.scan_each(match: 'baileys:sent:*') { |key| keys << key }
+    keys.each { |key| Redis::Alfred.delete(key) }
   end
 
   let(:account) { create(:account) }

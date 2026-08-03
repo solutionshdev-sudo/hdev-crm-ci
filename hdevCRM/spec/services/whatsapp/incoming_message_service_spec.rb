@@ -9,9 +9,12 @@ describe Whatsapp::IncomingMessageService do
     after do
       # The atomic dedup lock lives in Redis and is not rolled back by
       # transactional fixtures. Clean up any keys created during the test.
-      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') do |key|
-        Redis::Alfred.delete(key)
-      end
+      # Coletar ANTES de deletar: apagar no meio do SCAN pode pular chave quando o
+      # rehash encolhe a tabela (provado no CI em 02/08 — o lock fresco sobrevivia
+      # à varredura e o exemplo seguinte era barrado pelo dedupe).
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
     end
 
     let!(:whatsapp_channel) { create(:channel_whatsapp, sync_templates: false) }
@@ -433,6 +436,9 @@ describe Whatsapp::IncomingMessageService do
         expect(m1.attachments.first.fallback_title).to eq('+911800')
         expect(m1.attachments.first.meta).to eq({})
 
+        # DEBUG-VCARD (temporário): os µs de desempate chegaram no banco?
+        warn "DEBUG-VCARD #{whatsapp_channel.inbox.messages.pluck(:id, :content).inspect} " \
+             "times=#{whatsapp_channel.inbox.messages.map { |m| m.created_at.strftime('%H:%M:%S.%6N') }.inspect}"
         m2 = whatsapp_channel.inbox.messages.last
         expect(m2.content).to eq('Chatwoot')
         expect(m2.attachments.first.meta).to eq({ 'firstName' => 'Chatwoot' })

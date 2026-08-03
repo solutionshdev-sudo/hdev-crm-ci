@@ -100,6 +100,13 @@ module Whatsapp::IncomingMessageServiceHelpers
     message[:referral]&.to_h&.deep_stringify_keys || {}
   end
 
+  # Timestamp real do webhook (epoch s) vira created_at — sem ele, backfill de histórico
+  # nasce com hora de agora e fora de ordem. Futuro trava em agora; ausente → Rails carimba.
+  def message_timestamp(message)
+    ts = message[:timestamp].to_i
+    [Time.zone.at(ts), Time.zone.now].min if ts.positive?
+  end
+
   def find_message_by_source_id(source_id)
     return unless source_id
 

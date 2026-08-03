@@ -10,7 +10,10 @@ require 'rails_helper'
 describe Whatsapp::IncomingMessageBaileysService do
   describe '#perform' do
     after do
-      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| Redis::Alfred.delete(key) }
+      # Coletar antes de deletar — apagar no meio do SCAN pode pular chave (CI 02/08).
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
     end
 
     let!(:whatsapp_channel) do
@@ -140,6 +143,15 @@ describe Whatsapp::IncomingMessageBaileysService do
   # no Node): eco do celular (field smb_message_echoes) e placeholder de
   # conteúdo não suportado (mídia que falhou no download, contact card, poll).
   describe 'baileys-service payloads (echo + unsupported)' do
+    after do
+      # Sem esta varredura os locks (ids aleatórios) acumulam no Redis e mudam a
+      # geometria do keyspace — foi o que expôs a aresta do SCAN nos cleanups de
+      # outros arquivos (CI 02/08). Coletar antes de deletar, pela mesma razão.
+      keys = []
+      Redis::Alfred.scan_each(match: 'MESSAGE_SOURCE_KEY::*') { |key| keys << key }
+      keys.each { |key| Redis::Alfred.delete(key) }
+    end
+
     let!(:channel) do
       create(:channel_whatsapp,
              provider: 'baileys',
@@ -200,6 +212,36 @@ describe Whatsapp::IncomingMessageBaileysService do
         described_class.new(inbox: inbox, params: echo_params(stop_echo), outgoing_echo: true).perform
 
         expect(inbox.conversations.last.contact.automation_opted_out?).to be(false)
+      end
+    end
+
+    describe 'payload timestamps (history backfill)' do
+      def text_params(timestamp:)
+        wrap('messages', { messaging_product: 'whatsapp',
+                           metadata: { display_phone_number: '1234567891', phone_number_id: 'instance-1' },
+                           contacts: [{ profile: { name: 'Cliente' }, wa_id: '919745786257' }],
+                           messages: [{ from: '919745786257', id: "instance-1:MSG-#{SecureRandom.hex(4)}",
+                                        timestamp: timestamp, type: 'text', text: { body: 'oi' } }.compact] })
+      end
+
+      it 'stamps created_at from the payload timestamp, so backfilled history keeps its real time and order' do
+        described_class.new(inbox: inbox, params: text_params(timestamp: '1722400000')).perform
+
+        expect(inbox.messages.last.created_at).to eq(Time.zone.at(1_722_400_000))
+      end
+
+      it 'clamps a future timestamp (skewed device clock) to now' do
+        travel_to Time.zone.local(2026, 8, 2, 12, 0, 0) do
+          described_class.new(inbox: inbox, params: text_params(timestamp: 1.hour.from_now.to_i.to_s)).perform
+
+          expect(inbox.messages.last.created_at).to eq(Time.zone.now)
+        end
+      end
+
+      it 'falls back to processing time when the payload has no timestamp' do
+        described_class.new(inbox: inbox, params: text_params(timestamp: nil)).perform
+
+        expect(inbox.messages.last.created_at).to be_within(5.seconds).of(Time.zone.now)
       end
     end
 

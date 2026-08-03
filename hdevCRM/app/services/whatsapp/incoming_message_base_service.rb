@@ -172,6 +172,9 @@ class Whatsapp::IncomingMessageBaseService
       status: outgoing_echo ? :delivered : :sent,
       sender: outgoing_echo ? nil : @contact,
       source_id: (source_id || message[:id]).to_s,
+      # content_attributes_source é sempre a mensagem original do webhook (no contact
+      # card, `message` aqui é o vcard, que não tem timestamp).
+      created_at: message_timestamp(content_attributes_source),
       content_attributes: message_content_attributes(content_attributes_source)
     )
   end
