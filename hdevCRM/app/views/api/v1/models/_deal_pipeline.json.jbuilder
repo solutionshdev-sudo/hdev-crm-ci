@@ -3,6 +3,7 @@ json.name deal_pipeline.name
 json.description deal_pipeline.description
 json.position deal_pipeline.position
 json.is_default deal_pipeline.is_default
+json.vocabulary deal_pipeline.vocabulary
 json.stages do
   json.array! deal_pipeline.deal_stages do |stage|
     json.id stage.id

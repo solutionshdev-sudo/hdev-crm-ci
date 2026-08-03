@@ -50,6 +50,8 @@ en:
       deal:
         stage_not_in_pipeline: 'must belong to the deal pipeline'
         lost_reason_required: 'is required when the deal is marked as lost'
+      deal_pipeline:
+        vocabulary_length: 'must be between 1 and 40 characters (%{key})'
       email_template:
         account_mismatch: 'must match inbox account'
         invalid_liquid: 'has invalid Liquid syntax: %{message}'
