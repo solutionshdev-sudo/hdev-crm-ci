@@ -1,7 +1,7 @@
 {
   "DEALS": {
     "BOARD": {
-      "TITLE": "Negócios",
+      "TITLE": "Kanban",
       "NEW_DEAL": "Novo negócio",
       "EMPTY": "Nenhuma etapa neste funil ainda.",
       "MOVE_ERROR": "Não foi possível mover o negócio. Tente de novo.",

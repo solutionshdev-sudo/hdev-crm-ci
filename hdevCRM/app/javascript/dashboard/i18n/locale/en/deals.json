@@ -1,7 +1,7 @@
 {
   "DEALS": {
     "BOARD": {
-      "TITLE": "Deals",
+      "TITLE": "Kanban",
       "NEW_DEAL": "New deal",
       "EMPTY": "No stages in this pipeline yet.",
       "MOVE_ERROR": "Could not move the deal. Try again.",
