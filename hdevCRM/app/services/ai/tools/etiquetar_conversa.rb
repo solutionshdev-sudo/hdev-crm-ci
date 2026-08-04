@@ -81,7 +81,7 @@ class Ai::Tools::EtiquetarConversa < Ai::Tool
     return encontrada.title if encontrada
 
     raise Ai::ToolError,
-          "A etiqueta '#{nome}' não existe nesta conta. Etiquetas disponíveis: #{cadastradas.map(&:title).join(', ')}."
+          "A etiqueta '#{nome}' não existe nesta conta. Etiquetas disponíveis: #{vocabulary_sample(cadastradas.map(&:title))}."
   end
 
   def mensagem_atual

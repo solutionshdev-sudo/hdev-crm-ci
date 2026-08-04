@@ -68,6 +68,16 @@ RSpec.describe Ai::AgentReplyService do
       expect(described_class.enabled_for?(conversation)).to be(false)
     end
 
+    it 'is false when the contact opted out of automation' do
+      conversation.contact.update!(automation_opted_out: true)
+      expect(described_class.enabled_for?(conversation)).to be(false)
+    end
+
+    it 'is false when the contact is blocked' do
+      conversation.contact.update!(blocked: true)
+      expect(described_class.enabled_for?(conversation)).to be(false)
+    end
+
     it 'respects the inbox allowlist' do
       account.update!(custom_attributes: { 'ai_agent_enabled' => true, 'ai_agent_inbox_ids' => [conversation.inbox_id + 1] })
       expect(described_class.enabled_for?(conversation)).to be(false)
@@ -172,6 +182,40 @@ RSpec.describe Ai::AgentReplyService do
     end
   end
 
+  # "PARAR" da Fase 2 é sem AUTOMAÇÃO, não só sem mensagem: o agente da F3a roda
+  # cinco ferramentas de ESCRITA antes de responder, e o gate de opt-out da
+  # camada de envio só barra o envio — o que já teria sido gravado no cadastro,
+  # nas etiquetas e no kanban ficaria gravado.
+  describe '#perform, contato fora da automação' do
+    before do
+      create(:label, account: account, title: 'urgente')
+      # o modelo (falso) TENTA escrever: se o turno rodar, a etiqueta aparece
+      stub_ai_turns(tool_turn('etiquetar_conversa', { 'etiquetas' => ['urgente'] }), text_turn('pronto'))
+    end
+
+    it 'não roda nada quando o contato deu PARAR: sem modelo, sem ferramenta, sem quota' do
+      conversation.contact.update!(automation_opted_out: true)
+
+      service.perform
+
+      expect(Ai::AnthropicService).not_to have_received(:new)
+      expect(ai_client).not_to have_received(:raw_chat)
+      expect(conversation.reload.label_list).to be_blank
+      expect(conversation.messages.outgoing.count).to eq(0)
+    end
+
+    it 'não roda nada quando o contato está bloqueado' do
+      conversation.contact.update!(blocked: true)
+
+      service.perform
+
+      expect(Ai::AnthropicService).not_to have_received(:new)
+      expect(ai_client).not_to have_received(:raw_chat)
+      expect(conversation.reload.label_list).to be_blank
+      expect(conversation.messages.outgoing.count).to eq(0)
+    end
+  end
+
   # Handoff barato: pedido explícito de humano é detectado por regex ANTES de
   # chamar o modelo. Conservador de propósito — falso positivo cala o bot à toa.
   describe '#perform, pedido explícito de atendente humano' do
@@ -189,7 +233,10 @@ RSpec.describe Ai::AgentReplyService do
       # verbo de ação abrindo a mensagem, sem verbo de desejo nenhum
       'falar com atendente',
       # verbo de desejo no meio da frase, sem pontuação antes
-      'bom dia quero falar com um atendente'
+      'bom dia quero falar com um atendente',
+      # "ser" só é ponte quando colado em atendido/atendida — o par do negativo
+      # "quero ser pessoa jurídica" logo abaixo
+      'quero ser atendido por um humano'
     ].each do |frase|
       it "transfere sem chamar a IA: #{frase.inspect}" do
         incoming(frase)
@@ -210,7 +257,14 @@ RSpec.describe Ai::AgentReplyService do
       'adorei falar com o atendente de vocês',
       'gostei de falar com a pessoa que me atendeu',
       'não quero falar com atendente',
-      'quero saber o status do meu pedido'
+      'quero saber o status do meu pedido',
+      # "pessoa" é substantivo comum: frases de cadastro/comercial que um CRM
+      # vendido pra agência recebe todo dia não podem calar o bot pra sempre
+      'quero ser pessoa jurídica',
+      'preciso ser pessoa jurídica pra emitir nota',
+      'quero uma pessoa de contato no comercial',
+      'gostaria de uma pessoa jurídica no cadastro',
+      'preciso de uma pessoa para assinar o contrato'
     ].each do |frase|
       it "menção solta não transfere, segue pra IA: #{frase.inspect}" do
         incoming(frase)

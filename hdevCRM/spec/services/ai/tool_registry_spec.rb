@@ -17,6 +17,20 @@ RSpec.describe Ai::ToolRegistry do
     end
   end
 
+  # Nomes de propriedade declarados em QUALQUER profundidade do schema (um
+  # `properties` aninhado dentro de `items`, por exemplo, também conta).
+  def property_names(node)
+    case node
+    when Hash
+      node.flat_map do |key, value|
+        aqui = key.to_s == 'properties' && value.is_a?(Hash) ? value.keys.map(&:to_s) : []
+        aqui + property_names(value)
+      end
+    when Array then node.flat_map { |item| property_names(item) }
+    else []
+    end
+  end
+
   def registry(context: :copilot, conversation: nil)
     stub_const('Ai::ToolRegistry::SETS', { context => [tool_class].freeze }.freeze)
     described_class.new(context: context, account: account, conversation: conversation)
@@ -65,18 +79,34 @@ RSpec.describe Ai::ToolRegistry do
     # Coração de segurança da fase: um estranho (WhatsApp, widget) escreve a
     # mensagem que o modelo lê, e nenhuma tool deste set pode expor parâmetro
     # que deixe o modelo apontar pra conversa/contato/negócio/conta de outro
-    # cliente. O sweep varre o schema inteiro (`inspect`, não só o primeiro
-    # nível) pra pegar regressão em qualquer profundidade.
-    it 'nenhuma tool do set :agent declara parâmetro de id no schema' do
-      proibidos = %w[account_id conversation_id contact_id deal_id]
+    # cliente.
+    #
+    # ALLOWLIST, não blacklist de nomes de id: uma lista de `%w[account_id
+    # conversation_id ...]` só conhece os nomes que alguém lembrou de escrever —
+    # `stage_id`, `id`, e principalmente seletores que nem parecem id
+    # (`negocio`, `pipeline`) passariam batido. Comparar por IGUALDADE faz
+    # qualquer propriedade nova, com qualquer nome, em qualquer profundidade do
+    # schema, quebrar este exemplo e obrigar alguém a decidir na mão se ela
+    # deixa o modelo apontar pra fora desta conversa.
+    #
+    # O que ele NÃO cobre, pra ninguém confundir com prova de segurança: o VALOR
+    # que o modelo manda em cada parâmetro (isso é o `with forged ids` no spec
+    # de cada tool) e o escopo resolvido por nome dentro da conta (o `resolve_`
+    # de cada tool). Aqui só se afirma qual é a superfície declarada.
+    it 'o set :agent não expõe nenhum parâmetro além dos revisados' do
+      esperados = {
+        'atualizar_contato' => %w[nome email],
+        'criar_negocio' => %w[etapa],
+        'etiquetar_conversa' => %w[etiquetas],
+        'mover_negocio_da_conversa' => %w[etapa],
+        'transferir_para_humano' => []
+      }
 
-      Ai::ToolRegistry::SETS.fetch(:agent).each do |tool_class|
-        schema_texto = tool_class.tool_schema.inspect
-
-        proibidos.each do |proibido|
-          expect(schema_texto).not_to include(proibido)
-        end
+      declarados = Ai::ToolRegistry::SETS.fetch(:agent).to_h do |tool_class|
+        [tool_class.tool_name, property_names(tool_class.tool_schema)]
       end
+
+      expect(declarados).to eq(esperados)
     end
   end
 end

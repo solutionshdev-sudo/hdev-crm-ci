@@ -52,14 +52,15 @@ class Ai::Tools::MoverNegocioDaConversa < Ai::Tool
 
   # Etapa por NOME, resolvida dentro do funil do próprio negócio. Errar o nome
   # não é falha do modelo, é falta de contexto: a mensagem devolve a lista para
-  # ele escolher na iteração seguinte.
+  # ele escolher na iteração seguinte — truncada, porque nome de etapa expõe o
+  # processo comercial da agência (ver Ai::Tool#vocabulary_sample).
   def resolve_stage(deal, etapa)
     stages = deal.deal_pipeline.deal_stages.to_a
     stage = stages.find { |candidate| candidate.name.casecmp?(etapa) }
     return stage if stage
 
     raise Ai::ToolError,
-          "A etapa '#{etapa}' não existe neste funil. Etapas disponíveis: #{stages.map(&:name).join(', ')}."
+          "A etapa '#{etapa}' não existe neste funil. Etapas disponíveis: #{vocabulary_sample(stages.map(&:name))}."
   end
 
   # 3º call site do motivo padrão (os outros dois: ActionService#move_deal_stage

@@ -52,6 +52,38 @@ RSpec.describe Ai::Tools::CriarNegocio do
     expect { ferramenta.call({}) }.to raise_error(Ai::ToolError, /conversa/)
   end
 
+  # Ciclo de prompt injection: entrar em etapa perdida tira o negócio do `open`
+  # (Deal#apply_stage_outcome), o guard de idempotência é `open`-scoped, e o
+  # modelo repetiria criar -> mover("Perdido") -> criar dentro de um turno,
+  # publicando card atrás de card no kanban da conta inteira.
+  context 'when the conversation already hit the deal cap' do
+    let!(:perdido) { create(:deal_stage, :lost, account: account, deal_pipeline: pipeline, name: 'Perdido', position: 3) }
+
+    def fechar_negocios(quantos)
+      quantos.times do
+        create(:deal, account: account, deal_pipeline: pipeline, deal_stage: perdido, lost_reason: 'ciclo',
+                      contact: conversation.contact, conversation: conversation)
+      end
+    end
+
+    it 'recusa em texto quando o teto já foi atingido, contando negócio FECHADO' do
+      fechar_negocios(described_class::MAX_DEALS_POR_CONVERSA)
+      fechados = account.deals.where(conversation_id: conversation.id)
+
+      resultado = nil
+      expect { resultado = tool.call({}) }.not_to change(Deal, :count)
+
+      expect(fechados.open.count).to eq(0)
+      expect(resultado).to eq(described_class::LIMITE_ATINGIDO)
+    end
+
+    it 'ainda cria enquanto a conversa está abaixo do teto' do
+      fechar_negocios(described_class::MAX_DEALS_POR_CONVERSA - 1)
+
+      expect { tool.call({}) }.to change(Deal, :count).by(1)
+    end
+  end
+
   context 'with forged ids pointing at another account' do
     let(:outra_conta) { create(:account) }
     let(:outra_conversa) { create(:conversation, account: outra_conta) }

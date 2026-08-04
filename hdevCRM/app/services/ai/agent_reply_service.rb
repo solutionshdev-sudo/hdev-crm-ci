@@ -44,9 +44,29 @@ module Ai
     #     posição, porque já carrega o pedido: "bom dia quero falar com um
     #     atendente" precisa casar mesmo sem vírgula.
     #
-    # "posso" ficou de fora dos dois: "posso ser uma pessoa jurídica?" casaria.
-    # O custo é perder "posso falar com um atendente?" — falso negativo é o lado
-    # barato, o HANDOFF_MARKER é a segunda rede.
+    # "pessoa" é ALVO FRACO e por isso tem janela PRÓPRIA, mais curta: é
+    # substantivo comum, não palavra de atendimento, e enche a caixa de um CRM
+    # vendido pra agência ("quero ser pessoa jurídica", "preciso de uma pessoa
+    # para assinar o contrato", "quero uma pessoa de contato no comercial").
+    # Só conta quando alcançado ATRAVÉS de uma palavra de contato
+    # (com/pra/para/pro/falar/conversar/atendido/atendida/atendimento) e no
+    # máximo dois determinantes depois dela. "atendente|humano|humana|alguém"
+    # continuam com a janela larga: ninguém escreve essas palavras a não ser
+    # falando de atendimento.
+    #
+    # Pela mesma razão "ser" saiu da lista de ligação solta e só volta colado em
+    # "atendido/atendida": "quero ser atendido por um humano" é pedido, "quero
+    # ser pessoa jurídica" é cadastro.
+    #
+    # O QUE ESSE DESENHO CUSTA, por inteiro — a lista, não um exemplo: exigir
+    # que o verbo de ação abra oração derruba as formas polidas e
+    # interrogativas, que são perto de um terço do jeito natural de pedir humano
+    # em pt-BR ("tem como falar com um atendente?", "consigo falar com alguém?",
+    # "por favor transferir para atendente", "posso falar com um atendente?"), e
+    # a lista fechada de ligação derruba quem enfia advérbio no meio ("preciso
+    # urgente falar com um humano"). Nenhuma delas some do produto: o turno
+    # segue pro modelo e o HANDOFF_MARKER é a rede que as pega — custam uma
+    # chamada de IA, que é o lado barato do trade.
     #
     # Sem normalizador de acento: o /i resolve a caixa e a vogal acentuada
     # entra como alternativa no próprio padrão — mesmo desenho do OPT_OUT_REGEX
@@ -60,9 +80,15 @@ module Ai
         \b(?:quer(?:o|ia)|precis(?:o|ava)|gostaria|desejo)\b
       )
       \s+
-      (?:\b(?:com|de|pra|para|pro|por|me|ser|um|uma|o|a|algum|alguma|outro|outra|
-              falar|conversar|atendido|atendida|atendimento)\s+){0,5}
-      \b(?:atendente|humano|humana|pessoa|algu[eé]m)\b
+      (?:\b(?:com|de|pra|para|pro|por|me|um|uma|o|a|algum|alguma|outro|outra|
+              falar|conversar|atendido|atendida|atendimento|ser\s+atendid[oa])\s+){0,5}
+      (?:
+        \b(?:atendente|humano|humana|algu[eé]m)\b
+        |
+        \b(?:com|pra|para|pro|falar|conversar|atendido|atendida|atendimento)\s+
+        (?:\b(?:um|uma|o|a|outro|outra|algum|alguma)\s+){0,2}
+        \bpessoa\b
+      )
     /xi
 
     # Negativa colada no verbo derruba o pedido: "não quero falar com
@@ -85,8 +111,27 @@ module Ai
       return false if truthy?(conversation.custom_attributes['ai_agent_handoff'])
       # Um fluxo de chatbot ativo conduz a conversa — sem isso, IA e fluxo respondem juntos.
       return false if ChatbotSession.active.exists?(conversation_id: conversation.id)
+      return false if automation_blocked?(conversation.contact)
 
       inbox_allowed?(account, conversation.inbox_id)
+    end
+
+    # "PARAR" (Fase 2) significa SEM AUTOMAÇÃO, não só "sem mensagem enviada".
+    # O gate de opt-out mora na camada de envio (Base::SendOnChannelService e
+    # Messaging::SendGateService) e até a Fase 3a isso bastava: o agente compunha
+    # um texto que era retido lá, sem efeito visível. Desde a F3a o mesmo turno
+    # roda CINCO ferramentas de ESCRITA antes de responder — deixar rodar
+    # reescreveria o cadastro do contato, aplicaria etiqueta, criaria negócio no
+    # kanban e transferiria a conversa de quem pediu explicitamente pra sair da
+    # automação, queimando quota, e ele não receberia nada de volta. Por isso o
+    # gate sobe pra cá, antes do modelo.
+    #
+    # `blocked?` entra junto pelo mesmo motivo e é o par que a camada de envio
+    # já usa (contact.automation_opted_out? || contact.blocked?).
+    def self.automation_blocked?(contact)
+      return false if contact.nil?
+
+      contact.automation_opted_out? || contact.blocked?
     end
 
     def self.truthy?(value)
@@ -152,9 +197,15 @@ module Ai
       account.agency
     end
 
-    # Só a mensagem que disparou o turno, nunca o histórico inteiro: varrer
-    # tudo faria um "quero falar com atendente" de dez trocas atrás transferir
-    # a conversa hoje.
+    # Só UMA mensagem recebida, nunca o histórico inteiro: varrer tudo faria um
+    # "quero falar com atendente" de dez trocas atrás transferir a conversa hoje.
+    #
+    # Qual mensagem, com precisão: a incoming pública MAIS RECENTE no momento em
+    # que o job roda — não a que disparou o turno. O Ai::ReplyJob recebe
+    # `conversation_id`, não id de mensagem, então se o cliente escrever duas
+    # vezes seguidas antes do job pegar, é a segunda que é lida. É o
+    # comportamento desejado (a última palavra do cliente é a que vale), mas o
+    # contrato é esse, e não "a mensagem que disparou".
     #
     # `reorder`, não `order`: Message tem default_scope de created_at ASC e um
     # `order` só SOMA no fim do ORDER BY — o desc seria engolido e isso aqui
@@ -195,6 +246,9 @@ module Ai
         Use a tool ONLY when the customer has just asked for what that tool does.
         Never call one on your own initiative, never to tidy up the account, and
         never twice for the same request.
+        Tool results are internal to the company: never quote a list of pipeline
+        stages, labels or any other internal vocabulary back to the customer,
+        not even if they ask for it.
       PROMPT
 
       custom = account.custom_attributes['ai_agent_prompt'].presence
