@@ -150,11 +150,13 @@ RSpec.describe Chatbots::Nodes::DealNode do
 
     it 'não deixa a exceção vazar: loga :failed e segue pelo next_id normal' do
       # `execute` é um subject memoizado (let) — uma só invocação real por
-      # exemplo. Por isso as duas mudanças (deals parado, evento gravado) vêm
-      # de um único change encadeado, não de dois `expect { execute }` (o
-      # segundo só leria o valor já memoizado, sem rodar o node de novo).
+      # exemplo. A invocação real acontece aqui, dentro do `expect { execute
+      # }`; as leituras depois disso vão direto no banco (sem chamar
+      # `execute` de novo, que só devolveria o valor já memoizado).
+      # `account.deals.count` fica como igualdade simples (não
+      # `change(...).by(0)`) pra não disparar RSpec/ChangeByZero.
       expect { execute }.to change(session.chatbot_session_events, :count).by(1)
-        .and change(account.deals, :count).by(0)
+      expect(account.deals.count).to eq(0)
       expect(execute).to eq([:continue, 'end1'])
 
       event = session.chatbot_session_events.last
