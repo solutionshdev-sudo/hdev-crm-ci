@@ -6,8 +6,10 @@ RSpec.describe Ai::Tools::EtiquetarConversa do
   let(:tool) { described_class.new(account: account, user: nil, conversation: conversation) }
 
   context 'when the account has labels registered' do
-    let!(:urgente) { create(:label, account: account, title: 'urgente') }
-    let!(:orcamento) { create(:label, account: account, title: 'orçamento-enviado') }
+    before do
+      create(:label, account: account, title: 'urgente')
+      create(:label, account: account, title: 'orçamento-enviado')
+    end
 
     it 'aplica as etiquetas conhecidas na conversa da vez' do
       resultado = tool.call('etiquetas' => %w[urgente orçamento-enviado])
@@ -77,9 +79,10 @@ RSpec.describe Ai::Tools::EtiquetarConversa do
   end
 
   context 'with forged ids pointing at another conversation' do
-    let!(:urgente) { create(:label, account: account, title: 'urgente') }
     let(:outra_conta) { create(:account) }
     let!(:outra_conversa) { create(:conversation, account: outra_conta) }
+
+    before { create(:label, account: account, title: 'urgente') }
 
     it 'ignora os ids forjados e etiqueta apenas a conversa injetada' do
       input = {
@@ -95,7 +98,7 @@ RSpec.describe Ai::Tools::EtiquetarConversa do
     end
 
     context 'when the label only exists on the other account' do
-      let!(:etiqueta_da_outra_conta) { create(:label, account: outra_conta, title: 'secreta-da-outra-conta') }
+      before { create(:label, account: outra_conta, title: 'secreta-da-outra-conta') }
 
       it 'rejeita a etiqueta como desconhecida, em vez de vazar o vocabulário de outra conta' do
         expect { tool.call('etiquetas' => ['secreta-da-outra-conta']) }

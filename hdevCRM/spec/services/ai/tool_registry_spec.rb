@@ -21,13 +21,16 @@ RSpec.describe Ai::ToolRegistry do
   # `properties` aninhado dentro de `items`, por exemplo, também conta).
   def property_names(node)
     case node
-    when Hash
-      node.flat_map do |key, value|
-        aqui = key.to_s == 'properties' && value.is_a?(Hash) ? value.keys.map(&:to_s) : []
-        aqui + property_names(value)
-      end
+    when Hash then property_names_from_hash(node)
     when Array then node.flat_map { |item| property_names(item) }
     else []
+    end
+  end
+
+  def property_names_from_hash(node)
+    node.flat_map do |key, value|
+      aqui = key.to_s == 'properties' && value.is_a?(Hash) ? value.keys.map(&:to_s) : []
+      aqui + property_names(value)
     end
   end
 

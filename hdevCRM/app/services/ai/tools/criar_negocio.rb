@@ -62,7 +62,7 @@ class Ai::Tools::CriarNegocio < Ai::Tool
     return 'Esta conversa não tem contato associado, então não dá para criar negócio.' if conversation.contact.blank?
 
     aberto = open_deal
-    return "Esta conversa já tem o negócio aberto \"#{aberto.title}\" na etapa \"#{aberto.deal_stage.name}\"." if aberto
+    return already_open_message(aberto) if aberto
     return LIMITE_ATINGIDO if deals_da_conversa >= MAX_DEALS_POR_CONVERSA
 
     stage = resolve_stage(input.to_h.with_indifferent_access[:etapa].to_s.strip)
@@ -71,10 +71,18 @@ class Ai::Tools::CriarNegocio < Ai::Tool
     deal = open_deal
     return 'Não foi possível criar o negócio agora. Avise que o time comercial vai assumir o atendimento.' if deal.nil?
 
-    "Negócio \"#{deal.title}\" criado na etapa \"#{deal.deal_stage.name}\"."
+    created_message(deal)
   end
 
   private
+
+  def already_open_message(deal)
+    "Esta conversa já tem o negócio aberto \"#{deal.title}\" na etapa \"#{deal.deal_stage.name}\"."
+  end
+
+  def created_message(deal)
+    "Negócio \"#{deal.title}\" criado na etapa \"#{deal.deal_stage.name}\"."
+  end
 
   def open_deal
     account.deals.open.find_by(conversation_id: conversation.id)
