@@ -211,6 +211,27 @@ export default {
       }),
     },
     {
+      path: frontendURL('accounts/:accountId/ai/conversations'),
+      name: 'conversation_ai',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: () => ({ conversationType: 'ai' }),
+    },
+    {
+      path: frontendURL('accounts/:accountId/ai/conversations/:conversationId'),
+      name: 'conversation_through_ai',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: route => ({
+        conversationId: route.params.conversationId,
+        conversationType: 'ai',
+      }),
+    },
+    {
       path: frontendURL('accounts/:accountId/participating/conversations'),
       name: 'conversation_participating',
       meta: {

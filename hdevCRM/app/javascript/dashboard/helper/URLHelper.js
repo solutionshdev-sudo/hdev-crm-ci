@@ -27,6 +27,8 @@ export const conversationUrl = ({
     url = `accounts/${accountId}/participating/conversations/${id}`;
   } else if (conversationType === 'unattended') {
     url = `accounts/${accountId}/unattended/conversations/${id}`;
+  } else if (conversationType === 'ai') {
+    url = `accounts/${accountId}/ai/conversations/${id}`;
   }
   return url;
 };
@@ -53,6 +55,7 @@ export const conversationListPageURL = ({
       mention: 'mentions/conversations',
       participating: 'participating/conversations',
       unattended: 'unattended/conversations',
+      ai: 'ai/conversations',
     };
     url = `accounts/${accountId}/${urlMap[conversationType]}`;
   }

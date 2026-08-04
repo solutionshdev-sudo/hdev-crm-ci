@@ -8,6 +8,7 @@ import InboxName from '../InboxName.vue';
 import MoreActions from './MoreActions.vue';
 import Avatar from 'next/avatar/Avatar.vue';
 import SLACardLabel from './components/SLACardLabel.vue';
+import AiHandlingBadge from 'dashboard/components-next/Conversation/AiHandlingBadge.vue';
 import ConversationCallButton from './ConversationCallButton.vue';
 import wootConstants from 'dashboard/constants/globals';
 import { conversationListPageURL } from 'dashboard/helper/URLHelper';
@@ -50,6 +51,7 @@ const backButtonUrl = computed(() => {
     conversation_through_mentions: 'mention',
     conversation_through_participating: 'participating',
     conversation_through_unattended: 'unattended',
+    conversation_through_ai: 'ai',
   };
   return conversationListPageURL({
     accountId: accountId.value,
@@ -167,6 +169,7 @@ const copyConversationId = async () => {
     <div
       class="flex flex-row items-center justify-start xl:justify-end flex-shrink-0 gap-2 w-full xl:w-auto header-actions-wrap"
     >
+      <AiHandlingBadge v-if="currentChat.ai_handling" class="hidden md:flex" />
       <SLACardLabel
         v-if="hasSlaPolicyId"
         :chat="chat"

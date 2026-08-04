@@ -35,6 +35,12 @@ export const filterByUnattended = (
     : shouldFilter;
 };
 
+export const filterByAi = (shouldFilter, conversationType, aiHandling) => {
+  return conversationType === 'ai'
+    ? !!aiHandling && shouldFilter
+    : shouldFilter;
+};
+
 export const applyPageFilters = (conversation, filters) => {
   const { inboxId, status, labels = [], teamId, conversationType } = filters;
   const {
@@ -44,6 +50,7 @@ export const applyPageFilters = (conversation, filters) => {
     meta = {},
     first_reply_created_at: firstReplyOn,
     waiting_since: waitingSince,
+    ai_handling: aiHandling,
   } = conversation;
   const team = meta.team || {};
   const { id: chatTeamId } = team;
@@ -58,6 +65,7 @@ export const applyPageFilters = (conversation, filters) => {
     firstReplyOn,
     waitingSince
   );
+  shouldFilter = filterByAi(shouldFilter, conversationType, aiHandling);
 
   return shouldFilter;
 };

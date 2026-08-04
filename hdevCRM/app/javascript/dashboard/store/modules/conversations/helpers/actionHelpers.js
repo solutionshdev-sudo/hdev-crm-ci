@@ -38,6 +38,11 @@ export const isOnParticipatingView = ({ route: { name: routeName } }) => {
   return PARTICIPATING_ROUTES.includes(routeName);
 };
 
+export const isOnAiView = ({ route: { name: routeName } }) => {
+  const AI_ROUTES = ['conversation_ai', 'conversation_through_ai'];
+  return AI_ROUTES.includes(routeName);
+};
+
 export const isOnFoldersView = ({ route: { name: routeName } }) => {
   const FOLDER_ROUTES = [
     'folder_conversations',
