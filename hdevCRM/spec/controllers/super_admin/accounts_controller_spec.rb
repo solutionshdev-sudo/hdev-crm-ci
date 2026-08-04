@@ -27,6 +27,17 @@ RSpec.describe 'Super Admin accounts API', type: :request do
 
   describe 'GET /super_admin/accounts/{account_id}' do
     context 'when it is an authenticated user' do
+      it 'keeps showing an account whose agency is suspended (F5-T2 §5.4: super admin continua acessando)' do
+        agency = create(:agency, status: :suspended)
+        account.update!(agency: agency)
+        sign_in(super_admin, scope: :super_admin)
+
+        get "/super_admin/accounts/#{account.id}"
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(account.name)
+      end
+
       it 'shows effective Captain model routing', if: HdevApp.enterprise? do
         account.update!(captain_models: { 'editor' => 'gpt-4.1' })
         sign_in(super_admin, scope: :super_admin)

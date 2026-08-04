@@ -4,6 +4,30 @@ RSpec.describe 'Super Admin agencies API', type: :request do
   let!(:super_admin) { create(:super_admin) }
   let!(:agency) { create(:agency) }
 
+  describe 'GET /super_admin/agencies/{agency_id}' do
+    context 'when it is an authenticated user' do
+      it 'keeps showing a suspended agency (F5-T2 §5.4: super admin continua acessando)' do
+        agency.update!(status: :suspended)
+        sign_in(super_admin, scope: :super_admin)
+
+        get "/super_admin/agencies/#{agency.id}"
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(agency.name)
+      end
+
+      it 'keeps showing a pending_payment agency' do
+        agency.update!(status: :pending_payment)
+        sign_in(super_admin, scope: :super_admin)
+
+        get "/super_admin/agencies/#{agency.id}"
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(agency.name)
+      end
+    end
+  end
+
   describe 'PATCH /super_admin/agencies/{agency_id}' do
     context 'when it is an authenticated user' do
       it 'updates the status to pending_payment (F5-T2 §5.2 select do super admin)' do

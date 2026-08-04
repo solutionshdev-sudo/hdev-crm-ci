@@ -12,12 +12,12 @@ class AgencyDashboard < Administrate::BaseDashboard
        [I18n.t('administrate.values.status.pending_payment'), 'pending_payment']]
     }),
     # Motivo de suspensão manual (settings['suspended_reason'], jsonb livre —
-    # sem migration). AVISO: suspensão manual por abuso deve vir acompanhada
-    # do cancelamento da assinatura no Stripe, senão o próximo invoice.paid
-    # reativa a agência (ver Subscription#reactivate_owner!). Não há
-    # mecanismo de hint/description limpo no form do Administrate deste
-    # repo (sem partial de campo customizado, sem README do super admin) —
-    # o aviso fica registrado aqui e no model (Agency#suspended_reason).
+    # sem migration, ver Agency#suspended_reason). O aviso do Stripe (§5.2)
+    # aparece no form via o mecanismo de hint NATIVO do gem administrate
+    # (não há override local de app/views/administrate/application/_form.html.erb
+    # nesse repo, então é o _form.html.erb do próprio gem quem procura a
+    # chave administrate.field_hints.agency.suspended_reason — en+pt_BR — e
+    # renderiza em .field-unit__hint se ela existir).
     suspended_reason: Field::String,
     installation_name: Field::String,
     brand_name: Field::String,

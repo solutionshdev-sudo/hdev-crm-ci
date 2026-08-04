@@ -1,7 +1,7 @@
 class Api::V1::AgenciesController < Api::BaseController
   include EnsureAgencyAccess
 
-  skip_before_action :fetch_agency, :ensure_agency_admin, only: [:index]
+  skip_before_action :fetch_agency, :ensure_agency_admin, :ensure_agency_active, only: [:index]
 
   AGENCY_ATTRIBUTES = %i[id name slug custom_domain status installation_name brand_name
                          brand_url widget_brand_url terms_url privacy_url primary_color].freeze
