@@ -27,7 +27,10 @@ module Ai
       end
     end
 
-    pattr_initialize [:account!, :user, :dry_run]
+    # `conversation` é opcional: só as tools do set `:agent` (task 2+) recebem
+    # — é o escopo injetado pelo runtime, nunca um id vindo do modelo. Reader
+    # fica privado (pattr_initialize já gera assim) — é a própria tool que usa.
+    pattr_initialize [:account!, :user, :dry_run, :conversation]
 
     # Recebe o input já parseado e devolve String — o texto vira o tool_result
     # que o modelo lê. Erro previsível deve virar Ai::ToolError.
