@@ -110,8 +110,8 @@ Na raiz do repo, fora de `hdevCRM/`. Quatro jobs: `rspec`, `lint`
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.
-- **A suíte termina VERDE: ~15-18 min de rspec** (5996 exemplos, 0 falhas,
-  64 pending). Verde desde o merge `f0fb6c6` de 28/07, o primeiro CI 100%
+- **A suíte termina VERDE: ~15-18 min de rspec** (6257 exemplos em 04/08, 0
+  falhas, 64 pending — o número sobe a cada fase; use-o só como sanidade). Verde desde o merge `f0fb6c6` de 28/07, o primeiro CI 100%
   verde do repo; ficou mais rápida em 29/07, quando a Fase 3 tirou o
   `enterprise/` e a suíte passou a rodar inteira, sem exclusão. A faixa voltou
   a subir em 30/07 (medido: 14m48s a 18m10s em 6 runs), quando a transcrição de

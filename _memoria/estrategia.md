@@ -272,6 +272,9 @@ revenda. Mas ~70% de uma IA própria já existia em código MIT: cliente Anthrop
 com quota por conta/agência (`Ai::AnthropicService` + `Ai::QuotaService` +
 `AiUsageEvent`), agente de atendimento com handoff e o motor de fluxo com 12
 nós. A lacuna era uma só: **a IA só conversava, não agia** — faltava tool calling.
+(Lacuna **fechada em 04/08 pela Fase 3a do Motor Integrado** — ver a quarta
+trilha abaixo: o agente de atendimento agora opera com tools escopadas na
+conversa. O nó de IA do chatbot ainda usa `chat` puro; é a F3b.)
 
 **Feito (27/07, commit `18e879b`, pushado):** fundação de tool calling.
 `Ai::Tool` (schema em JSON Schema puro, neutro de provider), `Ai::ToolLoop`
@@ -317,7 +320,7 @@ o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
-## Quarta trilha: Motor Integrado (03-04/08 — F1, F2 e F4 na main; F1/F4 provadas, F2 quase)
+## Quarta trilha: Motor Integrado (01-04/08 — F1, F2, F4 e F3a na main; F1/F4 provadas, F2 e F3a esperando a chave de IA)
 
 As peças existem mas não se conversam — o plano de 6 fases
 (`~/.claude/plans/merry-mixing-toast.md`) liga kanban, chatbot, Baileys, IA e
@@ -385,9 +388,38 @@ rótulo nunca dado, editor só persiste chave editada — `lead`/`won` ainda
 sem consumidor visual, wiring na F5); menu e título viraram "Kanban" fixo,
 `vocabulary.deal` vive no botão "Novo {label}". Prova §4.4 integral em
 produção 04/08 ("Novo Oportunidade" + título "Kanban" na mesma tela;
-automação movendo pra Perdido sem quebrar). **Próximo da trilha: F3a (IA
-operadora)** — worktree `feat/motor-fase3a-ia-operadora` já criado (limpo,
-base `9309315`); implementação livre, prova nível 4 exige a chave de IA.
+automação movendo pra Perdido sem quebrar).
+
+**Feito (04/08, PR #29 mergeado em `229a87b`) — Fase 3a, código completo,
+prova nível 4 pendente:** a IA deixou de só conversar e passou a **operar**.
+Cinco tools de escrita conversation-scoped vivas em `SETS[:agent]`
+(`MoverNegocioDaConversa`, `CriarNegocio`, `AtualizarContato`,
+`EtiquetarConversa`, `TransferirParaHumano`), handoff barato por regex antes
+do LLM (custo zero, sem `AiUsageEvent`) e o `AgentReplyService` rodando
+`Ai::ToolLoop` em vez de `chat` puro. A segurança é arquitetural, não
+textual: **nenhuma tool aceita id vindo do modelo** — o escopo vem do
+`conversation`/`account` injetados, e um spec-allowlist recursivo quebra se
+qualquer propriedade nova aparecer em qualquer schema do `:agent`. Duas
+emendas ao plano: ligar o `AgentReplyService` ao `ToolLoop` entrou na fase
+(sem isso nada consumiria o set) e `EtiquetarConversa` só aplica etiqueta já
+cadastrada na conta (o `add_labels` grava tagging e não cria `Label`, então
+etiqueta inventada por estranho nem aparecia no cadastro e furava a
+validação de formato).
+
+**Dois bugs de produção consertados de carona:** (1) o `default_scope` de
+`Message` do PR #27 é ASC e `.order` só APPENDA — o `history_messages`
+entregava a conversa **invertida** ao modelo desde 03/08; virou `reorder`,
+com o mesmo conserto no `Chatbots::Nodes::AiNode`. (2) o PARAR da F2 não
+valia pra escrita: o `enabled_for?` não olhava `automation_opted_out`, então
+com as tools o contato que pediu PARAR teria dados reescritos sem receber
+nada de volta. Contenções novas contra prompt injection: teto de 3 negócios
+por conversa (o ciclo criar→perder→criar enchia o kanban da conta e
+disparava `deal.won` no barramento) e truncagem do vocabulário da conta nos
+erros de tool. Detalhes e armadilhas na memória `motor-fase3a-mergeada`.
+
+**Próximo da trilha: F3b (IA dentro do fluxo + dono IA visível)**, depois F5.
+Antes disso, a prova nível 4 da F3a (§3a.5) e o PARAR completo da §2.6.2 —
+as duas dependem da mesma `ANTHROPIC_API_KEY` em produção.
 
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
