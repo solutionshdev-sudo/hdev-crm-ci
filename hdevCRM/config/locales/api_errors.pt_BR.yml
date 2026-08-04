@@ -13,6 +13,7 @@ pt_BR:
         invalid_current_password: 'Senha atual inválida'
       account:
         suspended: 'A conta está suspensa'
+        agency_suspended: 'A agência está suspensa'
         bot_not_authorized: 'O bot não tem autorização para acessar esta conta'
         agent_limit_exceeded: 'Limite de agentes da conta atingido. Adquira mais licenças'
       widget:

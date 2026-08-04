@@ -9,6 +9,9 @@ module EnsureCurrentAccountHelper
   def ensure_current_account
     account = Account.find(params[:account_id])
     render_unauthorized(I18n.t('errors.api.account.suspended')) and return unless account.active?
+    # pending_payment da agência não propaga: a conta filha aguardando o 1º
+    # pagamento não deve morrer por causa disso. Só suspended? bloqueia.
+    render_unauthorized(I18n.t('errors.api.account.agency_suspended')) and return if account.agency&.suspended?
 
     if current_user
       account_accessible_for_user?(account)

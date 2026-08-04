@@ -47,6 +47,11 @@ class Agency < ApplicationRecord
   # Valores só podem ser adicionados no fim (enum por posição no banco).
   enum :status, { active: 0, suspended: 1, pending_payment: 2 }
 
+  # Motivo de suspensão manual, editável no super admin. Suspensão manual por
+  # abuso deve vir acompanhada do cancelamento da assinatura no Stripe — senão
+  # o próximo invoice.paid reativa a agência (Subscription#reactivate_owner!).
+  store_accessor :settings, :suspended_reason
+
   before_validation :normalize_domain
   before_validation :ensure_slug
 

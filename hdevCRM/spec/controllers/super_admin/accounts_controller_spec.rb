@@ -110,6 +110,22 @@ RSpec.describe 'Super Admin accounts API', type: :request do
         expect(account.keep_pending_on_bot_failure).to be true
       end
 
+      it 'updates the status to pending_payment (F5-T2 §5.2 select do super admin)' do
+        sign_in(super_admin, scope: :super_admin)
+
+        patch "/super_admin/accounts/#{account.id}",
+              params: {
+                account: {
+                  name: account.name,
+                  locale: account.locale,
+                  status: 'pending_payment'
+                }
+              }
+
+        expect(response).to have_http_status(:redirect)
+        expect(account.reload.status).to eq('pending_payment')
+      end
+
       it 'rejects invalid Captain model overrides' do
         sign_in(super_admin, scope: :super_admin)
         existing_captain_models = account.captain_models

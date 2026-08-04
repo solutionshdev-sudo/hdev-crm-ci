@@ -7,8 +7,18 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug: Field::String.with_options(searchable: true),
     custom_domain: Field::String.with_options(searchable: true),
     status: Field::Select.with_options(collection: lambda { |_field|
-      [[I18n.t('administrate.values.status.active'), 'active'], [I18n.t('administrate.values.status.suspended'), 'suspended']]
+      [[I18n.t('administrate.values.status.active'), 'active'],
+       [I18n.t('administrate.values.status.suspended'), 'suspended'],
+       [I18n.t('administrate.values.status.pending_payment'), 'pending_payment']]
     }),
+    # Motivo de suspensão manual (settings['suspended_reason'], jsonb livre —
+    # sem migration). AVISO: suspensão manual por abuso deve vir acompanhada
+    # do cancelamento da assinatura no Stripe, senão o próximo invoice.paid
+    # reativa a agência (ver Subscription#reactivate_owner!). Não há
+    # mecanismo de hint/description limpo no form do Administrate deste
+    # repo (sem partial de campo customizado, sem README do super admin) —
+    # o aviso fica registrado aqui e no model (Agency#suspended_reason).
+    suspended_reason: Field::String,
     installation_name: Field::String,
     brand_name: Field::String,
     brand_url: Field::String,
@@ -51,6 +61,7 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug
     custom_domain
     status
+    suspended_reason
     installation_name
     brand_name
     brand_url
@@ -72,6 +83,7 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug
     custom_domain
     status
+    suspended_reason
     installation_name
     brand_name
     brand_url

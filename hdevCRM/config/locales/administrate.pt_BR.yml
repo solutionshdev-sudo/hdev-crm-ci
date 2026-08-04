@@ -58,6 +58,7 @@ pt_BR:
       status:
         active: Ativa
         suspended: Suspensa
+        pending_payment: Aguardando pagamento
       banner_type:
         info: Informativo
         warning: Aviso
@@ -125,6 +126,7 @@ pt_BR:
         slug: Slug
         custom_domain: Domínio customizado
         status: Status
+        suspended_reason: Motivo da suspensão
         installation_name: Nome da instalação
         brand_name: Nome da marca
         brand_url: URL da marca

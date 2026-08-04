@@ -1,0 +1,12 @@
+# O gem administrate embarca as chaves padrão (actions, form, fields, filters,
+# sidebar...) em inglês nativamente. "values.status" é uma chave CUSTOM desta
+# app (usada pelos lambdas de AgencyDashboard/AccountDashboard) que nunca
+# ganhou tradução em inglês — em :en caía em "translation missing". Fechado
+# aqui, ao lado da irmã pt_BR em administrate.pt_BR.yml.
+en:
+  administrate:
+    values:
+      status:
+        active: Active
+        suspended: Suspended
+        pending_payment: Pending payment
