@@ -30,11 +30,16 @@ class Chatbots::Nodes::AiNode < Chatbots::Nodes::BaseNode
 
   private
 
+  # TOOL_DISCIPLINE_PROMPT vem do AgentReplyService (não duplicado aqui): os
+  # dois nós usam o MESMO registry :agent, as MESMAS 5 tools de escrita e
+  # falam com o MESMO estranho do outro lado — sem essa disciplina na frente
+  # do prompt do autor do fluxo, um erro de tool devolve vocabulary_sample
+  # que o modelo repassaria ao cliente.
   def run_loop
     @loop = Ai::ToolLoop.new(
       service: Ai::AnthropicService.new(account: conversation.account, feature: 'chatbot_node', conversation: conversation),
       registry: Ai::ToolRegistry.new(context: :agent, account: conversation.account, conversation: conversation),
-      system_prompt: interpolate(data['prompt'].to_s)
+      system_prompt: [Ai::AgentReplyService::TOOL_DISCIPLINE_PROMPT, interpolate(data['prompt'].to_s)].join("\n\n")
     )
     @loop.run(messages: [{ role: 'user', content: user_content }])
   end

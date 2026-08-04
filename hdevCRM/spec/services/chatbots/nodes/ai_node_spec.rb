@@ -157,7 +157,8 @@ RSpec.describe Chatbots::Nodes::AiNode do
 
       execute
 
-      expect(captured[:system_prompt]).to eq('Você atende Fulano.')
+      expect(captured[:system_prompt]).to end_with('Você atende Fulano.')
+      expect(captured[:system_prompt]).to include('internal to the company')
       expect(captured[:registry]).to be_a(Ai::ToolRegistry)
       expect(captured[:registry].send(:context)).to eq(:agent)
       expect(captured[:registry].send(:conversation)).to eq(conversation)

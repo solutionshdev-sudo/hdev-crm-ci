@@ -45,5 +45,3 @@ class Conversations::AiHandlingFilterService
     Ai::AgentReplyService.truthy?(account.custom_attributes['ai_agent_enabled'])
   end
 end
-
-Conversations::AiHandlingFilterService.prepend_mod_with('Conversations::AiHandlingFilterService')

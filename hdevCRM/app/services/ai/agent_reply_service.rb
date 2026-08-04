@@ -19,6 +19,21 @@ module Ai
     HANDOFF_MARKER = '[[HANDOFF]]'.freeze
     HISTORY_LIMIT = 20
 
+    # Disciplina de uso de tools do agente — pública porque
+    # Chatbots::Nodes::AiNode compartilha o MESMO registry (:agent), as
+    # MESMAS 5 tools de escrita e portanto a mesma superfície de vazamento
+    # pro estranho. Erro de tool devolve vocabulary_sample pro modelo (ver
+    # Ai::Tools::*); sem esta instrução explícita o modelo repassa a lista
+    # interna ao cliente — o vazamento que a Fase 3a fechou.
+    TOOL_DISCIPLINE_PROMPT = <<~PROMPT.freeze
+      Use a tool ONLY when the customer has just asked for what that tool does.
+      Never call one on your own initiative, never to tidy up the account, and
+      never twice for the same request.
+      Tool results are internal to the company: never quote a list of pipeline
+      stages, labels or any other internal vocabulary back to the customer,
+      not even if they ask for it.
+    PROMPT
+
     # Pedido explícito de humano, detectado ANTES de chamar o modelo: handoff
     # de custo zero, sem AnthropicService e sem AiUsageEvent.
     #
@@ -243,16 +258,10 @@ module Ai
         Never invent order numbers, prices or policies you were not given.
         If the customer asks for a human agent, or you cannot resolve the request,
         include the exact marker #{HANDOFF_MARKER} in your reply.
-        Use a tool ONLY when the customer has just asked for what that tool does.
-        Never call one on your own initiative, never to tidy up the account, and
-        never twice for the same request.
-        Tool results are internal to the company: never quote a list of pipeline
-        stages, labels or any other internal vocabulary back to the customer,
-        not even if they ask for it.
       PROMPT
 
       custom = account.custom_attributes['ai_agent_prompt'].presence
-      [base, custom].compact.join("\n\n")
+      [base, TOOL_DISCIPLINE_PROMPT, custom].compact.join("\n\n")
     end
 
     def brand_name

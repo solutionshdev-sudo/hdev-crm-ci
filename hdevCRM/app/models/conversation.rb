@@ -148,8 +148,13 @@ class Conversation < ApplicationRecord
   # deliberado até existirem múltiplos agentes IA. O predicado é a disjunção
   # dos dois estados honestos que já existem: uma sessão de chatbot ativa
   # conduzindo a conversa, OU o agente de IA (Fase 3a) elegível pra responder.
+  #
+  # `enabled_for?` primeiro: ele mesmo já refaz o `chatbot_sessions.active.exists?`
+  # internamente (ver Ai::AgentReplyService.enabled_for?) e devolve false quando
+  # há sessão ativa, então a ordem não muda a semântica — só o custo. No caso
+  # comum (agente ligado, sem sessão) essa ordem gasta 1 query, não 2.
   def ai_handling?
-    chatbot_sessions.active.exists? || Ai::AgentReplyService.enabled_for?(self)
+    Ai::AgentReplyService.enabled_for?(self) || chatbot_sessions.active.exists?
   end
 
   def language
