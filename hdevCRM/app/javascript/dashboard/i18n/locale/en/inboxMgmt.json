@@ -671,6 +671,17 @@
         "LABEL": "Enable"
       }
     },
+    "LEAD_CAPTURE": {
+      "TITLE": "Lead capture",
+      "DESCRIPTION": "Use this endpoint to capture leads from external forms (landing pages, websites) straight into this inbox.",
+      "URL_LABEL": "Endpoint URL",
+      "SNIPPET_LABEL": "Ready-to-paste form snippet",
+      "SNIPPET_HELP_TEXT": "Paste this HTML form on your site. The field placeholders are in Portuguese on purpose — it's copy for the site visitor, not dashboard UI.",
+      "TEST_BUTTON": "Send test lead",
+      "TEST_SUCCESS": "Test lead sent successfully. Contact #{contactId} created, conversation: {conversationId}.",
+      "TEST_NO_CONVERSATION": "none created",
+      "TEST_ERROR": "Could not send the test lead. Please try again."
+    },
     "DELETE": {
       "BUTTON_TEXT": "Delete",
       "AVATAR_DELETE_BUTTON_TEXT": "Delete Avatar",

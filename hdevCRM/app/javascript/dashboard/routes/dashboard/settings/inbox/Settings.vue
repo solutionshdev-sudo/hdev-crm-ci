@@ -20,6 +20,7 @@ import GoogleReauthorize from './channels/google/Reauthorize.vue';
 import WhatsappReauthorize from './channels/whatsapp/Reauthorize.vue';
 import BaileysSession from './channels/whatsapp/BaileysSession.vue';
 import InboxReconnectionRequired from './components/InboxReconnectionRequired.vue';
+import LeadCaptureSection from './components/LeadCaptureSection.vue';
 import InboxHealthAPI from 'dashboard/api/inboxHealth';
 import PreChatFormSettings from './PreChatForm/Settings.vue';
 import WeeklyAvailability from './components/WeeklyAvailability.vue';
@@ -78,6 +79,7 @@ export default {
     WhatsappReauthorize,
     BaileysSession,
     InboxReconnectionRequired,
+    LeadCaptureSection,
     DuplicateInboxBanner,
     Editor,
     Avatar,
@@ -971,6 +973,11 @@ export default {
                 @on-reset="resetWebhookSecret"
               />
             </SettingsFieldSection>
+
+            <LeadCaptureSection
+              v-if="isAPIInbox && inbox.inbox_identifier"
+              :identifier="inbox.inbox_identifier"
+            />
 
             <SettingsFieldSection
               v-if="isAWebWidgetInbox"
