@@ -678,8 +678,7 @@
       "SNIPPET_LABEL": "Ready-to-paste form snippet",
       "SNIPPET_HELP_TEXT": "Paste this HTML form on your site. The field placeholders are in Portuguese on purpose — it's copy for the site visitor, not dashboard UI.",
       "TEST_BUTTON": "Send test lead",
-      "TEST_SUCCESS": "Test lead sent successfully. Contact #{contactId} created, conversation: {conversationId}.",
-      "TEST_NO_CONVERSATION": "none created",
+      "TEST_SUCCESS": "Test lead sent successfully. Contact #{contactId} and conversation #{conversationId} created.",
       "TEST_ERROR": "Could not send the test lead. Please try again."
     },
     "DELETE": {

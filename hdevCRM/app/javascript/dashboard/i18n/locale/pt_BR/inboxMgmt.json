@@ -678,8 +678,7 @@
       "SNIPPET_LABEL": "Snippet de formulário pronto para colar",
       "SNIPPET_HELP_TEXT": "Cole esse formulário HTML no site do cliente final. Os textos dos campos ficam em português de propósito — é conteúdo para o visitante do site, não é texto da UI do dashboard.",
       "TEST_BUTTON": "Enviar lead de teste",
-      "TEST_SUCCESS": "Lead de teste enviado com sucesso. Contato #{contactId} criado, conversa: {conversationId}.",
-      "TEST_NO_CONVERSATION": "nenhuma criada",
+      "TEST_SUCCESS": "Lead de teste enviado com sucesso. Contato #{contactId} e conversa #{conversationId} criados.",
       "TEST_ERROR": "Não foi possível enviar o lead de teste. Tente novamente."
     },
     "DELETE": {

@@ -76,6 +76,7 @@ describe('LeadCaptureSection', () => {
     const [url, options] = global.fetch.mock.calls[0];
     expect(url).toBe(EXPECTED_URL);
     expect(options.method).toBe('POST');
+    expect(options.credentials).toBe('omit');
     expect(options.headers['Content-Type']).toBe('application/json');
 
     const body = JSON.parse(options.body);
@@ -88,32 +89,7 @@ describe('LeadCaptureSection', () => {
     expect(useAlert).toHaveBeenCalledWith(
       `INBOX_MGMT.LEAD_CAPTURE.TEST_SUCCESS::${JSON.stringify({
         contactId: 42,
-        conversationId: '#7',
-      })}`
-    );
-  });
-
-  it('falls back to the no-conversation label when conversation_id is null', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          contact_id: 42,
-          conversation_id: null,
-          source_id: 's1',
-        }),
-    });
-
-    const wrapper = mountSection();
-    await wrapper
-      .get('[data-test="lead-capture-test-button"]')
-      .trigger('click');
-    await flushPromises();
-
-    expect(useAlert).toHaveBeenCalledWith(
-      `INBOX_MGMT.LEAD_CAPTURE.TEST_SUCCESS::${JSON.stringify({
-        contactId: 42,
-        conversationId: 'INBOX_MGMT.LEAD_CAPTURE.TEST_NO_CONVERSATION',
+        conversationId: 7,
       })}`
     );
   });
@@ -130,8 +106,17 @@ describe('LeadCaptureSection', () => {
     expect(useAlert).toHaveBeenCalledWith('INBOX_MGMT.LEAD_CAPTURE.TEST_ERROR');
   });
 
+  // Mock com `.json()` funcional de propósito: sem o guard `if (!response.ok)`
+  // o código seguiria até `useAlert` de sucesso normalmente (o response.json()
+  // resolveria igual), então só o guard é que faz esse teste discriminar --
+  // um mock sem `.json` faria o mesmo teste passar mesmo com o guard removido
+  // (o `await response.json()` estouraria e caberia no mesmo catch).
   it('shows an error alert when the endpoint responds with a non-ok status', async () => {
-    global.fetch.mockResolvedValue({ ok: false, status: 422 });
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 422,
+      json: () => Promise.resolve({ contact_id: 1, conversation_id: 1 }),
+    });
 
     const wrapper = mountSection();
     await wrapper

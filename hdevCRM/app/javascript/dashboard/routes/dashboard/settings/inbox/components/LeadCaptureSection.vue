@@ -41,8 +41,11 @@ const sendTestLead = async () => {
   try {
     // Endpoint público (sem autenticação) -- fetch direto, nunca o axios do
     // dashboard, que anexaria os headers de sessão da conta via interceptor.
+    // credentials: 'omit' pra garantir que o cookie de sessão do dashboard
+    // não viaje pra esse endpoint público (same-origin mandaria por padrão).
     const response = await fetch(leadCaptureUrl.value, {
       method: 'POST',
+      credentials: 'omit',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nome: 'Lead de teste',
@@ -56,14 +59,15 @@ const sendTestLead = async () => {
     }
 
     const data = await response.json();
-    const conversationLabel = data.conversation_id
-      ? `#${data.conversation_id}`
-      : t('INBOX_MGMT.LEAD_CAPTURE.TEST_NO_CONVERSATION');
 
+    // A `mensagem` acima nunca vai em branco, e o backend
+    // (leads_controller.rb#find_or_create_conversation) só devolve
+    // conversation_id nulo quando `mensagem` está em branco -- não existe
+    // branch sem conversa nesse fluxo de teste.
     useAlert(
       t('INBOX_MGMT.LEAD_CAPTURE.TEST_SUCCESS', {
         contactId: data.contact_id,
-        conversationId: conversationLabel,
+        conversationId: data.conversation_id,
       })
     );
   } catch (error) {
