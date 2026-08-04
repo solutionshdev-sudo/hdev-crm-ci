@@ -90,6 +90,19 @@ RSpec.describe Ai::QuotaService do
       expect(service.account_limit).to be_nil
     end
 
+    # Decisão do controller (promovida a spec): com subscription ativa, o
+    # plano manda sempre -- mesmo quando ai_monthly_tokens é nil (ilimitado)
+    # e existe um custom_attributes legado populado. O fallback NÃO
+    # ressuscita: uma conta pagante de plano ilimitado não pode ficar
+    # estrangulada por um valor velho do custom_attributes.
+    it 'does not resurrect the legacy fallback when the active plan is explicitly unlimited' do
+      plan = create(:plan, ai_monthly_tokens: nil)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 5000 })
+
+      expect(service.account_limit).to be_nil
+    end
+
     it 'sums ai_extra_tokens on top of the plan limit' do
       plan = create(:plan, ai_monthly_tokens: 1000)
       create(:subscription, owner: account, plan: plan, status: 'active')
@@ -164,13 +177,12 @@ RSpec.describe Ai::QuotaService do
         .to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
     end
 
-    it 'enqueues the exhausted alert at 100%, not the 80% alert' do
+    it 'enqueues only the exhausted alert at 100%, never also the 80% alert' do
       create(:ai_usage_event, account: account, input_tokens: 1000, output_tokens: 0)
 
       expect { service.check_thresholds! }
         .to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_exhausted)
-      expect { service.check_thresholds! }
-        .not_to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+        .and(not_have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold))
     end
 
     it 'does nothing when the account has no configured limit' do

@@ -27,17 +27,25 @@ RSpec.describe AdministratorNotifications::AccountNotificationMailer do
   end
 
   describe '#ai_quota_threshold' do
-    it 'sets the subject and includes the percent in the body' do
+    let!(:administrator) { create(:user, :administrator, account: account) }
+    let!(:another_administrator) { create(:user, :administrator, account: account) }
+
+    it 'sets the subject, recipients and includes the percent in the body' do
       mail = mailer.ai_quota_threshold(80)
       expect(mail.subject).to eq('Your AI usage has reached 80% of your monthly quota')
+      expect(mail.to).to contain_exactly(administrator.email, another_administrator.email)
       expect(mail.body.decoded).to include('80%')
     end
   end
 
   describe '#ai_quota_exhausted' do
-    it 'sets the subject and includes the percent in the body' do
+    let!(:administrator) { create(:user, :administrator, account: account) }
+    let!(:another_administrator) { create(:user, :administrator, account: account) }
+
+    it 'sets the subject, recipients and includes the percent in the body' do
       mail = mailer.ai_quota_exhausted(100)
       expect(mail.subject).to eq('Your AI monthly quota has been reached')
+      expect(mail.to).to contain_exactly(administrator.email, another_administrator.email)
       expect(mail.body.decoded).to include('100%')
     end
   end

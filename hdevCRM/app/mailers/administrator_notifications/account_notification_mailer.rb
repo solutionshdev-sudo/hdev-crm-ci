@@ -61,7 +61,7 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
   # percent: 80 -- só o limiar de alarme; em 100% o disparo é ai_quota_exhausted.
   def ai_quota_threshold(percent)
     subject = I18n.t('mailers.account_notification_mailer.ai_quota_threshold.subject')
-    action_url = settings_url('billing')
+    action_url = settings_url('ai-agent')
     meta = { 'percent' => percent }
 
     send_notification(subject, action_url: action_url, meta: meta)
@@ -69,7 +69,7 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
 
   def ai_quota_exhausted(percent)
     subject = I18n.t('mailers.account_notification_mailer.ai_quota_exhausted.subject')
-    action_url = settings_url('billing')
+    action_url = settings_url('ai-agent')
     meta = { 'percent' => percent }
 
     send_notification(subject, action_url: action_url, meta: meta)
