@@ -35,6 +35,20 @@ export const filterByUnattended = (
     : shouldFilter;
 };
 
+// Aba "IA" (plano §3b.2): o servidor (`Conversations::AiHandlingFilterService`)
+// manda só uma aproximação grossa e sargável — de propósito NÃO vê inbox
+// allowlist nem opt-out/bloqueio de contato, porque isso é Ruby puro dentro
+// de `Ai::AgentReplyService.enabled_for?`, não vira condição de índice. Aqui
+// o cliente refina com o predicado fino que já veio no payload de cada
+// conversa (`ai_handling`, espelho de `Conversation#ai_handling?`) — sem
+// isso, conversa que a aproximação do servidor incluiu por engano vazaria
+// pra aba. Efeito colateral aceito: se o agente tem allowlist de inbox, o
+// servidor conta conversas de inboxes que ele nem vê, o cliente esconde
+// essas linhas, e a aba pode ficar mais curta (ou vazia) que a contagem do
+// servidor sugere — o que também prende `resetAndFetchData`/
+// `conversationListPagination` (`ChatList.vue`) tentando preencher a
+// página. Divergência de contagem/paginação nesse cenário é trade aceito
+// desta fase, não bug.
 export const filterByAi = (shouldFilter, conversationType, aiHandling) => {
   return conversationType === 'ai'
     ? !!aiHandling && shouldFilter
