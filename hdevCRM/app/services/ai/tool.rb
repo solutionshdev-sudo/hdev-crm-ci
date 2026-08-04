@@ -11,6 +11,10 @@ module Ai
   #     def call(input) = 'resultado em texto'
   #   end
   class Tool
+    # Quantos nomes de vocabulário interno da conta cabem num texto de erro
+    # devolvido ao modelo (ver #vocabulary_sample).
+    VOCABULARY_SAMPLE = 10
+
     class << self
       attr_reader :tool_name, :tool_description, :tool_schema
 
@@ -27,7 +31,10 @@ module Ai
       end
     end
 
-    pattr_initialize [:account!, :user, :dry_run]
+    # `conversation` é opcional: só as tools do set `:agent` (task 2+) recebem
+    # — é o escopo injetado pelo runtime, nunca um id vindo do modelo. Reader
+    # fica privado (pattr_initialize já gera assim) — é a própria tool que usa.
+    pattr_initialize [:account!, :user, :dry_run, :conversation]
 
     # Recebe o input já parseado e devolve String — o texto vira o tool_result
     # que o modelo lê. Erro previsível deve virar Ai::ToolError.
@@ -64,6 +71,18 @@ module Ai
     end
 
     private
+
+    # Amostra de vocabulário INTERNO da conta (etapas do funil, etiquetas) para
+    # o texto de erro que o modelo lê e usa pra se corrigir na iteração
+    # seguinte. A lista é útil e por isso continua indo — mas ela vira
+    # tool_result lido por um modelo instruído a ser prestativo, numa conversa
+    # cuja mensagem foi escrita por um ESTRANHO, então "quais etiquetas vocês
+    # usam?" pode voltar como lista. O teto não fecha o vazamento (quem fecha é
+    # a regra no system prompt do agente), fecha o TAMANHO dele.
+    def vocabulary_sample(names)
+      amostra = names.first(VOCABULARY_SAMPLE).join(', ')
+      names.size > VOCABULARY_SAMPLE ? "#{amostra}, ..." : amostra
+    end
 
     # Erro de validação vira Ai::ToolError: o texto volta pro modelo como
     # tool_result de erro e ele corrige na iteração seguinte.

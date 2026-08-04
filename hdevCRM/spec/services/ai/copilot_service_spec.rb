@@ -100,7 +100,21 @@ RSpec.describe Ai::CopilotService do
     end
   end
 
-  it 'não expõe ferramenta de escrita ao agente de atendimento' do
-    expect(Ai::ToolRegistry::SETS[:agent]).to be_empty
+  # F3a: SETS[:agent] deixa de ser vazio — passa a ter cinco ferramentas de
+  # escrita, com o escopo (conversa/contato/negócio) vindo só do contexto
+  # injetado, nunca de um id que o modelo decida passar. A varredura "nenhuma
+  # tool declara parâmetro de id" mora em spec/services/ai/tool_registry_spec.rb
+  # (allowlist sobre o SETS[:agent] real); não duplicar aqui.
+  #
+  # O que ainda vale guardar neste arquivo, que fala do lado :copilot: os dois
+  # conjuntos continuam sendo fronteiras separadas. Nenhuma ferramenta de poder
+  # de conta inteira do :copilot (ex.: CreateDealPipeline, SetBusinessHours) pode
+  # vazar pro :agent — que roda em cima de mensagem de um estranho — nem o
+  # contrário.
+  it 'mantém :agent e :copilot como conjuntos disjuntos de ferramentas' do
+    agente = Ai::ToolRegistry::SETS.fetch(:agent)
+    copiloto = Ai::ToolRegistry::SETS.fetch(:copilot)
+
+    expect(agente & copiloto).to be_empty
   end
 end

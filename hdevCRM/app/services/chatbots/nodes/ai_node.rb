@@ -24,8 +24,13 @@ class Chatbots::Nodes::AiNode < Chatbots::Nodes::BaseNode
     Array(response&.content).filter_map { |block| block.text if block.respond_to?(:text) }.join("\n").strip
   end
 
+  # `reorder`, não `order`: Message tem default_scope de created_at ASC e um
+  # `order` só SOMA no fim do ORDER BY — o desc era engolido e este nó mandava
+  # ao modelo a mensagem mais ANTIGA da conversa (mesmo bug consertado no
+  # Ai::AgentReplyService#history_messages na Fase 3a; as duas portas de entrada
+  # de IA precisam ler a conversa do mesmo jeito).
   def user_content
-    last_incoming = conversation.messages.incoming.where(private: false).order(created_at: :desc).first
+    last_incoming = conversation.messages.incoming.where(private: false).reorder(created_at: :desc, id: :desc).first
     last_incoming&.content.presence || 'Olá'
   end
 end
