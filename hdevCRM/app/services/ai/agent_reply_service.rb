@@ -32,12 +32,33 @@ module Ai
     # do meu pedido" também não ("saber" não está na lista de ligação, então a
     # janela não estica por cima de qualquer palavra).
     #
+    # Os verbos entram por dois portões diferentes, e é isso que separa pedido
+    # de elogio:
+    #
+    #   - verbo de AÇÃO (falar, passar, transferir...) só vale ABRINDO oração —
+    #     início da mensagem, depois de pontuação/quebra de linha, ou depois de
+    #     pronome ("me passa"). Sem esse portão, "adorei falar com o atendente
+    #     de vocês" e "gostei de falar com a pessoa que me atendeu" — elogios de
+    #     pós-atendimento — calavam o bot pro resto da conversa.
+    #   - verbo de DESEJO (quero, preciso, gostaria, desejo) vale em qualquer
+    #     posição, porque já carrega o pedido: "bom dia quero falar com um
+    #     atendente" precisa casar mesmo sem vírgula.
+    #
+    # "posso" ficou de fora dos dois: "posso ser uma pessoa jurídica?" casaria.
+    # O custo é perder "posso falar com um atendente?" — falso negativo é o lado
+    # barato, o HANDOFF_MARKER é a segunda rede.
+    #
     # Sem normalizador de acento: o /i resolve a caixa e a vogal acentuada
     # entra como alternativa no próprio padrão — mesmo desenho do OPT_OUT_REGEX
     # em app/services/whatsapp/incoming_message_service_helpers.rb.
     HANDOFF_REQUEST_REGEX = /
-      \b(?:quer(?:o|ia)|precis(?:o|ava)|gostaria|desejo|falar|conversar|
-           cham(?:a|ar|e)|pass(?:a|ar|e)|transfer(?:e|ir|a)|encaminh(?:a|ar|e))\b
+      (?:
+        (?:\A\s*|[.!?,;:\n]\s*|\b(?:eu|vc|voc[eê]|me)\s+)
+        \b(?:falar|conversar|cham(?:a|ar|e)|pass(?:a|ar|e)|
+             transfer(?:e|ir|a)|encaminh(?:a|ar|e))\b
+        |
+        \b(?:quer(?:o|ia)|precis(?:o|ava)|gostaria|desejo)\b
+      )
       \s+
       (?:\b(?:com|de|pra|para|pro|por|me|ser|um|uma|o|a|algum|alguma|outro|outra|
               falar|conversar|atendido|atendida|atendimento)\s+){0,5}
@@ -45,9 +66,13 @@ module Ai
     /xi
 
     # Negativa colada no verbo derruba o pedido: "não quero falar com
-    # atendente" casaria pelo "falar com atendente" que sobra no meio. Exige o
-    # verbo IMEDIATAMENTE depois do "não", então "não recebi o pedido, quero
-    # falar com atendente" continua sendo handoff.
+    # atendente" casaria pelo "falar com atendente" que sobra no meio.
+    #
+    # O padrão exige o verbo imediatamente depois do "não", mas o VETO é da
+    # MENSAGEM INTEIRA: "não quero esperar, quero falar com um atendente" é
+    # suprimida por completo. Fica assim de propósito — falso negativo é o lado
+    # barato e o HANDOFF_MARKER cobre. "não recebi o pedido, quero falar com
+    # atendente" continua sendo handoff, porque "recebi" não está na lista.
     HANDOFF_DENIAL_REGEX = /\bn[aã]o\s+(?:quero|queria|preciso|precisava|gostaria|desejo)\b/i
 
     pattr_initialize [:conversation!]

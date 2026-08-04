@@ -185,7 +185,11 @@ RSpec.describe Ai::AgentReplyService do
       'pode me transferir para um humano?',
       'quero atendente',
       'me passa pra uma pessoa por favor',
-      'preciso falar com alguém'
+      'preciso falar com alguém',
+      # verbo de ação abrindo a mensagem, sem verbo de desejo nenhum
+      'falar com atendente',
+      # verbo de desejo no meio da frase, sem pontuação antes
+      'bom dia quero falar com um atendente'
     ].each do |frase|
       it "transfere sem chamar a IA: #{frase.inspect}" do
         incoming(frase)
@@ -194,12 +198,17 @@ RSpec.describe Ai::AgentReplyService do
 
         expect(conversation.reload.custom_attributes['ai_agent_handoff']).to be(true)
         expect(ai_client).not_to have_received(:raw_chat)
+        # o caminho barato é silencioso: o cliente não recebe resposta do bot
+        expect(conversation.messages.outgoing.where(private: false).count).to eq(0)
       end
     end
 
     [
       'meu atendente favorito resolveu',
       'a pessoa que me atendeu foi ótima',
+      # elogio de pós-atendimento: verbo de ação sem abrir oração
+      'adorei falar com o atendente de vocês',
+      'gostei de falar com a pessoa que me atendeu',
       'não quero falar com atendente',
       'quero saber o status do meu pedido'
     ].each do |frase|
