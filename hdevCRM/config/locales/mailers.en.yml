@@ -13,6 +13,10 @@ en:
         subject: "Your contact's export file is available to download."
       automation_rule_disabled:
         subject: 'Automation rule disabled due to validation errors.'
+      ai_quota_threshold:
+        subject: 'Your AI usage has reached 80% of your monthly quota'
+      ai_quota_exhausted:
+        subject: 'Your AI monthly quota has been reached'
     channel_notifications_mailer:
       facebook_disconnect:
         subject: 'Your Facebook page connection has expired'

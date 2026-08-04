@@ -109,4 +109,9 @@ module Redis::RedisKeys
   # ACCOUNT_OUTBOUND_EMAIL_COUNT_KEY acima. Formato fixado pelo plano (lowercase,
   # ':' em vez de '::') -- nao alinhar com a convencao do resto do arquivo.
   BAILEYS_DAILY_SENT_COUNT = 'baileys:sent:%<instance_id>s:%<date>s'.freeze
+
+  ## AI Quota Alerts (Motor Fase 5 - Ai::QuotaService#check_thresholds!)
+  # Cooldown de 24h por limiar (80/100) por conta, pra nao reenviar o alarme
+  # a cada iteracao do tool loop enquanto o uso segue acima do limiar.
+  AI_QUOTA_ALERT_KEY = 'AI_QUOTA_ALERT::%<account_id>d::%<threshold>d'.freeze
 end

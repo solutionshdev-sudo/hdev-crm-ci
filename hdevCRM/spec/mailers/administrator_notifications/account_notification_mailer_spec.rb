@@ -26,6 +26,22 @@ RSpec.describe AdministratorNotifications::AccountNotificationMailer do
     end
   end
 
+  describe '#ai_quota_threshold' do
+    it 'sets the subject and includes the percent in the body' do
+      mail = mailer.ai_quota_threshold(80)
+      expect(mail.subject).to eq('Your AI usage has reached 80% of your monthly quota')
+      expect(mail.body.decoded).to include('80%')
+    end
+  end
+
+  describe '#ai_quota_exhausted' do
+    it 'sets the subject and includes the percent in the body' do
+      mail = mailer.ai_quota_exhausted(100)
+      expect(mail.subject).to eq('Your AI monthly quota has been reached')
+      expect(mail.body.decoded).to include('100%')
+    end
+  end
+
   describe '#format_deletion_date' do
     it 'formats a valid date string' do
       date_str = '2024-12-31T12:00:00Z'
