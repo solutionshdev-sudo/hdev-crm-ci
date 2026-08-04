@@ -563,6 +563,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :inboxes do
           scope module: :inboxes do
+            resources :leads, only: [:create]
             resources :contacts, only: [:create, :show, :update] do
               resources :conversations, only: [:index, :create, :show] do
                 member do

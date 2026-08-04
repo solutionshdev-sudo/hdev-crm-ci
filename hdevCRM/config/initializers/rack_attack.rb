@@ -199,6 +199,18 @@ class Rack::Attack
   ##-----------------------------------------------##
 
   ###-----------------------------------------------###
+  ###------------Public Lead API Throttling---------###
+  ###-----------------------------------------------###
+
+  ## Prevent abuse of the public lead capture endpoint (per inbox token) ###
+  throttle('leads/token', limit: 60, period: 1.hour) do |req|
+    match_data = %r{\A/public/api/v1/inboxes/(?<token>[^/]+)/leads\z}.match(req.path_without_extensions)
+    match_data[:token] if match_data.present? && req.post?
+  end
+
+  ##-----------------------------------------------##
+
+  ###-----------------------------------------------###
   ###----------Application API Throttling-----------###
   ###-----------------------------------------------###
 
