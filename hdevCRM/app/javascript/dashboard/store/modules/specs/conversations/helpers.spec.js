@@ -5,6 +5,7 @@ import {
   filterByTeam,
   filterByLabel,
   filterByUnattended,
+  filterByAi,
 } from '../../conversations/helpers';
 
 const conversationList = [
@@ -170,5 +171,21 @@ describe('#filterByUnattended', () => {
   });
   it('returns true if conversation type is unattended and has first reply', () => {
     expect(filterByUnattended(true, 'mentions', 123)).toEqual(true);
+  });
+});
+
+describe('#filterByAi', () => {
+  it('returns true if conversation type is ai and the conversation is ai_handling', () => {
+    expect(filterByAi(true, 'ai', true)).toEqual(true);
+  });
+  it('returns false if conversation type is ai and the conversation is not ai_handling', () => {
+    expect(filterByAi(true, 'ai', false)).toEqual(false);
+  });
+  it('returns false if conversation type is ai and ai_handling is undefined', () => {
+    expect(filterByAi(true, 'ai', undefined)).toEqual(false);
+  });
+  it('does not filter when conversation type is not ai', () => {
+    expect(filterByAi(true, 'mentions', false)).toEqual(true);
+    expect(filterByAi(false, 'mentions', true)).toEqual(false);
   });
 });

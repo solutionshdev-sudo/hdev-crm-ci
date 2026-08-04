@@ -72,6 +72,58 @@ RSpec.describe Ai::Tools::EtiquetarConversa do
     end
   end
 
+  # F3b-T4 item 2: sem ator, activity_message_owner(nil) com Current.executed_by
+  # nil não nomeia ninguém na activity de etiqueta. O tool marca o ator como
+  # :ai_agent só ao redor do add_labels (ver EtiquetarConversa#aplicar_labels).
+  #
+  # `Current` não é CurrentAttributes (lib/current.rb, thread_mattr_accessor
+  # puro) — sem reset automático entre exemplos. Um request spec anterior na
+  # ordem de execução pode ter deixado `Current.user` setado
+  # (ApplicationController#set_current_user), e `determine_user_name` lê
+  # `Current.user&.name` antes de cair no `activity_message_owner` — por
+  # isso o before/after zera os dois, espelhando spec/models/conversation_spec.rb:9.
+  describe 'ator da activity de etiqueta (Current.executed_by)' do
+    before do
+      create(:label, account: account, title: 'orçamento-enviado')
+      Current.user = nil
+    end
+
+    after { Current.reset }
+
+    it 'aplicar etiqueta gera activity message com o ator "Agente IA"' do
+      expect { tool.call('etiquetas' => ['orçamento-enviado']) }
+        .to have_enqueued_job(Conversations::ActivityMessageJob)
+        .with(conversation, { account_id: conversation.account_id, inbox_id: conversation.inbox_id, message_type: :activity,
+                              content: "#{I18n.t('automation.ai_agent_name')} added orçamento-enviado" })
+    end
+
+    it 'restaura Current.executed_by ao valor anterior depois do call' do
+      Current.executed_by = :ator_anterior
+
+      tool.call('etiquetas' => ['orçamento-enviado'])
+
+      expect(Current.executed_by).to eq(:ator_anterior)
+    end
+
+    it 'etiqueta desconhecida: resolver levanta ANTES do aplicar_labels, Current.executed_by nem chega a ser tocado' do
+      Current.executed_by = :ator_anterior
+
+      expect { tool.call('etiquetas' => ['inexistente']) }.to raise_error(Ai::ToolError)
+
+      expect(Current.executed_by).to eq(:ator_anterior)
+    end
+
+    it 'restaura Current.executed_by no ensure quando add_labels levanta DE VERDADE dentro do bloco protegido' do
+      Current.executed_by = :ator_anterior
+      allow(conversation).to receive(:add_labels).and_raise(StandardError, 'falha simulada no add_labels')
+
+      expect { tool.call('etiquetas' => ['orçamento-enviado']) }
+        .to raise_error(StandardError, 'falha simulada no add_labels')
+
+      expect(Current.executed_by).to eq(:ator_anterior)
+    end
+  end
+
   it 'levanta erro claro quando não há conversa no contexto' do
     ferramenta = described_class.new(account: account, user: nil)
 

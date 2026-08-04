@@ -581,6 +581,7 @@ en:
     policy_actor: 'Automation System via %{policy_name}'
   automation:
     system_name: 'Automation System'
+    ai_agent_name: 'AI Agent'
     default_lost_reason: 'Moved by automation'
   crm:
     no_message: 'No messages in conversation'

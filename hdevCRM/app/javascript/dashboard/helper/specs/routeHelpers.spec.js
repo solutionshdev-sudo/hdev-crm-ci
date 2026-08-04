@@ -148,6 +148,7 @@ describe('isAConversationRoute', () => {
     expect(isAConversationRoute('conversation_through_inbox')).toBe(true);
     expect(isAConversationRoute('conversations_through_label')).toBe(true);
     expect(isAConversationRoute('conversations_through_team')).toBe(true);
+    expect(isAConversationRoute('conversation_through_ai')).toBe(true);
     expect(isAConversationRoute('dashboard')).toBe(false);
   });
 
@@ -155,6 +156,7 @@ describe('isAConversationRoute', () => {
     expect(isAConversationRoute('home', true)).toBe(true);
     expect(isAConversationRoute('conversation_mentions', true)).toBe(true);
     expect(isAConversationRoute('conversation_unattended', true)).toBe(true);
+    expect(isAConversationRoute('conversation_ai', true)).toBe(true);
     expect(isAConversationRoute('inbox_dashboard', true)).toBe(true);
     expect(isAConversationRoute('label_conversations', true)).toBe(true);
     expect(isAConversationRoute('team_conversations', true)).toBe(true);
@@ -166,6 +168,7 @@ describe('isAConversationRoute', () => {
     expect(isAConversationRoute('home', false)).toBe(false);
     expect(isAConversationRoute('conversation_mentions', false)).toBe(false);
     expect(isAConversationRoute('conversation_unattended', false)).toBe(false);
+    expect(isAConversationRoute('conversation_ai', false)).toBe(false);
     expect(isAConversationRoute('inbox_dashboard', false)).toBe(false);
     expect(isAConversationRoute('label_conversations', false)).toBe(false);
     expect(isAConversationRoute('team_conversations', false)).toBe(false);
@@ -183,6 +186,7 @@ describe('isAConversationRoute', () => {
     expect(isAConversationRoute('conversation_unattended', true, true)).toBe(
       true
     );
+    expect(isAConversationRoute('conversation_ai', true, true)).toBe(true);
     expect(isAConversationRoute('inbox_dashboard', true, true)).toBe(true);
     expect(isAConversationRoute('label_conversations', true, true)).toBe(true);
     expect(isAConversationRoute('team_conversations', true, true)).toBe(true);
@@ -206,6 +210,9 @@ describe('getConversationDashboardRoute', () => {
     expect(
       getConversationDashboardRoute('conversation_through_unattended')
     ).toEqual('conversation_unattended');
+    expect(getConversationDashboardRoute('conversation_through_ai')).toEqual(
+      'conversation_ai'
+    );
     expect(
       getConversationDashboardRoute('conversations_through_label')
     ).toEqual('label_conversations');

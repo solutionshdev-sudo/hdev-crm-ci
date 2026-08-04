@@ -410,6 +410,13 @@ const menuItems = computed(() => {
           to: accountScopedRoute('conversation_unattended'),
         },
         {
+          name: 'AI',
+          activeOn: ['conversation_through_ai'],
+          label: t('SIDEBAR.AI_CONVERSATIONS'),
+          icon: 'i-lucide-sparkles',
+          to: accountScopedRoute('conversation_ai'),
+        },
+        {
           name: 'Folders',
           label: t('SIDEBAR.CUSTOM_VIEWS_FOLDER'),
           icon: 'i-lucide-folder',

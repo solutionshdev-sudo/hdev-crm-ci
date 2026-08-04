@@ -60,11 +60,26 @@ class Ai::Tools::EtiquetarConversa < Ai::Tool
     cadastradas = account.labels.to_a
     return 'Esta conta ainda não tem etiquetas cadastradas. Peça pra alguém do time criar etiquetas antes.' if cadastradas.blank?
 
-    conversation.reload.add_labels(nomes.map { |nome| resolver(nome, cadastradas) })
+    aplicar_labels(nomes.map { |nome| resolver(nome, cadastradas) })
     mensagem_atual
   end
 
   private
+
+  # Marca o ator como :ai_agent só ao redor do add_labels — é o que
+  # `activity_message_owner` (assignee_activity_message_handler.rb) lê pra
+  # nomear a activity de etiqueta como "Agente IA" em vez de ficar em branco.
+  # Escopo deliberadamente estreito: NÃO envolve o ToolLoop inteiro, porque
+  # setar executed_by durante mudança de STATUS suprimiria as activities de
+  # status/handoff (caminho user_status_change_activity_content, que precisa
+  # continuar sem Current.executed_by presente).
+  def aplicar_labels(labels)
+    previous = Current.executed_by
+    Current.executed_by = :ai_agent
+    conversation.reload.add_labels(labels)
+  ensure
+    Current.executed_by = previous
+  end
 
   # Lista vazia ou ausente não é erro: só significa "nada novo pra aplicar" —
   # a resposta ainda devolve o estado atual pro modelo.

@@ -565,6 +565,7 @@ pt_BR:
     policy_actor: 'Sistema de Automação via %{policy_name}'
   automation:
     system_name: 'Sistema de Automação'
+    ai_agent_name: 'Agente IA'
     default_lost_reason: 'Movido por automação'
   crm:
     no_message: 'Nenhuma mensagem na conversa'

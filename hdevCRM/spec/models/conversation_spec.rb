@@ -665,6 +665,7 @@ RSpec.describe Conversation do
     let(:expected_data) do
       {
         additional_attributes: {},
+        ai_handling: false,
         meta: {
           sender: conversation.contact.push_event_data,
           assignee: conversation.assigned_entity&.push_event_data,
@@ -1050,6 +1051,53 @@ RSpec.describe Conversation do
       allow(message_window_service).to receive(:can_reply?).and_return(false)
       expect(conversation.can_reply?).to be false
       expect(message_window_service).to have_received(:can_reply?)
+    end
+  end
+
+  describe '#ai_handling?' do
+    let(:account) { create(:account) }
+    let(:conversation) { create(:conversation, account: account) }
+
+    context 'when a chatbot session is active' do
+      it 'is true, regardless of the account AI agent setting' do
+        chatbot = create(:chatbot, account: account)
+        create(:chatbot_session, account: account, chatbot: chatbot, conversation: conversation, status: :running)
+
+        expect(conversation.ai_handling?).to be(true)
+      end
+    end
+
+    context 'when the chatbot session is completed and the account has no AI agent' do
+      it 'is false' do
+        chatbot = create(:chatbot, account: account)
+        create(:chatbot_session, account: account, chatbot: chatbot, conversation: conversation, status: :completed)
+
+        expect(conversation.ai_handling?).to be(false)
+      end
+    end
+
+    context 'when the account has the AI agent enabled and the conversation is eligible' do
+      let(:account) { create(:account, custom_attributes: { 'ai_agent_enabled' => true }) }
+
+      it 'is true' do
+        expect(conversation.ai_handling?).to be(true)
+      end
+    end
+
+    context 'when the AI agent is enabled but Ai::AgentReplyService.enabled_for? denies it' do
+      let(:account) { create(:account, custom_attributes: { 'ai_agent_enabled' => true }) }
+
+      it 'is false when the conversation has an assignee' do
+        conversation.update!(assignee: create(:user, account: account, role: :agent))
+
+        expect(conversation.ai_handling?).to be(false)
+      end
+
+      it 'is false when a handoff was already marked' do
+        conversation.update!(custom_attributes: { 'ai_agent_handoff' => true })
+
+        expect(conversation.ai_handling?).to be(false)
+      end
     end
   end
 

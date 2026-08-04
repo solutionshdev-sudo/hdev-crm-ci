@@ -44,6 +44,7 @@ import {
   isOnMentionsView,
   isOnParticipatingView,
   isOnUnattendedView,
+  isOnAiView,
 } from '../store/modules/conversations/helpers/actionHelpers';
 import {
   getUserPermissions,
@@ -72,7 +73,19 @@ const store = useStore();
 
 const resolveAttributesModalRef = ref(null);
 
-const activeAssigneeTab = ref(wootConstants.ASSIGNEE_TYPE.ME);
+// Na aba "IA" o lado agente do predicado (assignee nil) some por
+// construção: "Minhas" (ASSIGNEE_TYPE.ME) filtra por assignee = eu, e
+// conversa em automação de IA não tem assignee. Sem isso a aba abre vazia
+// mesmo com conversas lá dentro — default pra "Todas" só nessa view;
+// demais views continuam abrindo em "Minhas". Usuário ainda pode clicar
+// em "Minhas" à vontade, isso só muda o ponto de partida.
+function defaultAssigneeTabFor(conversationType) {
+  return conversationType === wootConstants.CONVERSATION_TYPE.AI
+    ? wootConstants.ASSIGNEE_TYPE.ALL
+    : wootConstants.ASSIGNEE_TYPE.ME;
+}
+
+const activeAssigneeTab = ref(defaultAssigneeTabFor(props.conversationType));
 const activeStatus = ref(wootConstants.STATUS_TYPE.OPEN);
 const activeSortBy = ref(wootConstants.SORT_BY_TYPE.LAST_ACTIVITY_AT_DESC);
 const showAdvancedFilters = ref(false);
@@ -289,6 +302,9 @@ const pageTitle = computed(() => {
   }
   if (props.conversationType === wootConstants.CONVERSATION_TYPE.UNATTENDED) {
     return t('CHAT_LIST.UNATTENDED_HEADING');
+  }
+  if (props.conversationType === wootConstants.CONVERSATION_TYPE.AI) {
+    return t('CHAT_LIST.AI_HEADING');
   }
   if (hasActiveFolders.value) {
     return activeFolder.value.name;
@@ -654,6 +670,8 @@ function redirectToConversationList() {
     conversationType = wootConstants.CONVERSATION_TYPE.PARTICIPATING;
   } else if (isOnUnattendedView({ route: { name } })) {
     conversationType = wootConstants.CONVERSATION_TYPE.UNATTENDED;
+  } else if (isOnAiView({ route: { name } })) {
+    conversationType = wootConstants.CONVERSATION_TYPE.AI;
   }
   router.push(
     conversationListPageURL({
@@ -861,7 +879,15 @@ watch(
 );
 watch(
   computed(() => props.conversationType),
-  () => resetAndFetchData()
+  () => {
+    // ConversationView/ChatList não remonta ao trocar de rota entre as views
+    // com conversationType (Menções/Não atendidas/IA/normal) — é o mesmo
+    // componente com prop nova. Reseta o default da aba de assignee aqui,
+    // no ponto de entrada de uma view nova; escolha explícita de aba feita
+    // pelo usuário (updateAssigneeTab) não passa por este watch.
+    activeAssigneeTab.value = defaultAssigneeTabFor(props.conversationType);
+    resetAndFetchData();
+  }
 );
 
 watch(activeFolder, (newVal, oldVal) => {

@@ -111,5 +111,33 @@ RSpec.describe Ai::ToolRegistry do
 
       expect(declarados).to eq(esperados)
     end
+
+    # F3b-T4 item 3 (dívida do CI round da F3a: "verificado à mão, não
+    # automatizado"). Invariante arquitetural: a resposta da IA sai SÓ pelo
+    # caminho normal de envio (gates da F2 — opt-out, anti-ban); tool nenhuma
+    # do :agent constrói ou enfileira mensagem por fora dele.
+    #
+    # Análise TEXTUAL do código-fonte, não semântica: não pega indireção via
+    # metaprogramação/`send`, nem um helper com nome que não bate no regex.
+    # O que pega: qualquer tool nova (ou tool existente alterada) que chame
+    # `Messages::MessageBuilder`, `Messages::...`, `send_reply`,
+    # `perform_later`/`perform_async` fora de comentário — por isso as linhas
+    # de comentário (`#...`) são descartadas antes do match: o próprio
+    # EtiquetarConversa tem um comentário que CITA
+    # `Conversations::ActivityMessageJob.perform_later` só pra explicar por
+    # que aquele job dispara (o `after_update_commit` da Conversation), não
+    # pra chamá-lo — sem o filtro, o comentário derrubaria o guard num falso
+    # positivo.
+    it 'nenhuma tool do set :agent tem sinal de envio de mensagem no código-fonte' do
+      sinal_de_envio = /MessageBuilder|Messages::|send_reply|perform_later|perform_async/
+
+      Ai::ToolRegistry::SETS[:agent].each do |klass|
+        path, = Object.const_source_location(klass.name)
+        codigo_sem_comentarios = File.readlines(path).reject { |linha| linha.strip.start_with?('#') }.join
+        mensagem = "#{klass.name} (#{path}) parece construir/enviar mensagem fora do caminho normal de envio"
+
+        expect(codigo_sem_comentarios).not_to match(sinal_de_envio), mensagem
+      end
+    end
   end
 end
