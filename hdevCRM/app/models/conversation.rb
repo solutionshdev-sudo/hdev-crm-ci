@@ -143,6 +143,15 @@ class Conversation < ApplicationRecord
     Conversations::MessageWindowService.new(self).can_reply?
   end
 
+  # Dono IA visível (plano §3b.2, versão mínima que não mente): sem coluna
+  # nova de assignee — `assignee_kind` fica registrado como não-feito
+  # deliberado até existirem múltiplos agentes IA. O predicado é a disjunção
+  # dos dois estados honestos que já existem: uma sessão de chatbot ativa
+  # conduzindo a conversa, OU o agente de IA (Fase 3a) elegível pra responder.
+  def ai_handling?
+    chatbot_sessions.active.exists? || Ai::AgentReplyService.enabled_for?(self)
+  end
+
   def language
     additional_attributes&.dig('conversation_language')
   end

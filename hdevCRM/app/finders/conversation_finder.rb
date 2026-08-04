@@ -145,8 +145,35 @@ class ConversationFinder
       @conversations = current_user.participating_conversations.where(account_id: current_account.id)
     when 'unattended'
       @conversations = @conversations.unattended
+    when 'ai'
+      @conversations = filter_by_ai_handling
     end
     @conversations
+  end
+
+  # Aba "IA" (plano §3b.2): aproximação barata e indexável do predicado fino
+  # `Conversation#ai_handling?` (que é a verdade por conversa, exibida no
+  # badge). Aqui só o lado SARGÁVEL entra em SQL — de propósito NÃO filtra
+  # inbox allowlist nem opt-out/bloqueio do contato (isso é Ruby puro dentro
+  # de `Ai::AgentReplyService.enabled_for?`, não vira condição de índice), o
+  # que pode incluir conversas que o badge não marcaria. É a divergência
+  # aceita pelo plano: filtro de lista é aproximação, badge é a verdade fina.
+  def filter_by_ai_handling
+    session_conversations = @conversations.where(id: ChatbotSession.active.select(:conversation_id))
+    session_conversations.or(ai_agent_eligible_conversations)
+  end
+
+  # Reproduz em SQL só os predicados sargáveis de `Ai::AgentReplyService.enabled_for?`:
+  # conta com o agente ligado, conversa não resolvida, sem assignee e sem
+  # handoff marcado. `ai_agent_enabled` é decisão POR CONTA — se a conta atual
+  # não tem o agente ligado, o lado agente do filtro é vazio.
+  def ai_agent_eligible_conversations
+    agent_enabled = Ai::AgentReplyService.truthy?(current_account.custom_attributes['ai_agent_enabled'])
+    return @conversations.where(id: []) unless agent_enabled
+
+    @conversations.where.not(status: :resolved)
+                  .where(assignee_id: nil)
+                  .where("(conversations.custom_attributes->>'ai_agent_handoff') IS DISTINCT FROM 'true'")
   end
 
   def filter_by_query
@@ -209,7 +236,8 @@ class ConversationFinder
 
   def conversations_base_query
     @conversations.includes(
-      :taggings, :inbox, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }, :team, :contact_inbox
+      :taggings, :inbox, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }, :team, :contact_inbox,
+      :account
     )
   end
 

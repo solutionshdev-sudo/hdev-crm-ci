@@ -290,5 +290,83 @@ describe ConversationFinder do
         expect(result[:conversations].length).to be 2
       end
     end
+
+    context 'with conversation_type ai' do
+      subject(:ai_finder) { described_class.new(ai_user, params) }
+
+      let(:ai_account) { create(:account) }
+      let(:ai_user) { create(:user, account: ai_account) }
+      let(:ai_inbox) { create(:inbox, account: ai_account, enable_auto_assignment: false) }
+      let(:params) { { conversation_type: 'ai', status: 'all' } }
+
+      before do
+        create(:inbox_member, user: ai_user, inbox: ai_inbox)
+        Current.account = ai_account
+      end
+
+      it 'includes a conversation with an active chatbot session' do
+        conversation = create(:conversation, account: ai_account, inbox: ai_inbox)
+        chatbot = create(:chatbot, account: ai_account)
+        create(:chatbot_session, account: ai_account, chatbot: chatbot, conversation: conversation, status: :running)
+
+        result = ai_finder.perform
+
+        expect(result[:conversations].map(&:id)).to include(conversation.id)
+      end
+
+      it 'excludes a conversation whose chatbot session already completed, when the AI agent is off' do
+        conversation = create(:conversation, account: ai_account, inbox: ai_inbox)
+        chatbot = create(:chatbot, account: ai_account)
+        create(:chatbot_session, account: ai_account, chatbot: chatbot, conversation: conversation, status: :completed)
+
+        result = ai_finder.perform
+
+        expect(result[:conversations].map(&:id)).not_to include(conversation.id)
+      end
+
+      it 'excludes every conversation when the AI agent is off and there is no active session' do
+        create(:conversation, account: ai_account, inbox: ai_inbox)
+
+        result = ai_finder.perform
+
+        expect(result[:conversations]).to be_empty
+      end
+
+      context 'when the account has the AI agent enabled' do
+        let(:ai_account) { create(:account, custom_attributes: { 'ai_agent_enabled' => true }) }
+
+        it 'includes an eligible unassigned, unresolved conversation' do
+          conversation = create(:conversation, account: ai_account, inbox: ai_inbox)
+
+          result = ai_finder.perform
+
+          expect(result[:conversations].map(&:id)).to include(conversation.id)
+        end
+
+        it 'excludes a resolved conversation' do
+          conversation = create(:conversation, account: ai_account, inbox: ai_inbox, status: 'resolved')
+
+          result = ai_finder.perform
+
+          expect(result[:conversations].map(&:id)).not_to include(conversation.id)
+        end
+
+        it 'excludes a conversation with an assignee' do
+          conversation = create(:conversation, account: ai_account, inbox: ai_inbox, assignee: ai_user)
+
+          result = ai_finder.perform
+
+          expect(result[:conversations].map(&:id)).not_to include(conversation.id)
+        end
+
+        it 'excludes a conversation with ai_agent_handoff marked' do
+          conversation = create(:conversation, account: ai_account, inbox: ai_inbox, custom_attributes: { 'ai_agent_handoff' => true })
+
+          result = ai_finder.perform
+
+          expect(result[:conversations].map(&:id)).not_to include(conversation.id)
+        end
+      end
+    end
   end
 end

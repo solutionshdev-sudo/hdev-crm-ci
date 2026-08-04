@@ -33,6 +33,7 @@ RSpec.describe 'Conversations API', type: :request do
         expect(body[:data][:meta].keys).to include(:all_count, :mine_count, :assigned_count, :unassigned_count)
         expect(body[:data][:payload].first[:uuid]).to eq(conversation.uuid)
         expect(body[:data][:payload].first[:messages].first[:id]).to eq(message.id)
+        expect(body[:data][:payload].first[:ai_handling]).to be(false)
       end
 
       it 'returns conversations with empty messages array for conversations with out messages' do

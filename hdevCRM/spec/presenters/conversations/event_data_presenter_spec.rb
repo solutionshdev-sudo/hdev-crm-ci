@@ -10,6 +10,7 @@ RSpec.describe Conversations::EventDataPresenter do
     let(:expected_data) do
       {
         additional_attributes: {},
+        ai_handling: false,
         meta: {
           sender: conversation.contact.push_event_data,
           assignee: conversation.assigned_entity&.push_event_data,
