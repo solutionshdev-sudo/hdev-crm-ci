@@ -42,4 +42,41 @@ RSpec.describe Ai::ToolRegistry do
     expect { described_class.new(context: :inexistente, account: account).tools }
       .to raise_error(described_class::UnknownContextError, /inexistente/)
   end
+
+  # F3a: o set :agent deixa de ser vazio — cinco tools de negócio/contato/
+  # conversa, todas com o escopo vindo só do contexto injetado.
+  describe 'SETS[:agent]' do
+    let(:conversation) { create(:conversation, account: account) }
+
+    it 'instancia as cinco tools da fase, na ordem registrada, com a conversation injetada' do
+      tools = described_class.new(context: :agent, account: account, conversation: conversation).tools
+
+      expect(tools.map(&:class)).to eq(
+        [
+          Ai::Tools::AtualizarContato,
+          Ai::Tools::CriarNegocio,
+          Ai::Tools::EtiquetarConversa,
+          Ai::Tools::MoverNegocioDaConversa,
+          Ai::Tools::TransferirParaHumano
+        ]
+      )
+    end
+
+    # Coração de segurança da fase: um estranho (WhatsApp, widget) escreve a
+    # mensagem que o modelo lê, e nenhuma tool deste set pode expor parâmetro
+    # que deixe o modelo apontar pra conversa/contato/negócio/conta de outro
+    # cliente. O sweep varre o schema inteiro (`inspect`, não só o primeiro
+    # nível) pra pegar regressão em qualquer profundidade.
+    it 'nenhuma tool do set :agent declara parâmetro de id no schema' do
+      proibidos = %w[account_id conversation_id contact_id deal_id]
+
+      Ai::ToolRegistry::SETS.fetch(:agent).each do |tool_class|
+        schema_texto = tool_class.tool_schema.inspect
+
+        proibidos.each do |proibido|
+          expect(schema_texto).not_to include(proibido)
+        end
+      end
+    end
+  end
 end

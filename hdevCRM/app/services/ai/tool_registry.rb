@@ -13,7 +13,13 @@ module Ai
   # Registry literal — nunca constantize string vinda do modelo.
   class ToolRegistry
     SETS = {
-      agent: [].freeze,
+      agent: [
+        Ai::Tools::AtualizarContato,
+        Ai::Tools::CriarNegocio,
+        Ai::Tools::EtiquetarConversa,
+        Ai::Tools::MoverNegocioDaConversa,
+        Ai::Tools::TransferirParaHumano
+      ].freeze,
       copilot: [
         Ai::Tools::CreateChatbotFlow,
         Ai::Tools::CreateDealPipeline,
