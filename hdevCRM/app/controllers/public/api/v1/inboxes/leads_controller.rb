@@ -56,9 +56,24 @@ class Public::Api::V1::Inboxes::LeadsController < Public::Api::V1::InboxesContro
     {
       name: permitted_params[:nome],
       email: permitted_params[:email],
-      phone_number: permitted_params[:telefone],
+      phone_number: normalized_telefone,
       additional_attributes: additional_attributes
     }
+  end
+
+  # Zapier/n8n manda telefone com máscara local (parênteses, hífen, espaço,
+  # ponto) que não bate no E.164 que o Contact exige, e o builder usa
+  # `create!` — sem normalizar, isso derruba o lead inteiro com 422. Tira só
+  # a máscara (nunca prefixa DDI: chutar +55 num número internacional é pior
+  # do que descartar); se ainda não casar (ex.: sem o `+`), descarta o campo
+  # e deixa o lead passar sem telefone — mesma filosofia do utm_params/nome:
+  # campo ruim não pode custar nome+email+mensagem.
+  def normalized_telefone
+    telefone = permitted_params[:telefone]
+    return if telefone.blank?
+
+    stripped = telefone.gsub(/[\s\-().]/, '')
+    stripped if stripped.match?(/\+[1-9]\d{1,14}\z/)
   end
 
   def additional_attributes

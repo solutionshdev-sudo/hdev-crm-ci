@@ -29,6 +29,24 @@ RSpec.describe 'Public Inbox Leads API', type: :request do
       expect(contact.additional_attributes['external_id']).to eq('zap-123')
     end
 
+    it 'normalizes a masked BR phone (parens/space/hyphen) into E.164 before creating the contact' do
+      post "/public/api/v1/inboxes/#{api_channel.identifier}/leads",
+           params: lead_params.merge(telefone: '+55 (11) 99999-8888'), as: :json
+
+      expect(response).to have_http_status(:success)
+      contact = api_channel.account.contacts.find(response.parsed_body['contact_id'])
+      expect(contact.phone_number).to eq('+5511999998888')
+    end
+
+    it 'discards an unrecoverable phone (missing the leading +) and still creates the lead' do
+      post "/public/api/v1/inboxes/#{api_channel.identifier}/leads",
+           params: lead_params.merge(telefone: '(11) 99999-8888'), as: :json
+
+      expect(response).to have_http_status(:success)
+      contact = api_channel.account.contacts.find(response.parsed_body['contact_id'])
+      expect(contact.phone_number).to be_nil
+    end
+
     it 'creates a conversation with the mensagem as the first inbound message' do
       post "/public/api/v1/inboxes/#{api_channel.identifier}/leads", params: lead_params, as: :json
 
@@ -92,9 +110,9 @@ RSpec.describe 'Public Inbox Leads API', type: :request do
       contact = create(:contact, account: api_channel.account, email: 'pendente@example.com')
       contact_inbox = create(:contact_inbox, contact: contact, inbox: api_channel.inbox, source_id: 'lead:pend-1')
       pending_conversation = create(:conversation, account: api_channel.account, inbox: api_channel.inbox,
-                                    contact: contact, contact_inbox: contact_inbox, status: :pending)
+                                                   contact: contact, contact_inbox: contact_inbox, status: :pending)
       create(:message, account: api_channel.account, inbox: api_channel.inbox, conversation: pending_conversation,
-             message_type: :incoming, content: lead_params[:mensagem])
+                       message_type: :incoming, content: lead_params[:mensagem])
 
       post "/public/api/v1/inboxes/#{api_channel.identifier}/leads",
            params: lead_params.merge(external_id: 'pend-1'), as: :json
