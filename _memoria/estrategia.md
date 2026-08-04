@@ -317,7 +317,7 @@ o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
-## Quarta trilha: Motor Integrado (01/08 — Fase 1 na main)
+## Quarta trilha: Motor Integrado (03-04/08 — F1, F2 e F4 na main; F1/F4 provadas, F2 quase)
 
 As peças existem mas não se conversam — o plano de 6 fases
 (`~/.claude/plans/merry-mixing-toast.md`) liga kanban, chatbot, Baileys, IA e
@@ -344,12 +344,17 @@ tsc, job `baileys` novo no CI). Veto adia ou registra com nota, nunca perde
 mensagem em silêncio; retida/negada fica `failed`. **Deploy feito em 02/08 — número
 conectado** (log: versão WA buscada em runtime funcionando + LID session OK;
 2 erros benignos de JSON no backlog offline, upstream da lib Baileys, sem
-crash). **Provas da F2 ADIADAS e adaptadas à realidade (02/08):** o teste
-"PARAR cala o bot" precisa de bot ativo e NÃO há chave de IA configurada
-ainda; o teste da janela de horário também fica pra depois. Regra combinada:
-o que der pra testar por script, o Claude escreve e testa direto; o que for
-manual, o Harvey testa com roteiro do Claude. **A Fase 6 (disparo em massa)
-só abre com a F2 PROVADA.**
+crash). **Provas da F2 FECHADAS em 03/08** (§2.6.1-3): throttle provado local com
+chip de teste (5 POSTs concorrentes → espaçamento mínimo 1.13s); PARAR
+provado parcial em produção (nota de opt-out, automação retida como failed
++ nota, humano ainda envia, regex não casa frase, idempotente — e opt-out é
+por contato: widget do site seguiu recebendo); janela provada forçando o
+fuso da conta pra Hawaii (postpone automatizado é SILENCIOSO por design —
+sem nota; a prova é `antiban_reschedule_count`=1 + chegada na abertura).
+**Falta só a prova completa do PARAR (bot cala), que exige a chave de IA
+(`ANTHROPIC_API_KEY` via InstallationConfig ou env) — é o último item do
+gate da Fase 6.** Regra combinada: automatizável o Claude testa por script;
+manual o Harvey executa com roteiro.
 
 **Eco do celular RESOLVIDO (02-03/08, PRs #11 e #27 mergeados):** a análise
 F2×eco não achou conflito de comportamento (helpers usam `messages_data`,
@@ -364,10 +369,25 @@ era ordem arbitrária do Postgres). A caçada do PR #27 também matou um bug
 latente de suíte: deletar chave DENTRO de `scan_each` do Redis pula chave
 (rehash) — lock órfão de dedupe engolia mensagem em spec sem erro; os 5
 cleanups migraram pra coleta-antes-de-deletar (memória
-`rspec-redis-scan-delete-armadilha`). **Pendente: deploy do container Rails**
-(só ele — o Node já manda timestamp certo). As 8 mensagens backfilladas com
-horário errado não têm conserto retroativo; se incomodarem, apagar e
-re-parear depois do deploy.
+`rspec-redis-scan-delete-armadilha`). **Deploy do Rails feito e PROVADO em
+03/08:** re-pareamento entregou o backfill com horário histórico real e em
+ordem, e o eco apareceu ao vivo (mensagens enviadas por aparelho vinculado
+entraram na conversa com timestamp são).
+
+**Feito (03-04/08, PR #28 mergeado em `9309315`) — Fase 4 PROVADA:**
+semântica de vendas no kanban. Deal não entra em etapa perdida sem
+`lost_reason` (validação no model, só na entrada; modal no board no drag E
+no form de edição); caminho programático preenche "Movido por automação"
+(`ActionService` + `DealNode` — e a tool da F3a será o 3º call site, ver
+memória `motor-fase4-mergeada`); lista de motivos por conta em
+`account.settings.deal_lost_reasons`; `deal_pipelines.vocabulary` (jsonb,
+rótulo nunca dado, editor só persiste chave editada — `lead`/`won` ainda
+sem consumidor visual, wiring na F5); menu e título viraram "Kanban" fixo,
+`vocabulary.deal` vive no botão "Novo {label}". Prova §4.4 integral em
+produção 04/08 ("Novo Oportunidade" + título "Kanban" na mesma tela;
+automação movendo pra Perdido sem quebrar). **Próximo da trilha: F3a (IA
+operadora)** — worktree `feat/motor-fase3a-ia-operadora` já criado (limpo,
+base `9309315`); implementação livre, prova nível 4 exige a chave de IA.
 
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
