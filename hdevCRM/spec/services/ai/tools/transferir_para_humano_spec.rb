@@ -22,6 +22,14 @@ RSpec.describe Ai::Tools::TransferirParaHumano do
       .with(Events::Types::CONVERSATION_BOT_HANDOFF, anything, hash_including(conversation: conversation))
   end
 
+  # O fio que a Task 4 amarrou: sem essa flag o agente voltava a responder no
+  # turno seguinte, mesmo depois de chamar um humano.
+  it 'marca ai_agent_handoff para calar o agente de IA nos turnos seguintes' do
+    tool.call({})
+
+    expect(conversation.reload.custom_attributes['ai_agent_handoff']).to be(true)
+  end
+
   it 'devolve string final para o modelo se despedir' do
     resultado = tool.call({})
 

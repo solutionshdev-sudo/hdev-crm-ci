@@ -3,6 +3,10 @@ module Ai
   # AI agent and hands the conversation off to a human when asked (or when
   # the AI token quota is exhausted).
   #
+  # Desde a Fase 3a o agente não é só conversador: ele roda o Ai::ToolLoop com
+  # o conjunto :agent de ferramentas (mover negócio, criar negócio, atualizar
+  # contato, etiquetar, transferir), todas escopadas NESTA conversa.
+  #
   # Account-level configuration (account.custom_attributes):
   #   'ai_agent_enabled'   => true/false
   #   'ai_agent_prompt'    => extra instructions appended to the system prompt
@@ -14,6 +18,37 @@ module Ai
   class AgentReplyService
     HANDOFF_MARKER = '[[HANDOFF]]'.freeze
     HISTORY_LIMIT = 20
+
+    # Pedido explícito de humano, detectado ANTES de chamar o modelo: handoff
+    # de custo zero, sem AnthropicService e sem AiUsageEvent.
+    #
+    # Conservador é o requisito, não a cobertura: falso positivo cala o bot à
+    # toa (a flag de handoff não volta sozinha), enquanto falso negativo ainda
+    # é pego pelo HANDOFF_MARKER que o modelo emite — a segunda rede.
+    #
+    # Por isso exige VERBO + ALVO, com uma lista FECHADA de palavras de
+    # ligação entre os dois: "quero falar com um atendente" casa; "meu
+    # atendente favorito resolveu" não (alvo sem verbo antes), e "quero saber
+    # do meu pedido" também não ("saber" não está na lista de ligação, então a
+    # janela não estica por cima de qualquer palavra).
+    #
+    # Sem normalizador de acento: o /i resolve a caixa e a vogal acentuada
+    # entra como alternativa no próprio padrão — mesmo desenho do OPT_OUT_REGEX
+    # em app/services/whatsapp/incoming_message_service_helpers.rb.
+    HANDOFF_REQUEST_REGEX = /
+      \b(?:quer(?:o|ia)|precis(?:o|ava)|gostaria|desejo|falar|conversar|
+           cham(?:a|ar|e)|pass(?:a|ar|e)|transfer(?:e|ir|a)|encaminh(?:a|ar|e))\b
+      \s+
+      (?:\b(?:com|de|pra|para|pro|por|me|ser|um|uma|o|a|algum|alguma|outro|outra|
+              falar|conversar|atendido|atendida|atendimento)\s+){0,5}
+      \b(?:atendente|humano|humana|pessoa|algu[eé]m)\b
+    /xi
+
+    # Negativa colada no verbo derruba o pedido: "não quero falar com
+    # atendente" casaria pelo "falar com atendente" que sobra no meio. Exige o
+    # verbo IMEDIATAMENTE depois do "não", então "não recebi o pedido, quero
+    # falar com atendente" continua sendo handoff.
+    HANDOFF_DENIAL_REGEX = /\bn[aã]o\s+(?:quero|queria|preciso|precisava|gostaria|desejo)\b/i
 
     pattr_initialize [:conversation!]
 
@@ -38,13 +73,43 @@ module Ai
       inbox_ids.blank? || inbox_ids.map(&:to_i).include?(inbox_id)
     end
 
+    # Único ponto de handoff do agente de IA: o #handoff! daqui e a ferramenta
+    # Ai::Tools::TransferirParaHumano entram os dois por aqui. As duas pontas
+    # precisam do MESMO par de efeitos e bloco duplicado desalinha na primeira
+    # mudança.
+    #
+    #   1. a flag em custom_attributes é o que cala o bot (ver .enabled_for?);
+    #   2. conversation#bot_handoff! reabre a conversa e dispara
+    #      CONVERSATION_BOT_HANDOFF no barramento — o mesmo caminho do
+    #      Chatbots::Nodes::HandoffNode, que fila/notificação/automação já
+    #      entendem.
+    #
+    # Idempotente de propósito: se o modelo chamar a ferramenta E devolver o
+    # HANDOFF_MARKER no mesmo turno, o evento sai UMA vez só.
+    def self.handoff!(conversation)
+      return false if truthy?(conversation.custom_attributes['ai_agent_handoff'])
+
+      conversation.custom_attributes['ai_agent_handoff'] = true
+      conversation.save!
+      conversation.bot_handoff!
+      true
+    end
+
     def perform
       return unless self.class.enabled_for?(conversation)
+      return handoff!(note: 'Customer asked for a human agent — handed off before calling the AI.') if human_requested?
 
       messages = history_messages
-      return if messages.blank?
+      deliver(ai_response(messages)) if messages.present?
+    rescue Ai::QuotaExceededError
+      handoff!(note: 'AI token quota exceeded — conversation handed off to a human agent.')
+    end
 
-      text = extract_text(ai_response(messages))
+    private
+
+    # Texto final do loop: o marcador vira handoff, o resto sai pro cliente
+    # pelo caminho normal de envio.
+    def deliver(text)
       return if text.blank?
 
       if text.include?(HANDOFF_MARKER)
@@ -52,11 +117,7 @@ module Ai
       else
         send_reply(text)
       end
-    rescue Ai::QuotaExceededError
-      handoff!(note: 'AI token quota exceeded — conversation handed off to a human agent.')
     end
-
-    private
 
     def account
       conversation.account
@@ -66,10 +127,33 @@ module Ai
       account.agency
     end
 
+    # Só a mensagem que disparou o turno, nunca o histórico inteiro: varrer
+    # tudo faria um "quero falar com atendente" de dez trocas atrás transferir
+    # a conversa hoje.
+    #
+    # `reorder`, não `order`: Message tem default_scope de created_at ASC e um
+    # `order` só SOMA no fim do ORDER BY — o desc seria engolido e isso aqui
+    # leria a mensagem mais ANTIGA (ver comentário no topo de message.rb).
+    def human_requested?
+      content = conversation.messages.incoming.where(private: false).reorder(created_at: :desc, id: :desc).pick(:content).to_s
+      content.match?(HANDOFF_REQUEST_REGEX) && !content.match?(HANDOFF_DENIAL_REGEX)
+    end
+
+    # O agente roda o LOOP agêntico, não um chat solto — é o que o transforma
+    # de conversador em operador (move negócio, etiqueta, transfere). Quota e
+    # AiUsageEvent continuam exatamente onde estavam, dentro do #raw_chat do
+    # service, medidos uma vez por iteração.
+    #
+    # Nenhuma ferramenta de ENVIO entra no conjunto :agent de propósito: a
+    # resposta continua saindo por #send_reply, o caminho normal, que é onde
+    # vivem os gates anti-ban da Fase 2.
     def ai_response(messages)
-      AnthropicService
-        .new(account: account, feature: 'ai_agent', conversation: conversation)
-        .chat(messages: messages, system: system_prompt, model: model)
+      ToolLoop.new(
+        service: AnthropicService.new(account: account, feature: 'ai_agent', conversation: conversation),
+        registry: ToolRegistry.new(context: :agent, account: account, conversation: conversation),
+        system_prompt: system_prompt,
+        model: model
+      ).run(messages: messages)
     end
 
     def model
@@ -83,6 +167,9 @@ module Ai
         Never invent order numbers, prices or policies you were not given.
         If the customer asks for a human agent, or you cannot resolve the request,
         include the exact marker #{HANDOFF_MARKER} in your reply.
+        Use a tool ONLY when the customer has just asked for what that tool does.
+        Never call one on your own initiative, never to tidy up the account, and
+        never twice for the same request.
       PROMPT
 
       custom = account.custom_attributes['ai_agent_prompt'].presence
@@ -97,26 +184,21 @@ module Ai
     # Last N public messages, oldest first, mapped to Anthropic roles. The
     # Messages API requires the first message to be from the user, so leading
     # assistant messages (e.g. campaign greetings) are dropped.
+    #
+    # `reorder` conserta um bug silencioso: com `order` o default_scope ASC de
+    # Message vencia, o LIMIT pegava as mensagens mais VELHAS e o `.reverse`
+    # entregava o histórico de trás pra frente ao modelo.
     def history_messages
       records = conversation.messages
                             .where(message_type: [:incoming, :outgoing])
                             .where(private: false)
-                            .order(created_at: :desc)
+                            .reorder(created_at: :desc, id: :desc)
                             .limit(HISTORY_LIMIT)
                             .reverse
 
       records
         .filter_map { |message| { role: message.incoming? ? 'user' : 'assistant', content: message.content } if message.content.present? }
         .drop_while { |message| message[:role] != 'user' }
-    end
-
-    def extract_text(response)
-      return if response.blank?
-
-      Array(response.content)
-        .filter_map { |block| block.text if block.respond_to?(:text) }
-        .join("\n")
-        .strip
     end
 
     def send_reply(text)
@@ -129,9 +211,7 @@ module Ai
     def handoff!(reply_text: nil, note: nil)
       send_reply(reply_text) if reply_text.present?
 
-      conversation.custom_attributes['ai_agent_handoff'] = true
-      conversation.status = :open if conversation.pending?
-      conversation.save!
+      self.class.handoff!(conversation)
 
       note_params = {
         content: note || 'AI agent handed this conversation off to a human.',
