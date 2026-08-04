@@ -11,6 +11,15 @@ class Chatbots::Nodes::AiNode < Chatbots::Nodes::BaseNode
   # existente. O autor do fluxo referencia essas chaves no prompt do nó; não
   # há bloco de contexto automático a mais para adicionar aqui.
   def execute
+    # PARAR (Fase 2) é SEM AUTOMAÇÃO, não só sem mensagem: o loop roda cinco
+    # tools de ESCRITA (mover negócio, etiquetar, atualizar contato,
+    # transferir) antes de responder, e gasta quota — deixar rodar pra um
+    # contato que pediu pra sair reescreveria cadastro/kanban/etiqueta de
+    # quem não quer automação. Mesmo argumento e mesmo gate do
+    # Ai::AgentReplyService.enabled_for? (ver comentário lá), aplicado aqui
+    # porque o caminho do chatbot não herda aquele gate.
+    return [:continue, next_or_default('handoff')] if Ai::AgentReplyService.automation_blocked?(conversation.contact)
+
     text = run_loop
     return [:continue, next_or_default('handoff')] if text.blank?
 

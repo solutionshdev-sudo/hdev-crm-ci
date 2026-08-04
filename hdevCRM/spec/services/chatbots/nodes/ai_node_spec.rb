@@ -81,6 +81,32 @@ RSpec.describe Chatbots::Nodes::AiNode do
     expect(conversation.messages.outgoing.count).to eq(0)
   end
 
+  # PARAR (Fase 2) é SEM AUTOMAÇÃO: o loop roda tools de ESCRITA antes de
+  # responder, e o gate de opt-out da camada de envio só barra a MENSAGEM —
+  # o que já teria sido gravado no cadastro/etiqueta/kanban ficaria gravado.
+  # Fix round 1 (review F3b-T1): mesmo argumento do
+  # Ai::AgentReplyService.enabled_for?, aplicado aqui porque o caminho do
+  # chatbot não herda aquele gate.
+  describe 'contato fora da automação' do
+    it 'contato deu PARAR (automation_opted_out): sai pelo handle handoff sem chamar o modelo' do
+      contact.update!(automation_opted_out: true)
+      allow(Ai::ToolLoop).to receive(:new)
+
+      expect(execute).to eq([:continue, 'handoff1'])
+      expect(Ai::ToolLoop).not_to have_received(:new)
+      expect(conversation.messages.count).to eq(0)
+    end
+
+    it 'contato bloqueado: sai pelo handle handoff sem chamar o modelo' do
+      contact.update!(blocked: true)
+      allow(Ai::ToolLoop).to receive(:new)
+
+      expect(execute).to eq([:continue, 'handoff1'])
+      expect(Ai::ToolLoop).not_to have_received(:new)
+      expect(conversation.messages.count).to eq(0)
+    end
+  end
+
   describe 'data["send_reply"] é false' do
     let(:node_data) { { 'prompt' => 'p', 'send_reply' => false } }
 
