@@ -671,6 +671,16 @@
         "LABEL": "Ativar"
       }
     },
+    "LEAD_CAPTURE": {
+      "TITLE": "Captação de leads",
+      "DESCRIPTION": "Use esse endpoint para captar leads de formulários externos (landing pages, sites) direto para essa caixa de entrada.",
+      "URL_LABEL": "URL do endpoint",
+      "SNIPPET_LABEL": "Snippet de formulário pronto para colar",
+      "SNIPPET_HELP_TEXT": "Cole esse formulário HTML no site do cliente final. Os textos dos campos ficam em português de propósito — é conteúdo para o visitante do site, não é texto da UI do dashboard.",
+      "TEST_BUTTON": "Enviar lead de teste",
+      "TEST_SUCCESS": "Lead de teste enviado com sucesso. Contato #{contactId} e conversa #{conversationId} criados.",
+      "TEST_ERROR": "Não foi possível enviar o lead de teste. Tente novamente."
+    },
     "DELETE": {
       "BUTTON_TEXT": "Excluir",
       "AVATAR_DELETE_BUTTON_TEXT": "Apagar Avatar",

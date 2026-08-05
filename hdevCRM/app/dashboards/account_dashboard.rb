@@ -34,7 +34,9 @@ class AccountDashboard < Administrate::BaseDashboard
     conversations: CountField,
     locale: Field::Select.with_options(collection: LANGUAGES_CONFIG.map { |_x, y| [y[:name], y[:iso_639_1_code]] }),
     status: Field::Select.with_options(collection: lambda { |_field|
-      [[I18n.t('administrate.values.status.active'), 'active'], [I18n.t('administrate.values.status.suspended'), 'suspended']]
+      [[I18n.t('administrate.values.status.active'), 'active'],
+       [I18n.t('administrate.values.status.suspended'), 'suspended'],
+       [I18n.t('administrate.values.status.pending_payment'), 'pending_payment']]
     }),
     agency: Field::BelongsTo.with_options(searchable: true, searchable_field: 'name', order: 'id DESC', include_blank: true),
     account_users: Field::HasMany,

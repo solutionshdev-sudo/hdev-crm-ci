@@ -58,6 +58,7 @@ pt_BR:
       status:
         active: Ativa
         suspended: Suspensa
+        pending_payment: Aguardando pagamento
       banner_type:
         info: Informativo
         warning: Aviso
@@ -65,6 +66,14 @@ pt_BR:
       role:
         agent: Agente
         administrator: Administrador
+    # Hint nativo do gem: o _form.html.erb do próprio administrate procura
+    # "administrate.field_hints.<resource>.<attribute>" e renderiza em
+    # .field-unit__hint quando a chave existe (ver _form.html.erb no gem).
+    field_hints:
+      agency:
+        suspended_reason: >-
+          Suspensão manual por abuso deve vir acompanhada do cancelamento da
+          assinatura no Stripe — o próximo invoice.paid reativa a agência.
   helpers:
     submit:
       create: 'Criar %{model}'
@@ -125,6 +134,7 @@ pt_BR:
         slug: Slug
         custom_domain: Domínio customizado
         status: Status
+        suspended_reason: Motivo da suspensão
         installation_name: Nome da instalação
         brand_name: Nome da marca
         brand_url: URL da marca

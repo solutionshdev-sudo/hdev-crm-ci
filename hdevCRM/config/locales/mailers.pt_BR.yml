@@ -13,6 +13,10 @@ pt_BR:
         subject: 'O arquivo de exportação dos seus contatos está pronto para download.'
       automation_rule_disabled:
         subject: 'Regra de automação desativada por erros de validação.'
+      ai_quota_threshold:
+        subject: 'Seu uso de IA atingiu 80% da cota mensal'
+      ai_quota_exhausted:
+        subject: 'Sua cota mensal de IA foi esgotada'
     channel_notifications_mailer:
       facebook_disconnect:
         subject: 'A conexão com sua página do Facebook expirou'

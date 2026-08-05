@@ -13,6 +13,7 @@ en:
         invalid_current_password: 'Invalid current password'
       account:
         suspended: 'Account is suspended'
+        agency_suspended: 'Agency is suspended'
         bot_not_authorized: 'Bot is not authorized to access this account'
         agent_limit_exceeded: 'Account limit exceeded. Please purchase more licenses'
       widget:

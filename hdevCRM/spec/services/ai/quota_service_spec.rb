@@ -51,4 +51,155 @@ RSpec.describe Ai::QuotaService do
       expect(summary[:usage][:total_tokens]).to eq(1500)
     end
   end
+
+  describe '#account_limit' do
+    it 'uses the plan limit when the subscription is active' do
+      plan = create(:plan, ai_monthly_tokens: 1000)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 50 }) # deve ser ignorado: plano manda
+
+      expect(service.account_limit).to eq(1000)
+    end
+
+    it 'uses the plan limit when the subscription is past_due' do
+      plan = create(:plan, ai_monthly_tokens: 2000)
+      create(:subscription, owner: account, plan: plan, status: 'past_due')
+
+      expect(service.account_limit).to eq(2000)
+    end
+
+    it 'falls back to custom_attributes when the subscription is canceled' do
+      plan = create(:plan, ai_monthly_tokens: 2000)
+      create(:subscription, owner: account, plan: plan, status: 'canceled')
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 300 })
+
+      expect(service.account_limit).to eq(300)
+    end
+
+    it 'falls back to custom_attributes when there is no subscription' do
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 400 })
+
+      expect(service.account_limit).to eq(400)
+    end
+
+    it 'is unlimited when the plan has no cap, even with extra tokens' do
+      plan = create(:plan, ai_monthly_tokens: nil)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+      account.update!(ai_extra_tokens: 500)
+
+      expect(service.account_limit).to be_nil
+    end
+
+    # Decisão do controller (promovida a spec): com subscription ativa, o
+    # plano manda sempre -- mesmo quando ai_monthly_tokens é nil (ilimitado)
+    # e existe um custom_attributes legado populado. O fallback NÃO
+    # ressuscita: uma conta pagante de plano ilimitado não pode ficar
+    # estrangulada por um valor velho do custom_attributes.
+    it 'does not resurrect the legacy fallback when the active plan is explicitly unlimited' do
+      plan = create(:plan, ai_monthly_tokens: nil)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 5000 })
+
+      expect(service.account_limit).to be_nil
+    end
+
+    it 'sums ai_extra_tokens on top of the plan limit' do
+      plan = create(:plan, ai_monthly_tokens: 1000)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+      account.update!(ai_extra_tokens: 250)
+
+      expect(service.account_limit).to eq(1250)
+    end
+
+    it 'sums ai_extra_tokens on top of the fallback limit' do
+      account.update!(custom_attributes: { 'ai_monthly_tokens' => 500 }, ai_extra_tokens: 100)
+
+      expect(service.account_limit).to eq(600)
+    end
+  end
+
+  describe '#agency_limit' do
+    it 'uses the plan limit plus extra tokens when the agency subscription is active' do
+      plan = create(:plan, ai_monthly_tokens: 3000)
+      create(:subscription, owner: agency, plan: plan, status: 'active')
+      agency.update!(ai_extra_tokens: 500)
+
+      expect(service.agency_limit).to eq(3500)
+    end
+
+    it 'falls back to settings when the agency has no subscription' do
+      agency.update!(settings: { 'ai_monthly_tokens' => 700 })
+
+      expect(service.agency_limit).to eq(700)
+    end
+  end
+
+  describe '#check_thresholds!' do
+    around do |example|
+      travel_to(Time.zone.local(2026, 6, 15, 12, 0, 0)) { example.run }
+    end
+
+    before { account.update!(custom_attributes: { 'ai_monthly_tokens' => 1000 }) }
+
+    after do
+      Redis::Alfred.delete(format(Redis::RedisKeys::AI_QUOTA_ALERT_KEY, account_id: account.id, threshold: 80))
+      Redis::Alfred.delete(format(Redis::RedisKeys::AI_QUOTA_ALERT_KEY, account_id: account.id, threshold: 100))
+    end
+
+    it 'does not enqueue a mail below the 80% threshold' do
+      create(:ai_usage_event, account: account, input_tokens: 790, output_tokens: 0)
+
+      expect { service.check_thresholds! }
+        .not_to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+    end
+
+    it 'enqueues the 80% alert once usage crosses the threshold' do
+      create(:ai_usage_event, account: account, input_tokens: 800, output_tokens: 0)
+
+      expect { service.check_thresholds! }
+        .to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+    end
+
+    it 'does not enqueue a second 80% alert within the cooldown window' do
+      create(:ai_usage_event, account: account, input_tokens: 800, output_tokens: 0)
+      service.check_thresholds!
+
+      expect { service.check_thresholds! }
+        .not_to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+    end
+
+    it 'sends a new 80% alert once the cooldown key is cleared' do
+      create(:ai_usage_event, account: account, input_tokens: 800, output_tokens: 0)
+      service.check_thresholds!
+      Redis::Alfred.delete(format(Redis::RedisKeys::AI_QUOTA_ALERT_KEY, account_id: account.id, threshold: 80))
+
+      expect { service.check_thresholds! }
+        .to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+    end
+
+    it 'enqueues only the exhausted alert at 100%, never also the 80% alert' do
+      create(:ai_usage_event, account: account, input_tokens: 1000, output_tokens: 0)
+
+      expect { service.check_thresholds! }
+        .to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_exhausted)
+        .and(not_have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold))
+    end
+
+    it 'does nothing when the account has no configured limit' do
+      account.update!(custom_attributes: {})
+      create(:ai_usage_event, account: account, input_tokens: 999_999, output_tokens: 0)
+
+      expect { service.check_thresholds! }
+        .not_to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_threshold)
+      expect { service.check_thresholds! }
+        .not_to have_enqueued_mail(AdministratorNotifications::AccountNotificationMailer, :ai_quota_exhausted)
+    end
+
+    it 'never raises when Redis is unavailable' do
+      create(:ai_usage_event, account: account, input_tokens: 800, output_tokens: 0)
+      allow(Redis::Alfred).to receive(:set).and_raise(StandardError, 'boom')
+
+      expect { service.check_thresholds! }.not_to raise_error
+    end
+  end
 end

@@ -65,6 +65,33 @@ RSpec.describe 'Agencies API', type: :request do
       expect(response.parsed_body['id']).to eq(agency.id)
       expect(response.parsed_body['name']).to eq(agency.name)
     end
+
+    context 'when the agency is suspended (F5-T2 §5.2 painel)' do
+      it 'returns unauthorized with the agency suspended message even for its own admin' do
+        agency.update!(status: :suspended)
+
+        get "/api/v1/agencies/#{agency.id}", headers: agency_admin.create_new_auth_token
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.api.account.agency_suspended'))
+      end
+    end
+
+    context 'when the agency is pending_payment (F5-T2 §5.2 painel)' do
+      it 'also blocks the panel — unlike the child account guard, pending_payment blocks here too' do
+        agency.update!(status: :pending_payment)
+
+        get "/api/v1/agencies/#{agency.id}", headers: agency_admin.create_new_auth_token
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.api.account.agency_suspended'))
+      end
+    end
+
+    context 'when the agency is active' do
+      it 'returns success' do
+        get "/api/v1/agencies/#{agency.id}", headers: agency_admin.create_new_auth_token
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 
   describe 'GET /api/v1/agencies/:agency_id/accounts' do

@@ -27,6 +27,17 @@ RSpec.describe 'Super Admin accounts API', type: :request do
 
   describe 'GET /super_admin/accounts/{account_id}' do
     context 'when it is an authenticated user' do
+      it 'keeps showing an account whose agency is suspended (F5-T2 §5.4: super admin continua acessando)' do
+        agency = create(:agency, status: :suspended)
+        account.update!(agency: agency)
+        sign_in(super_admin, scope: :super_admin)
+
+        get "/super_admin/accounts/#{account.id}"
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(account.name)
+      end
+
       it 'shows effective Captain model routing', if: HdevApp.enterprise? do
         account.update!(captain_models: { 'editor' => 'gpt-4.1' })
         sign_in(super_admin, scope: :super_admin)
@@ -108,6 +119,22 @@ RSpec.describe 'Super Admin accounts API', type: :request do
         expect(response).to have_http_status(:redirect)
         expect(account.reload.captain_models).to eq('assistant' => 'gpt-5.2')
         expect(account.keep_pending_on_bot_failure).to be true
+      end
+
+      it 'updates the status to pending_payment (F5-T2 §5.2 select do super admin)' do
+        sign_in(super_admin, scope: :super_admin)
+
+        patch "/super_admin/accounts/#{account.id}",
+              params: {
+                account: {
+                  name: account.name,
+                  locale: account.locale,
+                  status: 'pending_payment'
+                }
+              }
+
+        expect(response).to have_http_status(:redirect)
+        expect(account.reload.status).to eq('pending_payment')
       end
 
       it 'rejects invalid Captain model overrides' do

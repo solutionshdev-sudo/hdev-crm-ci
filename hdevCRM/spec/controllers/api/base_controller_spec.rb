@@ -179,4 +179,74 @@ RSpec.describe 'API Base', type: :request do
       end
     end
   end
+
+  describe 'when the account belongs to an agency (F5-T2 §5.2 propagação)' do
+    context 'when the agency is suspended' do
+      let!(:agency) { create(:agency, status: :suspended) }
+
+      before { account.update!(agency: agency) }
+
+      it 'returns 401 unauthorized with the agency suspended message for every child account request' do
+        get "/api/v1/accounts/#{account.id}/conversations",
+            headers: { api_access_token: user.access_token.token },
+            as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.api.account.agency_suspended'))
+      end
+    end
+
+    context 'when the agency is reactivated' do
+      let!(:agency) { create(:agency, status: :suspended) }
+
+      before { account.update!(agency: agency) }
+
+      it 'returns success again' do
+        agency.update!(status: :active)
+
+        get "/api/v1/accounts/#{account.id}/conversations",
+            headers: { api_access_token: user.access_token.token },
+            as: :json
+
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    context 'when the agency is pending_payment' do
+      let!(:agency) { create(:agency, status: :pending_payment) }
+
+      before { account.update!(agency: agency) }
+
+      it 'does not block the child account (pending_payment does not propagate)' do
+        get "/api/v1/accounts/#{account.id}/conversations",
+            headers: { api_access_token: user.access_token.token },
+            as: :json
+
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    context 'when the account itself is suspended (regression)' do
+      it 'keeps returning the original account suspended message' do
+        account.update!(status: :suspended)
+
+        get "/api/v1/accounts/#{account.id}/conversations",
+            headers: { api_access_token: user.access_token.token },
+            as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.api.account.suspended'))
+      end
+    end
+
+    context 'when the account has no agency' do
+      it 'is not affected' do
+        get "/api/v1/accounts/#{account.id}/conversations",
+            headers: { api_access_token: user.access_token.token },
+            as: :json
+
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
 end

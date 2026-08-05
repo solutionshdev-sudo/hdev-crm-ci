@@ -7,8 +7,18 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug: Field::String.with_options(searchable: true),
     custom_domain: Field::String.with_options(searchable: true),
     status: Field::Select.with_options(collection: lambda { |_field|
-      [[I18n.t('administrate.values.status.active'), 'active'], [I18n.t('administrate.values.status.suspended'), 'suspended']]
+      [[I18n.t('administrate.values.status.active'), 'active'],
+       [I18n.t('administrate.values.status.suspended'), 'suspended'],
+       [I18n.t('administrate.values.status.pending_payment'), 'pending_payment']]
     }),
+    # Motivo de suspensão manual (settings['suspended_reason'], jsonb livre —
+    # sem migration, ver Agency#suspended_reason). O aviso do Stripe (§5.2)
+    # aparece no form via o mecanismo de hint NATIVO do gem administrate
+    # (não há override local de app/views/administrate/application/_form.html.erb
+    # nesse repo, então é o _form.html.erb do próprio gem quem procura a
+    # chave administrate.field_hints.agency.suspended_reason — en+pt_BR — e
+    # renderiza em .field-unit__hint se ela existir).
+    suspended_reason: Field::String,
     installation_name: Field::String,
     brand_name: Field::String,
     brand_url: Field::String,
@@ -51,6 +61,7 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug
     custom_domain
     status
+    suspended_reason
     installation_name
     brand_name
     brand_url
@@ -72,6 +83,7 @@ class AgencyDashboard < Administrate::BaseDashboard
     slug
     custom_domain
     status
+    suspended_reason
     installation_name
     brand_name
     brand_url
