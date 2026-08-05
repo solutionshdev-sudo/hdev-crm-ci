@@ -135,5 +135,35 @@ RSpec.describe 'Agencies API', type: :request do
 
       expect(response).to have_http_status(:unauthorized)
     end
+
+    context 'with plan limits (F6)' do
+      it 'returns payment_required when max_client_accounts is reached' do
+        plan = create(:plan, :agency, max_client_accounts: 1)
+        create(:subscription, owner: agency, plan: plan, status: 'active')
+        create(:account, agency: agency)
+
+        expect do
+          post "/api/v1/agencies/#{agency.id}/accounts",
+               params: params,
+               headers: agency_admin.create_new_auth_token,
+               as: :json
+        end.not_to change(Account, :count)
+
+        expect(response).to have_http_status(:payment_required)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.plan_limits.client_account'))
+      end
+
+      it 'creates the account while under the limit' do
+        plan = create(:plan, :agency, max_client_accounts: 1)
+        create(:subscription, owner: agency, plan: plan, status: 'active')
+
+        post "/api/v1/agencies/#{agency.id}/accounts",
+             params: params,
+             headers: agency_admin.create_new_auth_token,
+             as: :json
+
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 end

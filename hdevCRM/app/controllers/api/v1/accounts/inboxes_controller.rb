@@ -4,6 +4,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   before_action :fetch_agent_bot, only: [:set_agent_bot]
   # we are already handling the authorization in fetch inbox
   before_action :check_authorization, except: [:show]
+  before_action :validate_plan_limits, only: [:create]
 
   include Api::V1::Accounts::Concerns::WhatsappHealthManagement
 
@@ -92,6 +93,19 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   def fetch_inbox
     @inbox = Current.account.inboxes.find(params[:id])
     authorize @inbox, :show?
+  end
+
+  # Limites do plano (F6): teto de caixas, teto por tipo de canal e teto de
+  # instâncias baileys — a instância nasce junto do canal whatsapp
+  # provider=baileys criado aqui (provision é callback do model).
+  def validate_plan_limits
+    enforcer = Plan::LimitEnforcer.new(account: Current.account)
+    enforcer.allow!(:inbox, channel_type: channel_type_from_params&.name)
+    enforcer.allow!(:baileys_instance) if baileys_channel_params?
+  end
+
+  def baileys_channel_params?
+    params.dig(:channel, :type) == 'whatsapp' && params.dig(:channel, :provider) == 'baileys'
   end
 
   def fetch_agent_bot

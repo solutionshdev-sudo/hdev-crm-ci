@@ -44,8 +44,24 @@ RSpec.describe Account do
   describe 'usage_limits' do
     let(:account) { create(:account) }
 
-    it 'returns HdevApp.max limits' do
+    it 'returns HdevApp.max limits without a plan' do
       expect(account.usage_limits[:agents]).to eq(HdevApp.max_limit)
+      expect(account.usage_limits[:inboxes]).to eq(HdevApp.max_limit)
+    end
+
+    it 'returns the plan limits when the subscription grants one (F6)' do
+      plan = create(:plan, max_agents: 3, max_inboxes: 5)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+
+      expect(account.usage_limits[:agents]).to eq(3)
+      expect(account.usage_limits[:inboxes]).to eq(5)
+    end
+
+    it 'keeps the sentinel for plan columns left unlimited' do
+      plan = create(:plan, max_agents: 3, max_inboxes: nil)
+      create(:subscription, owner: account, plan: plan, status: 'active')
+
+      expect(account.usage_limits[:agents]).to eq(3)
       expect(account.usage_limits[:inboxes]).to eq(HdevApp.max_limit)
     end
   end

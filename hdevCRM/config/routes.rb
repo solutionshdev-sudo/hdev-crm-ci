@@ -673,6 +673,7 @@ Rails.application.routes.draw do
       end
 
       # order of resources affect the order of sidebar navigation in super admin
+      resources :plans, only: [:index, :new, :create, :show, :edit, :update, :destroy]
       resources :accounts, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
         post :seed, on: :member
         post :reset_cache, on: :member

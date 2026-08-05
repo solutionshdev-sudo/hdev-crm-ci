@@ -161,10 +161,14 @@ class Account < ApplicationRecord
     super.presence || ENV.fetch('MAILER_SENDER_EMAIL') { GlobalConfig.get('MAILER_SUPPORT_EMAIL')['MAILER_SUPPORT_EMAIL'] }
   end
 
+  # A fonte é o Plan::LimitEnforcer (alocação → plano direto → plano da
+  # agência); sem plano fica o teto sentinela — o contrato aqui é inteiro,
+  # porque o agents_controller faz aritmética em cima (available_agent_count).
   def usage_limits
+    enforcer = Plan::LimitEnforcer.new(account: self)
     {
-      agents: HdevApp.max_limit.to_i,
-      inboxes: HdevApp.max_limit.to_i
+      agents: enforcer.limit_for(:agent) || HdevApp.max_limit.to_i,
+      inboxes: enforcer.limit_for(:inbox) || HdevApp.max_limit.to_i
     }
   end
 

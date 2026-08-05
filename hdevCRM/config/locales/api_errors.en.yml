@@ -1,5 +1,11 @@
 en:
   errors:
+    plan_limits:
+      agent: 'Plan agent limit reached. Upgrade the plan to add more agents'
+      inbox: 'Plan inbox limit reached. Upgrade the plan to add more inboxes'
+      baileys_instance: 'Plan WhatsApp instance limit reached. Upgrade the plan to add more instances'
+      client_account: 'Plan client account limit reached. Upgrade the plan to add more client accounts'
+      channel: 'Plan limit for this channel type reached. Upgrade the plan to add more inboxes of this channel'
     api:
       common:
         resource_not_found: 'Resource could not be found'

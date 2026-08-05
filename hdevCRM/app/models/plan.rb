@@ -37,7 +37,31 @@ class Plan < ApplicationRecord
   validates :stripe_price_id, uniqueness: true, allow_nil: true
   validates :max_agents, :max_inboxes, :max_baileys_instances, :max_client_accounts, :ai_monthly_tokens,
             numericality: { greater_than_or_equal_to: 0, allow_nil: true }
+  validate :channel_limits_shape
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:position, :id) }
+
+  # O form do super admin edita o jsonb como texto (o SerializedField só tem
+  # form de string); JSON inválido fica retido e vira erro de validação.
+  def channel_limits_json
+    channel_limits.to_json
+  end
+
+  def channel_limits_json=(raw)
+    @channel_limits_json_invalid = false
+    self.channel_limits = raw.presence ? JSON.parse(raw) : {}
+  rescue JSON::ParserError
+    @channel_limits_json_invalid = true
+  end
+
+  private
+
+  def channel_limits_shape
+    return errors.add(:channel_limits, :invalid) if @channel_limits_json_invalid
+    return errors.add(:channel_limits, :invalid) unless channel_limits.is_a?(Hash)
+
+    invalid_value = channel_limits.values.any? { |value| !(value.nil? || (value.is_a?(Integer) && value >= 0)) }
+    errors.add(:channel_limits, :invalid) if invalid_value
+  end
 end
