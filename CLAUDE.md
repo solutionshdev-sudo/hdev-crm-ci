@@ -68,7 +68,9 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 ## Ferramentas / ambiente
 
 - [x] node 24
-- [x] git 2.55 — repo `solutionshdev-sudo/hdev-crm` no GitHub, `main` sincronizada
+- [x] git 2.55 — repo `solutionshdev-sudo/hdev-crm` no GitHub, `main` sincronizada.
+      Desde 05/08 existe também o espelho **público** `solutionshdev-sudo/hdev-crm-ci`,
+      que só recebe código e serve pra rodar o CI de graça (ver seção CI)
 - [x] gh (GitHub CLI) — autenticado; é como se acompanha o CI daqui
 - [x] pnpm 10.2 — via `corepack pnpm` (não está no PATH direto)
 - [ ] playwright — só quando for usar render de carrossel
@@ -105,8 +107,21 @@ de chutar a assinatura.
 
 Na raiz do repo, fora de `hdevCRM/`. Quatro jobs: `rspec`, `lint`
 (rubocop + eslint), `vitest` e `baileys` (desde 02/08 — `tsc --noEmit` +
-`vitest run` do microserviço, node 22 = imagem de produção). Roda em push na
-`main`, em PR e sob demanda.
+`vitest run` do microserviço, node 22 = imagem de produção).
+
+> **ONDE ELE RODA MUDOU EM 05/08.** O Actions do repo privado está bloqueado
+> por billing (decisão: não pagar), então o CI roda num **espelho público só do
+> código**: `solutionshdev-sudo/hdev-crm-ci`. Fluxo por rodada: eu monto o
+> commit de sync (`scripts/sync-ci-mirror.sh` — allowlist de `hdevCRM/`,
+> `baileys-service/`, `.github/`; **nunca** `_memoria/` e afins; restaura os
+> bits 100755 senão o `Lint/ScriptPermission` acusa falso positivo) e **o
+> Harvey dá o push** — `git push --force <url-do-espelho> HEAD:refs/heads/main`
+> a partir do diretório de staging, conferindo antes que `git log --oneline -1`
+> mostra o commit `sync:`. O push em `main` dispara o CI sozinho. Acompanhar
+> com `gh run list/view --repo solutionshdev-sudo/hdev-crm-ci`. Detalhes e o
+> incidente de 05/08 na memória `ci-espelho-publico-gratis`.
+
+Gatilhos do workflow: push na `main`, PR e sob demanda.
 
 - **É o único interpretador Ruby do projeto.** A imagem de produção apaga
   `spec/`, então rodar rspec no EasyPanel não é opção.

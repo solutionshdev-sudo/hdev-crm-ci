@@ -9,7 +9,19 @@
 Produto no ar (EasyPanel, 26/07/2026) — em processo de desvinculação total do
 Chatwoot antes de abrir pra agências.
 
-## Infra de desenvolvimento (28/07)
+## Infra de desenvolvimento (28/07, revisada em 05/08)
+
+> **MUDANÇA DE 05/08 — o CI saiu do repo privado.** O GitHub Actions da conta
+> está bloqueado por falha de pagamento / spending limit, e a decisão do Harvey
+> é **não pagar**. O CI passou a rodar num **espelho público só do código**
+> (`solutionshdev-sudo/hdev-crm-ci`) — runner em repo público é grátis e
+> ilimitado. O ciclo ganhou um passo manual: eu monto o commit de sync
+> (allowlist de `hdevCRM/`, `baileys-service/`, `.github/` — nunca `_memoria/`)
+> e **o push do espelho é do Harvey** (`git push --force ... HEAD:refs/heads/main`,
+> que dispara o CI sozinho). Script: `scripts/sync-ci-mirror.sh`. Receita
+> completa, armadilhas (bits de execução, branch default) e o incidente do push
+> errado estão na memória `ci-espelho-publico-gratis` do Claude. Tudo abaixo
+> sobre os jobs continua valendo — só o lugar onde rodam mudou.
 
 **Existe CI**: `.github/workflows/ci.yml`, na raiz do repo. Quatro jobs — `rspec`,
 `lint` (rubocop + eslint), `vitest` e `baileys` (desde 02/08, cobre o
@@ -320,7 +332,7 @@ o id do modelo — os specs stubam o `Ai::AnthropicService` inteiro).
 cliente reclamar que o bot não conhece o produto dele — pgvector já está
 habilitado.
 
-## Quarta trilha: Motor Integrado (01-04/08 — F1, F2, F4 e F3a na main; F1/F4 provadas, F2 e F3a esperando a chave de IA)
+## Quarta trilha: Motor Integrado (01-05/08 — CINCO das seis fases na main: F1, F2, F3a, F3b, F4 e F5; F1/F4 provadas, o resto esperando a chave de IA e o deploy)
 
 As peças existem mas não se conversam — o plano de 6 fases
 (`~/.claude/plans/merry-mixing-toast.md`) liga kanban, chatbot, Baileys, IA e
@@ -417,9 +429,50 @@ por conversa (o ciclo criar→perder→criar enchia o kanban da conta e
 disparava `deal.won` no barramento) e truncagem do vocabulário da conta nos
 erros de tool. Detalhes e armadilhas na memória `motor-fase3a-mergeada`.
 
-**Próximo da trilha: F3b (IA dentro do fluxo + dono IA visível)**, depois F5.
-Antes disso, a prova nível 4 da F3a (§3a.5) e o PARAR completo da §2.6.2 —
-as duas dependem da mesma `ANTHROPIC_API_KEY` em produção.
+**Feito (04/08, PR #30 mergeado em `f2e5b2d`) — Fase 3b:** a IA entrou no
+fluxo e o dono IA ficou visível. O `Chatbots::Nodes::AiNode` roda `Ai::ToolLoop`
+com as mesmas 5 tools da F3a (as duas portas de IA agora operam igual), com o
+PARAR gateando ANTES do modelo e o handoff por tool saindo pelo handle certo
+(decidido por `ToolLoop#executed`, não por reparse de texto). O review final
+pegou o que faltava: o nó entregava as tools **sem o bloco de disciplina** do
+system prompt da F3a — sem ele o nó reabria o vazamento de vocabulário interno
+que a F3a tinha fechado; virou a constante compartilhada
+`TOOL_DISCIPLINE_PROMPT`. Do lado visível: `Conversation#ai_handling?` no
+payload e no presenter (badge vivo por websocket), filtro `conversation_type=ai`
+num service próprio, badge "IA atendendo" na lista e no header, e aba "IA" que
+abre em "Todos" (Minhas ∩ IA é vazia por construção). Pagou dívida junto:
+`deal_node_spec` e `ai_node_spec` (primeira suíte `Chatbots::Nodes::*` do repo),
+ator "Agente IA" nas activities de etiqueta (antes **nenhuma** activity nascia
+nesse caminho) e o spec-guard automatizado de "nenhuma tool do `:agent` envia
+mensagem".
+
+**Feito (05/08, PR #31 mergeado em `33c0f1b`) — Fase 5, a camada comercial:**
+a quota de IA deixou de ser número solto e passou a vir do plano —
+`plan.ai_monthly_tokens` quando a assinatura está vigente (`active` ou
+`past_due`), somado a `ai_extra_tokens`, com o fallback legado só quando não há
+assinatura; **assinatura vigente manda sempre** (plano ilimitado não ressuscita
+limite antigo — decisão travada por spec). Alarme por e-mail em 80% e 100% com
+cooldown de 24h por limiar em Redis, dentro de rescue que nunca derruba a IA.
+Suspensão de agência passou a propagar: conta filha e painel da agência levam
+401 (`pending_payment` não propaga pras filhas, mas bloqueia o painel), e o
+super admin ganhou `pending_payment` nos selects e motivo de suspensão editável
+com o aviso do Stripe no hint nativo do administrate. E nasceu a **fonte de
+captação**: `POST /public/api/v1/inboxes/:id/leads` (JSON e form), idempotente
+por `external_id` no contato E na conversa, com telefone mascarado normalizado
+(lead nunca se perde por máscara), throttle de 60/h por token e UI na tela da
+inbox API com URL, snippet de `<form>` e botão de lead de teste. O card no
+kanban nasce pela regra de fábrica da F1 — zero código de deal.
+
+**Furo conhecido, primeiro item da F6:** a suspensão de agência **não alcança
+superfície pública** — `PublicController` não passa pelo guard, então lead (e o
+widget, que já era assim) de agência suspensa cria conversa, card e dispara os
+listeners de IA: **agência suspensa continua gerando custo**.
+
+**Próximo da trilha: F6 (disparo em massa), a última** — e ela tem
+pré-requisito duro: o PARAR completo da §2.6.2. Junto dele seguem pendentes as
+provas nível 4 da F3a (§3a.5), da F3b (§3b.4) e da F5 (§5.5, que ainda precisa
+de SMTP) — as três primeiras dependem da mesma `ANTHROPIC_API_KEY` em produção.
+Roteiro pronto em `.superpowers/sdd/merry-mixing-toast/roteiro-nivel4-f3a-f3b-parar.md`.
 
 **Gate FECHADO (02/08) — Fase 1 provada em produção:** a regra de fábrica
 salvou pela UI, o card nasceu sozinho ("Sistema criou o negócio" na atividade),
