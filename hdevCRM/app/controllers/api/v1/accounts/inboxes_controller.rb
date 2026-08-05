@@ -4,9 +4,9 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   before_action :fetch_agent_bot, only: [:set_agent_bot]
   # we are already handling the authorization in fetch inbox
   before_action :check_authorization, except: [:show]
-  before_action :validate_plan_limits, only: [:create]
 
   include Api::V1::Accounts::Concerns::WhatsappHealthManagement
+  include Api::V1::Accounts::Concerns::PlanLimitGuard
 
   def index
     @inboxes = policy_scope(Current.account.inboxes)
@@ -95,19 +95,6 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
     authorize @inbox, :show?
   end
 
-  # Limites do plano (F6): teto de caixas, teto por tipo de canal e teto de
-  # instâncias baileys — a instância nasce junto do canal whatsapp
-  # provider=baileys criado aqui (provision é callback do model).
-  def validate_plan_limits
-    enforcer = Plan::LimitEnforcer.new(account: Current.account)
-    enforcer.allow!(:inbox, channel_type: channel_type_from_params&.name)
-    enforcer.allow!(:baileys_instance) if baileys_channel_params?
-  end
-
-  def baileys_channel_params?
-    params.dig(:channel, :type) == 'whatsapp' && params.dig(:channel, :provider) == 'baileys'
-  end
-
   def fetch_agent_bot
     @agent_bot = AgentBot.accessible_to(Current.account).find(params[:agent_bot]) if params[:agent_bot]
   end
@@ -118,9 +105,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
     account_channels_method.create!(permitted_params(channel_type_from_params::EDITABLE_ATTRS)[:channel].except(:type))
   end
 
-  def allowed_channel_types
-    %w[web_widget api email line telegram whatsapp sms]
-  end
+  def allowed_channel_types = %w[web_widget api email line telegram whatsapp sms]
 
   def update_inbox_working_hours
     @inbox.update_working_hours(params.permit(working_hours: Inbox::OFFISABLE_ATTRS)[:working_hours]) if params[:working_hours]

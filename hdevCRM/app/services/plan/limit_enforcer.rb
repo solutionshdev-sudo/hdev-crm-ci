@@ -80,13 +80,18 @@ class Plan::LimitEnforcer
   end
 
   def resolve_channel(channel_type)
-    if @account
-      allocated = (@account.plan_allocations || {})['channel_limits']
-      return normalize(allocated[channel_type]) if allocated.is_a?(Hash) && allocated.key?(channel_type)
-    end
+    allocated = allocated_channel_limits
+    return normalize(allocated[channel_type]) if allocated.key?(channel_type)
 
     limits = resolved_plan&.channel_limits || {}
     limits.key?(channel_type) ? normalize(limits[channel_type]) : nil
+  end
+
+  def allocated_channel_limits
+    return {} if @account.nil?
+
+    allocated = (@account.plan_allocations || {})['channel_limits']
+    allocated.is_a?(Hash) ? allocated : {}
   end
 
   # Assinatura direta vigente decide sozinha (plano com coluna nula = ilimitado,

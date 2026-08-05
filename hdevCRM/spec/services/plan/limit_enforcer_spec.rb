@@ -40,7 +40,7 @@ RSpec.describe Plan::LimitEnforcer do
       expect(enforcer.limit_for(:inbox)).to be_nil
     end
 
-    context 'com agência' do
+    context 'when the account belongs to an agency' do
       let(:agency) { create(:agency) }
       let(:account) { create(:account, agency: agency) }
 
