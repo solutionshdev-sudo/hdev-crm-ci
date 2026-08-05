@@ -1,0 +1,56 @@
+<% content_for(:title) do %>
+  Configurações
+<% end %>
+<header class="flex px-8 py-4 items-center border-b border-n-weak" role="banner">
+  <div class="border border-n-weak mr-4 p-2 rounded-full">
+    <svg width="24" height="24"><use xlink:href="#icon-settings-2-line" /></svg>
+  </div>
+  <div class="flex flex-col h-14 justify-center">
+    <h1 class="text-base font-medium leading-6 text-n-slate-12" id="page-title">
+      <%= content_for(:title) %>
+    </h1>
+    <p class="text-sm font-normal leading-5 text-n-slate-11 m-0">Ajustes da instância e recursos disponíveis</p>
+  </div>
+</header>
+<section class="main-content__body px-8">
+  <div class="bg-n-slate-1 py-2 px-4 xl:px-0">
+    <div class="flex p-4 outline outline-1 outline-n-container rounded-lg items-start md:items-center shadow-sm flex-col md:flex-row">
+      <div class="flex flex-col flex-grow gap-1">
+        <h2 class="h-5 leading-5 text-n-slate-12 text-sm font-medium">Precisa de ajuda?</h2>
+        <p class="text-n-slate-11 m-0 text-sm">Fale com o suporte do Hdev CRM.</p>
+      </div>
+      <a href="mailto:contato@hdev.online">
+        <button class="mt-4 md:mt-0 flex gap-1 items-center shadow-sm h-9 bg-n-blue-9 hover:bg-n-blue-10 text-white rounded-lg font-medium p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-n-blue-8">
+          <svg width="16" height="16"><use xlink:href="#icon-mail-send-fill" /></svg>
+          <span class="px-1">contato@hdev.online</span>
+        </button>
+      </a>
+    </div>
+    <div class="mt-10 py-4">
+      <h3 class="h-5 leading-5 text-n-slate-12 font-medium text-base">Recursos</h3>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-3">
+      <% SuperAdmin::FeaturesHelper.available_features.each do |_feature, attrs| %>
+        <div class="outline outline-1 outline-n-container p-4 rounded-lg relative shadow-sm">
+          <span class="bg-n-blue-9 text-white absolute rounded-full p-1 inline-flex right-4 top-5">
+            <svg width="14" height="14"><use xlink:href="#icon-tick-line" /></svg>
+          </span>
+          <div class="flex items-center justify-center w-10 h-10 mb-2 border border-n-slate-6 border-solid text-n-slate-12 rounded-full">
+            <svg width="20" height="20"><use xlink:href="#<%= attrs[:icon] %>" /></svg>
+          </div>
+          <div class="flex items-center justify-between mb-1.5 mt-4">
+            <div class="flex items-center gap-2">
+              <h3 class="text-n-slate-12 font-medium"><%= attrs[:name] %></h3>
+              <% if attrs[:config_key].present? && attrs[:enabled] %>
+                <a class="inline-flex items-center justify-center h-5 w-5 hover:bg-n-slate-3 rounded-sm" href="/super_admin/app_config?config=<%= attrs[:config_key] %>">
+                  <svg width="18" height="18"><use xlink:href="#icon-gear" /></svg>
+                </a>
+              <% end %>
+            </div>
+          </div>
+          <p class="text-n-slate-11 mb-0"><%= attrs[:description] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Dear customer 👋, please take a few moments to share feedback about the conversation you had with {inboxName}.",
+    "RATING": {
+      "LABEL": "നിങ്ങളുടെ സംഭാഷണം റേറ്റുചെയ്യുക",
+      "SUCCESS_MESSAGE": "റേറ്റിംഗ് സമർപ്പിച്ചതിന് നന്ദി"
+    },
+    "FEEDBACK": {
+      "LABEL": "Do you have any thoughts you'd like to share?",
+      "PLACEHOLDER": "Your feedback (optional)",
+      "BUTTON_TEXT": "Submit feedback"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Survey updated successfully",
+      "ERROR_MESSAGE": "വൂട്ട് സെർവറിലേക്ക് കണക്റ്റുചെയ്യാനായില്ല, ദയവായി പിന്നീട് വീണ്ടും ശ്രമിക്കുക"
+    }
+  },
+  "POWERED_BY": "പ്രായോജകർ Hdev CRM"
+}

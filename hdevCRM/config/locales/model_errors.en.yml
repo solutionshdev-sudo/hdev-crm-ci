@@ -1,0 +1,89 @@
+en:
+  activerecord:
+    errors:
+      messages:
+        too_big: 'is too big'
+        filetype_not_supported: 'filetype not supported'
+        type_not_supported: 'type not supported'
+        size_too_big: 'size is too big'
+  errors:
+    models:
+      automation_rule:
+        conditions_not_supported: 'Automation conditions %{conditions} not supported.'
+        actions_not_supported: 'Automation actions %{actions} not supported.'
+        query_operator_required: 'Automation conditions should have query operator.'
+        invalid_query_operator: 'Query operator must be either "AND" or "OR"'
+      campaign:
+        unsupported_inbox_type: 'Unsupported Inbox type'
+        invalid_url: 'invalid'
+        must_belong_to_account: 'must belong to the same account as the campaign'
+        already_completed: 'The campaign is already completed'
+      category:
+        locale_not_allowed: '%{category_locale} of category is not part of portal''s %{allowed_locales}.'
+      channel_api:
+        invalid_agent_reply_time_window: 'agent_reply_time_window must be greater than 0'
+      channel_sms:
+        setup_error: 'error setting up'
+      channel_telegram:
+        invalid_token: 'invalid token'
+        webhook_setup_error: 'error setting up the webhook'
+      channel_whatsapp:
+        invalid_credentials: 'Invalid Credentials'
+      chatbot_inbox:
+        active_chatbot_exists: 'already has an active chatbot'
+      contact_inbox:
+        invalid_twilio_sms_source_id: 'invalid source id for twilio sms inbox. valid Regex %{regex}'
+        invalid_twilio_whatsapp_source_id: 'invalid source id for twilio whatsapp inbox. valid Regex %{regex}'
+        invalid_whatsapp_source_id: 'invalid source id for whatsapp inbox. valid Regex %{regex}'
+      content_attributes:
+        items_required: 'At least one item is required.'
+        items_type: 'Items should be a hash.'
+        invalid_item_keys: 'contains invalid keys for items : %{invalid_keys}'
+        missing_item_actions: 'contains items missing actions'
+        invalid_action_keys: 'contains invalid keys for actions:  %{invalid_keys}'
+      conversation_participant:
+        inbox_access_required: 'must have inbox access'
+      dashboard_app:
+        invalid_data: ': Invalid data'
+      data_import:
+        unsupported_import_types: 'contains unsupported values: %{invalid_types}'
+      deal:
+        stage_not_in_pipeline: 'must belong to the deal pipeline'
+        lost_reason_required: 'is required when the deal is marked as lost'
+      deal_pipeline:
+        vocabulary_length: 'must be between 1 and 40 characters (%{key})'
+      email_template:
+        account_mismatch: 'must match inbox account'
+        invalid_liquid: 'has invalid Liquid syntax: %{message}'
+        missing_layout_slot: 'must include {{ content_for_layout }}'
+      installation_config:
+        saml_sso_in_use: 'Cannot disable SAML SSO login while users are using SAML authentication'
+      integrations_hook:
+        feature_not_enabled: 'Feature not enabled'
+        invalid_settings: ': Invalid settings data'
+      json_schema:
+        required: 'is required'
+        type: 'must be of type %{type}'
+        minimum: 'must be greater than or equal to %{minimum}'
+        maximum: 'must be less than or equal to %{maximum}'
+      jsonb_attributes:
+        key_length: '%{key} length should be < 1500'
+        key_value: '%{key} value should be < 9999999999'
+      macro:
+        actions_not_supported: 'Macro execution actions %{actions} not supported.'
+      message:
+        too_many_messages: 'Too many messages'
+        attachments_limit_exceeded: 'exceeded maximum allowed'
+      portal:
+        config_not_supported: 'in portal on %{denied_keys} is not supported.'
+        default_locale_drafted: 'default locale cannot be drafted.'
+      working_hour:
+        close_before_open: 'Closing time cannot be before opening time'
+        open_and_closed_all_day: 'open_all_day and closed_all_day cannot be true at the same time'
+  channels:
+    web_widget:
+      default_pre_chat_form:
+        pre_chat_message: 'Share your queries or comments here.'
+        email: 'Email Id'
+        full_name: 'Full name'
+        phone_number: 'Phone number'

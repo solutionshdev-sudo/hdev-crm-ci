@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Poštovani korisniče 👋, molim vas izdvojite jedan trenutak da podelite iskustvo o razgovoru koje ste obavili sa {inboxName}.",
+    "RATING": {
+      "LABEL": "Ocenite razgovor",
+      "SUCCESS_MESSAGE": "Hvala vam na dostavljenoj oceni"
+    },
+    "FEEDBACK": {
+      "LABEL": "Da li ima nešto što bi ste podelili sa nama?",
+      "PLACEHOLDER": "Vaš utisak (opciono)",
+      "BUTTON_TEXT": "Podelite utisak"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Anketa je uspešno poslata",
+      "ERROR_MESSAGE": "Nije moguće se povezati sa Woot serverom, pokušajte ponovo kasnije"
+    }
+  },
+  "POWERED_BY": "Pokreće Hdev CRM"
+}

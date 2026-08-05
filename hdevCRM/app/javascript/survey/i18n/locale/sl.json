@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Draga stranka 👋, vzemite si nekaj trenutkov in nam posredujte povratne informacije o pogovoru, ki ste ga imeli z {inboxName}.",
+    "RATING": {
+      "LABEL": "Ocenite svoj pogovor",
+      "SUCCESS_MESSAGE": "Hvala za oddano oceno"
+    },
+    "FEEDBACK": {
+      "LABEL": "Imate še kaj, kar bi želeli deliti z nami?",
+      "PLACEHOLDER": "Vaše povratne informacije (neobvezno)",
+      "BUTTON_TEXT": "Pošlji povratne informacije"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Anketa je bila uspešno posodobljena",
+      "ERROR_MESSAGE": "Ni bilo mogoče vzpostaviti povezave s strežnikom, poskusite znova pozneje"
+    }
+  },
+  "POWERED_BY": "Poganja Hdev CRM"
+}

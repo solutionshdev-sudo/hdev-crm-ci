@@ -1,0 +1,79 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<body>
+</body>
+
+<%
+  user_id = 1
+  user_hash = OpenSSL::HMAC.hexdigest(
+    'sha256',
+    @web_widget.hmac_token,
+    user_id.to_s
+  )
+
+%>
+<script>
+
+window.hdevSettings = {
+  hideMessageBubble: false,
+  // showUnreadMessagesDialog: false,
+  // baseDomain: '.loca.lt',
+  position: '<%= @widget_position %>',
+  locale: 'en',
+  useBrowserLanguage: true,
+  type: '<%= @widget_type %>',
+  // showPopoutButton: true,
+  widgetStyle: '<%= @widget_style %>',
+  darkMode: '<%= @dark_mode %>',
+};
+
+(function(d,t) {
+  var BASE_URL = '';
+  var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+  g.src= BASE_URL + "/packs/js/sdk.js";
+  g.async = true;
+  s.parentNode.insertBefore(g,s);
+  g.onload=function(){
+    window.hdevSDK.run({
+      websiteToken: '<%= @web_widget.website_token %>',
+      baseUrl: BASE_URL
+    })
+  }
+})(document,"script");
+
+window.addEventListener('hdev:ready', function() {
+  console.log('hdev:ready', window.$hdev);
+  if (window.location.search.includes('setUser')) {
+    window.$hdev.setUser('<%= user_id %>', {
+      identifier_hash: '<%= user_hash %>',
+      email: 'jane@example.com',
+      name: 'Jane Doe',
+      phone_number: ''
+    });
+  }
+})
+
+window.addEventListener('hdev:error', function(e) {
+  console.log('hdev:error', e.detail)
+})
+
+
+window.addEventListener('hdev:on-message', function(e) {
+  console.log('hdev:on-message', e.detail)
+})
+
+window.addEventListener('hdev:postback', function(e) {
+  console.log('hdev:postback', e.detail)
+})
+
+window.addEventListener('hdev:opened', function() {
+  console.log('hdev:opened')
+})
+
+window.addEventListener('hdev:closed', function() {
+  console.log('hdev:closed')
+})
+
+window.addEventListener('hdev:on-start-conversation', function(e) {
+  console.log('hdev:on-start-conversation', e.detail)
+})
+</script>

@@ -1,0 +1,16 @@
+{
+  "COPILOT": {
+    "HEADER": "Copiloto de configuração",
+    "DESCRIPTION": "Descreva o que você quer configurar e o copiloto propõe as mudanças. Nada é gravado até você aplicar.",
+    "PLACEHOLDER": "Ex: cria um funil de vendas simples",
+    "PREVIEW": {
+      "TITLE": "Mudanças propostas",
+      "APPLY": "Aplicar",
+      "DISCARD": "Descartar"
+    },
+    "API": {
+      "APPLIED": "Mudanças aplicadas.",
+      "ERROR": "Não foi possível falar com o copiloto. Tente de novo em instantes."
+    }
+  }
+}

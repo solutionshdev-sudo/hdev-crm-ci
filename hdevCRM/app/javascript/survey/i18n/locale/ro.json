@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Stimate client 👋, vă rugăm să luați câteva momente pentru a împărtăși feedback despre conversația pe care ați avut-o cu {inboxName}.",
+    "RATING": {
+      "LABEL": "Evaluează conversația ta",
+      "SUCCESS_MESSAGE": "Vă mulțumim pentru trimiterea de rating"
+    },
+    "FEEDBACK": {
+      "LABEL": "Aveți gânduri pe care doriți să le împărtășiți?",
+      "PLACEHOLDER": "Feedback-ul tău (opțional)",
+      "BUTTON_TEXT": "Trimiteți feedback"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Chestionar actualizat cu succes",
+      "ERROR_MESSAGE": "Nu s-a putut conecta la Woot Server, încercați din nou mai târziu"
+    }
+  },
+  "POWERED_BY": "Oferit de Hdev CRM"
+}
