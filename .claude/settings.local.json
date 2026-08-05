@@ -63,7 +63,8 @@
       "Bash(ls -la \"C:/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/b930cb44-baf3-4c99-99b9-e466c8acaa3d/\" 2>&1 | head -50)",
       "Read(//c/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/b930cb44-baf3-4c99-99b9-e466c8acaa3d/**)",
       "Bash(ls -la \"C:/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/\" 2>&1 | head -50)",
-      "Read(//c/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/**)"
+      "Read(//c/Users/hdev/Desktop/open-design-main/open-design-main/.od/projects/**)",
+      "PowerShell(git checkout -b feat/fase6-planos-limites)"
     ]
   },
   "hooks": {
