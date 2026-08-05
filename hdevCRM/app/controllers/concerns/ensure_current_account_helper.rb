@@ -8,10 +8,7 @@ module EnsureCurrentAccountHelper
 
   def ensure_current_account
     account = Account.find(params[:account_id])
-    render_unauthorized(I18n.t('errors.api.account.suspended')) and return unless account.active?
-    # pending_payment da agência não propaga: a conta filha aguardando o 1º
-    # pagamento não deve morrer por causa disso. Só suspended? bloqueia.
-    render_unauthorized(I18n.t('errors.api.account.agency_suspended')) and return if account.agency&.suspended?
+    return if render_suspension_error(account)
 
     if current_user
       account_accessible_for_user?(account)
@@ -21,6 +18,24 @@ module EnsureCurrentAccountHelper
       render_unauthorized(I18n.t('errors.account.not_authorized'))
     end
     account
+  end
+
+  # Conta suspensa bloqueia com a mensagem antiga. Agência suspensa bloqueia
+  # com a mensagem nova — mas pending_payment da agência NÃO propaga: a conta
+  # filha aguardando o 1º pagamento não deve morrer por causa disso. Só
+  # suspended? bloqueia. Devolve truthy quando já renderizou a resposta.
+  def render_suspension_error(account)
+    unless account.active?
+      render_unauthorized(I18n.t('errors.api.account.suspended'))
+      return true
+    end
+
+    if account.agency&.suspended?
+      render_unauthorized(I18n.t('errors.api.account.agency_suspended'))
+      return true
+    end
+
+    false
   end
 
   def account_accessible_for_user?(account)
