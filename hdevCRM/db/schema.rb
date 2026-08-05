@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_03_000001) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_05_000002) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -76,6 +76,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_03_000001) do
     t.bigint "feature_flags_ext_1", default: 0, null: false
     t.bigint "agency_id"
     t.bigint "ai_extra_tokens", default: 0, null: false
+    t.jsonb "plan_allocations", default: {}, null: false
     t.index ["agency_id"], name: "index_accounts_on_agency_id"
     t.index ["status"], name: "index_accounts_on_status"
   end
@@ -1438,6 +1439,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_03_000001) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "channel_limits", default: {}, null: false
     t.index ["plan_type", "active", "position"], name: "index_plans_on_plan_type_and_active_and_position"
     t.index ["stripe_price_id"], name: "index_plans_on_stripe_price_id", unique: true, where: "(stripe_price_id IS NOT NULL)"
   end
