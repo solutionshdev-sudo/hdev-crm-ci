@@ -1,0 +1,30 @@
+<p>Olá,</p>
+
+<p>Esta é uma notificação para informar que uma conta foi excluída permanentemente da sua instância do Hdev CRM.</p>
+
+<p>
+  <strong>Instalação do Hdev CRM:</strong> {{ meta.instance_url }}<br>
+  <strong>ID da conta:</strong> {{ meta.account_id }}<br>
+  <strong>Nome da conta:</strong> {{ meta.account_name }}<br>
+  <strong>Exclusão prevista para:</strong> {{ meta.marked_for_deletion_at }}<br>
+  <strong>Excluída em:</strong> {{ meta.deleted_at }}<br>
+  <strong>Motivo da exclusão:</strong> {{ meta.deletion_reason }}
+</p>
+
+{% if meta.deleted_user_count > 0 %}
+<p>
+  <strong>Usuários excluídos ({{ meta.deleted_user_count }}):</strong><br>
+  {% for user in meta.soft_deleted_users %}
+    ID do usuário: {{ user.user_id }}, E-mail: {{ user.user_email }}{% unless forloop.last %}<br>{% endunless %}
+  {% endfor %}
+</p>
+{% else %}
+<p>
+  <strong>Usuários excluídos:</strong> Nenhum
+</p>
+{% endif %}
+
+<p>Este e-mail serve como registro para fins de conformidade.</p>
+
+<p>Obrigado,<br>
+Sistema Hdev CRM</p>

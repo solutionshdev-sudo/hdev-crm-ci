@@ -1,0 +1,28 @@
+{
+  "AI_AGENT_SETTINGS": {
+    "HEADER": "Agente de IA",
+    "DESCRIPTION": "Responda clientes automaticamente com o seu agente de IA. As conversas são transferidas para um humano sempre que o cliente pedir ou o agente não conseguir ajudar.",
+    "FORM": {
+      "ENABLED_LABEL": "Ativar agente de IA",
+      "ENABLED_NOTE": "O agente responde mensagens recebidas em conversas sem responsável atribuído.",
+      "MODEL_LABEL": "Modelo",
+      "PROMPT_LABEL": "Instruções personalizadas",
+      "PROMPT_PLACEHOLDER": "Instruções extras para o agente — tom de voz, regras do negócio, perguntas frequentes…",
+      "SAVE": "Salvar configurações"
+    },
+    "USAGE": {
+      "TITLE": "Consumo deste mês",
+      "TOKENS_USED": "Tokens usados",
+      "UNLIMITED": "Ilimitado",
+      "INPUT_TOKENS": "Tokens de entrada",
+      "OUTPUT_TOKENS": "Tokens de saída",
+      "COST": "Custo estimado",
+      "EXCEEDED": "A cota mensal de tokens de IA foi atingida. O agente vai transferir as conversas para humanos até o próximo ciclo."
+    },
+    "API": {
+      "SUCCESS": "Configurações do agente de IA salvas com sucesso",
+      "ERROR": "Não foi possível salvar as configurações do agente de IA, tente novamente",
+      "FETCH_ERROR": "Não foi possível carregar as configurações do agente de IA"
+    }
+  }
+}

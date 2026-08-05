@@ -1,0 +1,132 @@
+# Dívida de estilo herdada, congelada pela primeira rodada do CI (2026-07-28).
+# Gerado a partir das 67 ofensas que o rubocop apontou no primeiro run — o objetivo
+# é o gate valer pra código NOVO em vez de ficar vermelho por débito antigo.
+#
+# 33 delas são autocorrigíveis: rodar "bundle exec rubocop -a" no container e
+# regerar este arquivo derruba a lista de uma vez. As Metrics/* pedem refatoração
+# de verdade e podem ficar aqui.
+
+Metrics/AbcSize:
+  Exclude:
+    - 'app/controllers/api/v1/accounts/deals_controller.rb'
+    - 'app/controllers/webhooks/baileys_controller.rb'
+    - 'app/services/ai/tool_loop.rb'
+    - 'app/services/chatbots/flow_validator.rb'
+    - 'app/services/chatbots/nodes/collect_node.rb'
+    - 'app/services/chatbots/nodes/condition_node.rb'
+    - 'app/services/chatbots/nodes/deal_node.rb'
+    - 'app/services/chatbots/nodes/question_node.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'app/models/contact.rb'
+    - 'app/models/inbox.rb'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'app/controllers/api/v1/accounts/deals_controller.rb'
+    - 'app/jobs/chatbots/resume_job.rb'
+    - 'app/models/chatbot.rb'
+    - 'app/services/chatbots/answer_matcher.rb'
+    - 'app/services/chatbots/flow_validator.rb'
+    - 'app/services/chatbots/interpolator.rb'
+    - 'app/services/chatbots/nodes/collect_node.rb'
+    - 'app/services/chatbots/nodes/condition_node.rb'
+    - 'app/services/chatbots/nodes/question_node.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'app/controllers/api/v1/accounts_controller.rb'
+    - 'app/models/dashboard_app.rb'
+    - 'app/services/chatbots/nodes/question_node.rb'
+    - 'db/migrate/20260721000001_create_agencies.rb'
+    - 'db/migrate/20260727000003_create_chatbot_sessions.rb'
+    - 'db/migrate/20260727000007_create_deals.rb'
+
+Metrics/ParameterLists:
+  Exclude:
+    - 'app/models/ai_usage_event.rb'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'app/models/chatbot.rb'
+    - 'app/services/chatbots/answer_matcher.rb'
+    - 'app/services/chatbots/flow_validator.rb'
+    - 'app/services/chatbots/nodes/question_node.rb'
+
+Naming/BlockForwarding:
+  Exclude:
+    - 'spec/services/ai/tool_loop_spec.rb'
+
+Performance/Count:
+  Exclude:
+    - 'app/services/ai/tools/set_business_hours.rb'
+
+RSpec/EmptyExampleGroup:
+  Exclude:
+    - 'spec/factories/ai_usage_events.rb'
+
+RSpec/MissingExampleGroupArgument:
+  Exclude:
+    - 'spec/factories/ai_usage_events.rb'
+
+RSpec/ScatteredLet:
+  Exclude:
+    - 'spec/services/ai/copilot_service_spec.rb'
+    - 'spec/services/ai/tool_loop_spec.rb'
+
+Rails/ActiveRecordCallbacksOrder:
+  Exclude:
+    - 'app/models/channel/whatsapp.rb'
+
+Rails/NegateInclude:
+  Exclude:
+    - 'app/services/chatbots/nodes/condition_node.rb'
+
+Rails/Pluck:
+  Exclude:
+    - 'app/services/chatbots/flow_validator.rb'
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - 'db/migrate/20260726120000_update_widget_color_default_to_hdev_green.rb'
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'app/jobs/ai/reply_job.rb'
+    - 'app/services/ai/agent_reply_service.rb'
+    - 'app/services/ai/anthropic_service.rb'
+    - 'app/services/ai/copilot_service.rb'
+    - 'app/services/ai/quota_exceeded_error.rb'
+    - 'app/services/ai/quota_service.rb'
+    - 'app/services/ai/tool.rb'
+    - 'app/services/ai/tool_error.rb'
+    - 'app/services/ai/tool_loop.rb'
+    - 'app/services/ai/tool_registry.rb'
+    - 'app/services/ai/tools/assign_chatbot_to_inbox.rb'
+    - 'app/services/ai/tools/create_chatbot_flow.rb'
+    - 'app/services/ai/tools/create_deal_pipeline.rb'
+    - 'app/services/ai/tools/create_labels.rb'
+    - 'app/services/ai/tools/set_business_hours.rb'
+    - 'lib/ai/pricing.rb'
+
+Style/ComparableClamp:
+  Exclude:
+    - 'app/services/chatbots/nodes/delay_node.rb'
+
+Style/HashSyntax:
+  Exclude:
+    - 'app/services/whatsapp/providers/whatsapp_baileys_service.rb'
+
+Style/IfUnlessModifier:
+  Exclude:
+    - 'app/services/chatbots/flow_validator.rb'
+
+Style/StringLiterals:
+  Exclude:
+    - 'app/services/whatsapp/baileys_client.rb'
+
+Style/SymbolProc:
+  Exclude:
+    - 'app/services/ai/anthropic_service.rb'
+

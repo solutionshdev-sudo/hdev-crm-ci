@@ -1,0 +1,209 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      spec_path:
+        description: 'Caminho do spec a rodar (vazio = suite inteira). Ex: spec/services/ai/copilot_service_spec.rb:42'
+        required: false
+        default: ''
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: hdevCRM
+
+jobs:
+  backend:
+    name: rspec
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    services:
+      postgres:
+        # pgvector, nao postgres puro: schema.rb tem enable_extension "vector"
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: chatwoot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      RAILS_ENV: test
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: '5432'
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: chatwoot_test
+      REDIS_URL: redis://localhost:6379
+      SECRET_KEY_BASE: ci-secret-key-base-not-a-real-secret
+      # Mesmo valor do docker/Dockerfile. No default do Node (~2 GB) o build
+      # morre de heap em "rendering chunks".
+      NODE_OPTIONS: --max-old-space-size=4096
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: hdevCRM
+          bundler-cache: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.2.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+          cache-dependency-path: hdevCRM/pnpm-lock.yaml
+
+      # Node no job de rspec nao e opcional: specs de request renderizam views
+      # (widgets/show.html.erb, portal, superadmin) que chamam vite_javascript_tag.
+      # Sem manifest, o vite_ruby cai no autoBuild do bloco "test" do vite.json.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # db:schema:load ANTES do migrate: migrar do zero rodaria ~800 migrations
+      # desde 2019, varias referenciando modelos que nao existem mais.
+      - name: Preparar banco
+        run: bundle exec rake db:create db:schema:load db:migrate
+
+      # ConfigLoader roda de carona no db:migrate (lib/tasks/db_enhancements.rake)
+      # e semeia ~106 installation_configs. Os specs assumem banco limpo: a linha
+      # semeada vence o stub de ENV em GlobalConfigService.load (DB primeiro),
+      # o que derrubava ~70 exemplos (signup 404, features extras, HUMAN_AGENT).
+      # O CI do upstream nao roda migrate, por isso la nunca doeu.
+      - name: Limpar configs semeadas pelo migrate
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d chatwoot_test -c 'TRUNCATE installation_configs'
+
+      # Build explicito em vez de deixar o autoBuild disparar dentro do rspec: o
+      # vite_ruby captura a saida do build, entao uma falha ali fica invisivel no
+      # log e o processo trava sem escrever nada (foi o que segurou a suite por
+      # 90 min ate o timeout, todas as vezes, no primeiro exemplo de /widget).
+      - name: Build dos assets (Vite)
+        run: bundle exec vite build
+
+      # dump_schema_after_migration so esta desligado em production/staging,
+      # entao o migrate acima regenera o schema.rb. Baixar e commitar a mao.
+      - name: Publicar schema.rb regenerado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema
+          path: hdevCRM/db/schema.rb
+
+      - name: rspec
+        env:
+          SPEC_PATH: ${{ github.event.inputs.spec_path }}
+        # sem aspas de proposito: vazio precisa sumir e virar "suite inteira"
+        # < /dev/null: qualquer subprocesso que peca confirmacao no stdin (npx,
+        # corepack) recebe EOF e morre, em vez de segurar o job ate o timeout
+        # sem --exclude-pattern desde a Fase 3: spec/enterprise nao existe mais,
+        # e rodar a suite inteira sem exclusao e o que prova que a delecao ficou
+        # limpa.
+        run: bundle exec rspec $SPEC_PATH --tag '~opensearch' < /dev/null
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: hdevCRM
+          bundler-cache: true
+
+      - name: rubocop
+        run: bundle exec rubocop --parallel
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.2.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+          cache-dependency-path: hdevCRM/pnpm-lock.yaml
+
+      # --ignore-scripts: o "prepare" do package.json roda "husky install", herdado
+      # do upstream onde o app era a raiz do repo. Aqui o .git fica um nivel acima
+      # de hdevCRM/ e o husky aborta. Os hooks nao servem pra nada no CI mesmo.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: eslint
+        run: pnpm run eslint
+
+  frontend:
+    name: vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.2.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: pnpm
+          cache-dependency-path: hdevCRM/pnpm-lock.yaml
+
+      # --ignore-scripts: o "prepare" do package.json roda "husky install", herdado
+      # do upstream onde o app era a raiz do repo. Aqui o .git fica um nivel acima
+      # de hdevCRM/ e o husky aborta. Os hooks nao servem pra nada no CI mesmo.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: vitest
+        run: pnpm test
+
+  baileys:
+    name: baileys
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: baileys-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: baileys-service/package-lock.json
+
+      - run: npm ci
+
+      - name: typecheck
+        run: npx tsc --noEmit
+
+      - name: vitest
+        run: npx vitest run

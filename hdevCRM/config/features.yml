@@ -1,0 +1,257 @@
+# DO NOT change the order of features EVER
+############################################
+# name:               the name to be used internally in the code
+# display_name:       the name to be used in the UI
+# enabled:            whether the feature is enabled by default
+# column:             the account bitset column used to store the flag. Defaults to feature_flags.
+#                     Use feature_flags_ext_1 for extension flags. Each bigint column supports 63 flags.
+# chatwoot_internal:  whether the feature is internal to Chatwoot and should not be shown in the UI for other self hosted installations
+# deprecated:         purpose of feature flag is done, no need to show it in the UI anymore
+#
+# ADDING A NEW FEATURE FLAG:
+#   - The `feature_flags` column is FULL (63/63 slots used). Do NOT add to it.
+#   - New flags MUST set `column: feature_flags_ext_1` and be appended at the end.
+#   - Bit positions are persisted per column; never reorder or remove existing
+#     entries, and never change an existing feature's `column` after release.
+- name: inbound_emails
+  display_name: E-mails de entrada
+  enabled: true
+- name: channel_email
+  display_name: Canal de e-mail
+  enabled: true
+- name: channel_facebook
+  display_name: Canal do Facebook
+  enabled: true
+- name: conversation_unread_counts
+  display_name: Contagem de conversas não lidas
+  enabled: false
+  chatwoot_internal: true
+- name: ip_lookup
+  display_name: Consulta de IP
+  enabled: false
+- name: disable_branding
+  display_name: Ocultar marca
+  enabled: false
+  premium: true
+- name: email_continuity_on_api_channel
+  display_name: Continuidade de e-mail no canal de API
+  enabled: false
+- name: help_center
+  display_name: Central de ajuda
+  enabled: true
+- name: agent_bots
+  display_name: Bots de agente
+  enabled: true
+- name: macros
+  display_name: Macros
+  enabled: true
+- name: agent_management
+  display_name: Gestão de agentes
+  enabled: true
+- name: team_management
+  display_name: Gestão de equipes
+  enabled: true
+- name: inbox_management
+  display_name: Gestão de caixas de entrada
+  enabled: true
+- name: labels
+  display_name: Etiquetas
+  enabled: true
+- name: custom_attributes
+  display_name: Atributos personalizados
+  enabled: true
+- name: automations
+  display_name: Automações
+  enabled: true
+- name: canned_responses
+  display_name: Respostas prontas
+  enabled: true
+- name: integrations
+  display_name: Integrações
+  enabled: true
+- name: voice_recorder
+  display_name: Gravador de voz
+  enabled: true
+- name: report_rollup
+  display_name: Consolidação de relatórios
+  enabled: false
+- name: channel_website
+  display_name: Canal de site
+  enabled: true
+- name: campaigns
+  display_name: Campanhas
+  enabled: true
+- name: reports
+  display_name: Relatórios
+  enabled: true
+- name: crm
+  display_name: CRM
+  enabled: true
+- name: auto_resolve_conversations
+  display_name: Resolução automática de conversas
+  enabled: true
+- name: custom_reply_email
+  display_name: E-mail de resposta personalizado
+  enabled: false
+- name: custom_reply_domain
+  display_name: Domínio de resposta personalizado
+  enabled: false
+- name: audit_logs
+  display_name: Logs de auditoria
+  enabled: false
+  premium: true
+- name: custom_tools
+  display_name: Ferramentas personalizadas
+  enabled: false
+  premium: true
+- name: message_reply_to
+  display_name: Resposta a mensagem específica
+  enabled: false
+  deprecated: true
+- name: branded_email_templates
+  display_name: Modelos de e-mail com marca
+  enabled: false
+- name: inbox_view
+  display_name: Visualização de caixa de entrada
+  enabled: false
+  chatwoot_internal: true
+- name: sla
+  display_name: SLA
+  enabled: false
+  premium: true
+- name: help_center_embedding_search
+  display_name: Busca por embeddings na central de ajuda
+  enabled: false
+  premium: true
+  chatwoot_internal: true
+- name: linear_integration
+  display_name: Integração com Linear
+  enabled: false
+- name: captain_integration
+  display_name: Captain
+  enabled: false
+  premium: true
+- name: custom_roles
+  display_name: Papéis personalizados
+  enabled: false
+  premium: true
+- name: chatwoot_v4
+  display_name: Hdev CRM V4
+  enabled: true
+- name: captain_v1_action_classifier
+  display_name: Classificador de ações do Captain V1
+  enabled: false
+  premium: true
+  chatwoot_internal: true
+- name: contact_chatwoot_support_team
+  display_name: Falar com o suporte do Hdev CRM
+  enabled: true
+  chatwoot_internal: true
+- name: shopify_integration
+  display_name: Integração com Shopify
+  enabled: false
+  chatwoot_internal: true
+- name: search_with_gin
+  display_name: Busca de mensagens com GIN
+  enabled: false
+  chatwoot_internal: true
+- name: channel_instagram
+  display_name: Canal do Instagram
+  enabled: true
+- name: crm_integration
+  display_name: Integração de CRM
+  enabled: false
+- name: channel_voice
+  display_name: Canal de voz
+  enabled: false
+  premium: true
+- name: notion_integration
+  display_name: Integração com Notion
+  enabled: false
+- name: captain_integration_v2
+  display_name: Captain V2
+  enabled: false
+  premium: true
+- name: whatsapp_embedded_signup
+  display_name: Cadastro integrado do WhatsApp
+  enabled: false
+  deprecated: true
+- name: whatsapp_campaign
+  display_name: Campanha de WhatsApp
+  enabled: false
+- name: crm_v2
+  display_name: CRM V2
+  enabled: false
+  chatwoot_internal: true
+- name: assignment_v2
+  display_name: Atribuição V2
+  enabled: true
+- name: captain_document_auto_sync
+  display_name: Sincronização automática de documentos do Captain
+  enabled: false
+  premium: true
+- name: advanced_search
+  display_name: Busca avançada
+  enabled: false
+  premium: true
+- name: saml
+  display_name: SAML
+  enabled: false
+  premium: true
+- name: advanced_search_indexing
+  display_name: Indexação da busca avançada
+  enabled: false
+  premium: true
+  chatwoot_internal: true
+- name: reply_mailer_migration
+  # This feature is temporary only to migrate reply mailer to new email builder
+  # Once the migration is done, this feature can be removed
+  display_name: Migração do mailer de resposta
+  enabled: false
+  chatwoot_internal: true
+- name: unread_count_for_filters
+  display_name: Contagem de não lidas nos filtros
+  enabled: false
+  chatwoot_internal: true
+- name: companies
+  display_name: Empresas
+  enabled: false
+  premium: true
+- name: channel_tiktok
+  display_name: Canal do TikTok
+  enabled: true
+- name: csat_review_notes
+  display_name: Notas de avaliação CSAT
+  enabled: false
+  premium: true
+- name: captain_tasks
+  display_name: Tarefas do Captain
+  enabled: true
+- name: conversation_required_attributes
+  display_name: Atributos obrigatórios de conversa
+  enabled: false
+  premium: true
+- name: advanced_assignment
+  display_name: Atribuição avançada
+  enabled: false
+  premium: true
+- name: whatsapp_manual_transfer
+  display_name: Transferência manual de WhatsApp
+  enabled: false
+  column: feature_flags_ext_1
+- name: data_import
+  display_name: Importação de dados
+  enabled: false
+  column: feature_flags_ext_1
+- name: api_and_webhooks
+  display_name: API e webhooks
+  enabled: true
+  column: feature_flags_ext_1
+- name: whatsapp_reconfigure
+  display_name: Reconfiguração de WhatsApp
+  enabled: false
+  column: feature_flags_ext_1
+- name: whatsapp_embedded_signup_inbox_creation
+  display_name: Fluxo de cadastro integrado do WhatsApp
+  enabled: false
+  column: feature_flags_ext_1

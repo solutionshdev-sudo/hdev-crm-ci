@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html class="w-full h-full">
+  <head>
+    <% installation_name = GlobalConfig.get('INSTALLATION_NAME')['INSTALLATION_NAME'].presence || 'Hdev CRM' %>
+    <title>Super Admin | <%= installation_name %></title>
+    <meta name="viewport" content="initial-scale=1">
+    <script>
+      // Mirrors v3/App.vue: the theme follows the OS, and Tailwind's dark:
+      // variants only fire when `.dark` sits on the root element.
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag 'superadmin' %>
+  </head>
+  <body class="w-full h-full antialiased">
+    <main class="flex w-full min-h-screen bg-n-background">
+      <%# Brand panel — always dark in both themes, so only literal white/alpha
+          values belong in here (same rule as v3 AuthSplitLayout.vue). %>
+      <aside class="relative flex-col hidden px-12 overflow-hidden auth-brand lg:flex lg:w-[46%] xl:w-1/2 py-14">
+        <img src="/brand-assets/logo_dark.svg" alt="<%= installation_name %>" class="relative z-10 self-start w-auto h-9 auth-brand__rise">
+
+        <div class="relative z-10 flex flex-col justify-center flex-1 py-16 max-w-[520px] auth-brand__rise">
+          <h1 class="text-4xl font-semibold text-white xl:text-5xl leading-[1.12] tracking-[-0.02em] text-balance">
+            <%= t('super_admin.login.headline') %>
+            <span class="block auth-brand__accent"><%= installation_name %></span>
+          </h1>
+          <p class="mt-6 text-base leading-relaxed text-white/65">
+            <%= t('super_admin.login.subtitle') %>
+          </p>
+        </div>
+
+        <p class="relative z-10 text-xs auth-brand__rise text-white/35">
+          © <%= Time.current.year %> <%= installation_name %>. <%= t('super_admin.login.rights') %>
+        </p>
+      </aside>
+
+      <section class="flex flex-col items-center justify-center flex-1 px-5 py-10 sm:px-8">
+        <div class="mb-8 lg:hidden">
+          <img src="/brand-assets/logo.svg" alt="<%= installation_name %>" class="block w-auto h-8 dark:hidden">
+          <img src="/brand-assets/logo_dark.svg" alt="<%= installation_name %>" class="hidden w-auto h-8 dark:block">
+        </div>
+
+        <div class="w-full max-w-[420px]">
+          <div class="w-full p-8 shadow-lg rounded-xl bg-n-solid-1 outline outline-1 outline-n-weak">
+            <h2 class="text-xl font-semibold text-n-slate-12">
+              <%= t('super_admin.login.card_title') %>
+            </h2>
+            <p class="mt-1 mb-6 text-sm text-n-slate-11">
+              <%= t('super_admin.login.card_subtitle') %>
+            </p>
+
+            <% if flash[:error].present? %>
+              <div data-alert class="p-4 mb-5 text-sm text-white rounded-md bg-n-ruby-9">
+                <%= flash[:error] %>
+              </div>
+            <% end %>
+
+            <%= form_for(resource, as: resource_name, url: '/super_admin/sign_in') do |f| %>
+              <div class="mb-5">
+                <label for="super_admin_email" class="block text-sm font-medium leading-6 text-n-slate-12">
+                  <%= t('super_admin.login.email') %>
+                </label>
+                <div class="mt-1">
+                  <%= f.email_field :email,
+                                    autofocus: true,
+                                    autocomplete: 'email',
+                                    placeholder: t('super_admin.login.email_placeholder'),
+                                    class: 'block w-full border-none rounded-md shadow-sm bg-n-alpha-black2 appearance-none outline outline-1 ' \
+                                           'outline-n-weak hover:outline-n-slate-6 focus:outline focus:outline-1 focus:outline-n-brand ' \
+                                           'text-n-slate-12 placeholder:text-n-slate-10 sm:text-sm sm:leading-6 px-3 py-3' %>
+                </div>
+              </div>
+              <div class="mb-6">
+                <label for="super_admin_password" class="block text-sm font-medium leading-6 text-n-slate-12">
+                  <%= t('super_admin.login.password') %>
+                </label>
+                <div class="mt-1">
+                  <%= f.password_field :password,
+                                       autocomplete: 'current-password',
+                                       placeholder: t('super_admin.login.password_placeholder'),
+                                       class: 'block w-full border-none rounded-md shadow-sm bg-n-alpha-black2 appearance-none outline outline-1 ' \
+                                              'outline-n-weak hover:outline-n-slate-6 focus:outline focus:outline-1 focus:outline-n-brand ' \
+                                              'text-n-slate-12 placeholder:text-n-slate-10 sm:text-sm sm:leading-6 px-3 py-3' %>
+                </div>
+              </div>
+              <button type="submit"
+                      class="flex items-center justify-center w-full px-5 py-3 text-base font-medium text-white rounded-lg cursor-pointer auth-cta bg-n-blue-9 hover:bg-n-blue-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-n-blue-9">
+                <%= t('super_admin.login.submit') %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

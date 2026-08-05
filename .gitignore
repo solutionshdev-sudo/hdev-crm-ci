@@ -1,0 +1,18 @@
+# Segredos — NUNCA remover essas linhas
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+
+# Dependências e artefatos
+node_modules/
+__pycache__/
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+.claude/worktrees/

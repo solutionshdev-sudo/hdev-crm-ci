@@ -1,0 +1,10 @@
+json.id chatbot.id
+json.name chatbot.name
+json.description chatbot.description
+json.status chatbot.status
+json.flow chatbot.flow
+json.settings chatbot.settings
+json.flow_version chatbot.flow_version
+json.inbox_ids chatbot.chatbot_inboxes.map(&:inbox_id)
+json.created_at chatbot.created_at
+json.updated_at chatbot.updated_at

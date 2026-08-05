@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Arvoisa asiakas 👋, käytäthän hetken aikaasi ja annat palautetta keskustelusta, jonka kävit {inboxName} kanssa.",
+    "RATING": {
+      "LABEL": "Anna arvio palvelusta",
+      "SUCCESS_MESSAGE": "Kiitos, että lähetit arvion"
+    },
+    "FEEDBACK": {
+      "LABEL": "Onko sinulla vielä jotain palautetta, jonka haluaisit jakaa meille?",
+      "PLACEHOLDER": "Sinun palautteesi (ei pakollinen)",
+      "BUTTON_TEXT": "Lähetä palaute"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Survey updated successfully",
+      "ERROR_MESSAGE": "Yhteyden muodostaminen Woot-palvelimelle ei onnistunut, yritä myöhemmin uudelleen"
+    }
+  },
+  "POWERED_BY": "Palvelun tarjoaa Hdev CRM"
+}

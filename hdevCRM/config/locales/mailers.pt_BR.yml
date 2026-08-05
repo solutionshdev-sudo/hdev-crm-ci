@@ -1,0 +1,51 @@
+pt_BR:
+  mailers:
+    account_notification_mailer:
+      account_deletion_user_initiated:
+        subject: 'A exclusão da sua conta Hdev CRM foi agendada'
+      account_deletion_for_inactivity:
+        subject: 'Sua conta Hdev CRM está agendada para exclusão por inatividade'
+      contact_import_complete:
+        subject: 'Importação de contatos concluída'
+      contact_import_failed:
+        subject: 'Falha na importação de contatos'
+      contact_export_complete:
+        subject: 'O arquivo de exportação dos seus contatos está pronto para download.'
+      automation_rule_disabled:
+        subject: 'Regra de automação desativada por erros de validação.'
+      ai_quota_threshold:
+        subject: 'Seu uso de IA atingiu 80% da cota mensal'
+      ai_quota_exhausted:
+        subject: 'Sua cota mensal de IA foi esgotada'
+    channel_notifications_mailer:
+      facebook_disconnect:
+        subject: 'A conexão com sua página do Facebook expirou'
+      instagram_disconnect:
+        subject: 'A conexão com seu Instagram expirou'
+      tiktok_disconnect:
+        subject: 'A conexão com seu TikTok expirou'
+      whatsapp_disconnect:
+        subject: 'A conexão com seu WhatsApp expirou'
+      email_disconnect:
+        subject: 'Sua caixa de entrada de e-mail foi desconectada. Atualize as credenciais de SMTP/IMAP'
+    integrations_notification_mailer:
+      slack_disconnect:
+        subject: 'Sua integração com o Slack expirou'
+      dialogflow_disconnect:
+        subject: 'Sua integração com o Dialogflow foi desconectada'
+      openai_disconnect:
+        subject: 'Sua integração com a OpenAI foi desconectada'
+    conversation_notifications_mailer:
+      conversation_creation:
+        subject: '%{agent_name}, uma nova conversa [ID - %{display_id}] foi criada em %{inbox_name}.'
+      conversation_assignment:
+        subject: '%{agent_name}, uma nova conversa [ID - %{display_id}] foi atribuída a você.'
+      conversation_mention:
+        subject: '%{agent_name}, você foi mencionado(a) na conversa [ID - %{display_id}]'
+      assigned_conversation_new_message:
+        subject: '%{agent_name}, nova mensagem na conversa atribuída a você [ID - %{display_id}].'
+      participating_conversation_new_message:
+        subject: '%{agent_name}, nova mensagem em uma conversa da qual você participa [ID - %{display_id}].'
+    automation_notification_mailer:
+      default:
+        subject: 'Este e-mail foi enviado por uma ação de regra de automação.'

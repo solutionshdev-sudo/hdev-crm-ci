@@ -1,0 +1,59 @@
+// Typography
+$base-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+  "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif !default;
+$heading-font-family: $base-font-family !default;
+
+$base-font-size: 16px !default;
+
+$base-line-height: 1.5 !default;
+$heading-line-height: 1.2 !default;
+
+// Other Sizes
+$base-border-radius: 8px !default;
+$base-spacing: $base-line-height * 1em !default;
+$small-spacing: $base-spacing / 2 !default;
+
+// Colors — tokens runtime var(--sa-*) definidos no bundle Vite
+// (super_admin/index.scss), que os monta a partir das triplas :root/.dark; é
+// isso que faz o tema escuro valer no CSS do Administrate. Só var() aqui:
+// rgb(var(--…)) quebra o SassCompressor do Sprockets (libsass avalia rgb()).
+// $white/$black seguem literais: são texto sobre sólidos, não flipam com o tema.
+$white: #fff !default;
+$black: #000 !default;
+
+$blue: unquote("var(--sa-blue-9)") !default;
+$red: unquote("var(--sa-ruby-9)") !default;
+$light-yellow: unquote("var(--sa-amber-9)") !default;
+$light-green: unquote("var(--sa-teal-9)") !default;
+
+$grey-0: unquote("var(--sa-slate-2)") !default;
+$grey-1: unquote("var(--sa-slate-3)") !default;
+$grey-2: unquote("var(--sa-slate-6)") !default;
+$grey-5: unquote("var(--sa-slate-8)") !default;
+$grey-7: unquote("var(--sa-slate-12)") !default;
+
+$hint-grey: unquote("var(--sa-slate-11)") !default;
+
+// Font Colors
+$base-font-color: $grey-7 !default;
+$action-color: unquote("var(--sa-blue-11)") !default;
+$action-color-hover: unquote("var(--sa-blue-10)") !default;
+
+// Background Colors
+$base-background-color: $grey-0 !default;
+$surface-color: unquote("var(--sa-slate-1)") !default;
+
+// Focus
+$focus-outline-color: unquote("var(--sa-focus-ring)");
+$focus-outline-width: 3px;
+$focus-outline: $focus-outline-width solid $focus-outline-color;
+$focus-outline-offset: 1px;
+
+// Border
+$base-border-color: unquote("var(--sa-slate-6)") !default;
+$base-border: 1px solid $base-border-color !default;
+
+// Transitions
+$base-duration: 250ms !default;
+$base-timing: ease-in-out !default;

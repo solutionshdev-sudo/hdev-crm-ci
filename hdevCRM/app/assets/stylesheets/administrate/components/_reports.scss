@@ -1,0 +1,22 @@
+.report--list {
+  display: flex;
+  gap: $space-normal;
+  padding: 0 $space-two $space-larger;
+}
+
+.report-card {
+  background: unquote("var(--sa-slate-2)");
+  border: 1px solid unquote("var(--sa-slate-4)");
+  border-radius: 12px;
+  color: $hint-grey;
+  flex: 1;
+  font-size: $font-size-small;
+  padding: $space-normal;
+  text-align: left;
+
+  .metric {
+    color: $color-heading;
+    font-size: $font-size-bigger;
+    font-weight: $font-weight-bold;
+  }
+}

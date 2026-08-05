@@ -1,0 +1,590 @@
+# This file contains all the installation wide configuration which controls various settings in Chatwoot
+# This is internal config and should not be modified by the user directly in database
+# Chatwoot might override and modify these values during the upgrade process
+# Configs which can be modified by the user are available in the dashboard under appropriate UI
+#
+# name: the name of the config referenced in the code
+# value: the value of the config
+# display_title: the title of the config displayed in the dashboard UI
+# description: the description of the config displayed in the dashboard UI
+# locked: if you don't specify locked attribute in yaml, the default value will be true,
+#         which means the particular config will be locked and won't be available in `super_admin/installation_configs`
+# premium: These values get overwritten unless the user is on a premium plan
+# type: The type of the config. Default is text, select and boolean are also supported
+# options: For select types, its required to have options for the select in the following pattern: "option_value":"Human readable option"
+
+# ------- Branding Related Config ------- #
+- name: INSTALLATION_NAME
+  value: 'Hdev CRM'
+  display_title: 'Nome da instalação'
+  description: 'O nome global da instalação, usado no painel, no título das páginas etc.'
+- name: LOGO_THUMBNAIL
+  value: '/brand-assets/logo_thumbnail.svg'
+  display_title: 'Miniatura do logo'
+  description: 'A miniatura usada como favicon (512px X 512px)'
+- name: LOGO
+  value: '/brand-assets/logo.svg'
+  display_title: 'Logo'
+  description: 'O logo usado no painel, na página de login etc.'
+- name: LOGO_DARK
+  value: '/brand-assets/logo_dark.svg'
+  display_title: 'Logo do modo escuro'
+  description: 'O logo usado no painel, na página de login etc. no modo escuro'
+- name: BRAND_URL
+  value: '#'
+  display_title: 'URL da marca'
+  description: 'A URL usada nos e-mails na seção “Powered By”'
+- name: WIDGET_BRAND_URL
+  value: '#'
+  display_title: 'URL da marca no widget'
+  description: 'A URL usada no widget na seção “Powered By”'
+- name: BRAND_NAME
+  value: 'Hdev CRM'
+  display_title: 'Nome da marca'
+  description: 'O nome usado nos e-mails e no widget'
+- name: TERMS_URL
+  value: 'https://hdev.online/terms'
+  display_title: 'URL dos termos'
+  description: 'A URL dos termos de serviço exibida na página de cadastro'
+- name: PRIVACY_URL
+  value: 'https://hdev.online/privacy'
+  display_title: 'URL de privacidade'
+  description: 'A URL da política de privacidade exibida no aplicativo'
+- name: DISPLAY_MANIFEST
+  value: false
+  display_title: 'Metadados do Hdev CRM'
+  description: 'Exibir metadados padrão do Hdev CRM, como favicons e avisos de atualização'
+  type: boolean
+# ------- End of Branding Related Config ------- #
+
+# ------- Signup & Account Related Config ------- #
+- name: ENABLE_ACCOUNT_SIGNUP
+  display_title: 'Habilitar cadastro de contas'
+  value: false
+  description: 'Permitir que usuários se cadastrem criando novas contas'
+  locked: false
+  type: boolean
+- name: CREATE_NEW_ACCOUNT_FROM_DASHBOARD
+  value: false
+  description: 'Permitir que usuários criem novas contas a partir do painel'
+  locked: false
+- name: HCAPTCHA_SITE_KEY
+  value:
+  locked: false
+- name: HCAPTCHA_SERVER_KEY
+  value:
+  locked: false
+- name: INSTALLATION_EVENTS_WEBHOOK_URL
+  value:
+  display_title: 'URL de webhook de eventos do sistema'
+  description: 'A URL para onde serão enviados os eventos do sistema, como novas contas criadas'
+  locked: false
+- name: WEBHOOK_TIMEOUT
+  value: 5
+  display_title: 'Tempo limite de requisição de webhook (segundos)'
+  description: 'Tempo máximo que o Hdev CRM aguarda pela resposta de um webhook antes de falhar a requisição'
+  locked: false
+- name: DIRECT_UPLOADS_ENABLED
+  type: boolean
+  value: false
+  description: 'Habilitar uploads diretos para o armazenamento em nuvem'
+  locked: false
+- name: MAXIMUM_FILE_UPLOAD_SIZE
+  value: 40
+  display_title: 'Limite de tamanho de anexo (MB)'
+  description: 'Tamanho máximo de anexo em MB permitido para uploads'
+  locked: false
+# ------- End of Account Related Config ------- #
+
+# ------- Email Related Config ------- #
+- name: MAILER_INBOUND_EMAIL_DOMAIN
+  display_title: 'Domínio de e-mail de entrada'
+  value:
+  description: 'O domínio usado para gerar e-mails de continuidade de conversa (reply+id@dominio.com)'
+  locked: false
+- name: MAILER_SUPPORT_EMAIL
+  display_title: 'E-mail de suporte'
+  value:
+  description: 'O endereço de e-mail de suporte da sua instalação'
+  locked: false
+- name: ACCOUNT_EMAILS_LIMIT
+  display_title: 'Limite de envio de e-mails por conta (diário)'
+  description: 'Número máximo de e-mails fora de canal que uma conta pode enviar por dia'
+  value: 100
+  locked: false
+- name: ACCOUNT_EMAILS_PLAN_LIMITS
+  display_title: 'Limites de e-mail por plano (diário)'
+  description: 'Limites diários de envio de e-mail por plano, em JSON'
+  value:
+  type: code
+# ------- End of Email Related Config ------- #
+
+# ------- Facebook Channel Related Config ------- #
+- name: FB_APP_ID
+  display_title: 'Facebook App ID'
+  locked: false
+- name: FB_VERIFY_TOKEN
+  display_title: 'Token de verificação do Facebook'
+  description: 'O token de verificação usado no webhook do Facebook Messenger'
+  locked: false
+  type: secret
+- name: FB_APP_SECRET
+  display_title: 'Facebook App Secret'
+  locked: false
+  type: secret
+- name: IG_VERIFY_TOKEN
+  display_title: 'Token de verificação do Instagram'
+  description: 'O token de verificação usado no webhook do Instagram'
+  locked: false
+  type: secret
+- name: FACEBOOK_API_VERSION
+  display_title: 'Versão da API do Facebook'
+  description: 'Configure isto se quiser usar uma versão diferente da API do Facebook. Garanta que comece com o prefixo `v`'
+  value: 'v18.0'
+  locked: false
+- name: ENABLE_MESSENGER_CHANNEL_HUMAN_AGENT
+  display_title: 'Habilitar agente humano'
+  value: false
+  locked: false
+  description: 'Habilitar agente humano no canal Messenger para um período maior de resposta. Exige aprovação adicional do app: https://developers.facebook.com/docs/features-reference/human-agent/'
+  type: boolean
+# ------- End of Facebook Channel Related Config ------- #
+
+# ------- WhatsApp Channel Related Config ------- #
+- name: WHATSAPP_APP_ID
+  display_title: 'WhatsApp App ID'
+  description: 'O Facebook App ID para a integração com a WhatsApp Business API'
+  locked: false
+- name: WHATSAPP_CONFIGURATION_ID
+  display_title: 'WhatsApp Configuration ID'
+  description: 'O Configuration ID do fluxo de Embedded Signup do WhatsApp (obrigatório para o cadastro embutido)'
+  locked: false
+- name: WHATSAPP_APP_SECRET
+  display_title: 'WhatsApp App Secret'
+  description: 'O App Secret do fluxo de Embedded Signup do WhatsApp (obrigatório para o cadastro embutido)'
+  locked: false
+- name: WHATSAPP_API_VERSION
+  display_title: 'Versão da API do WhatsApp'
+  description: 'Configure isto se quiser usar uma versão diferente da API do WhatsApp. Garanta que comece com o prefixo `v`'
+  value: 'v22.0'
+  locked: false
+# ------- End of WhatsApp Channel Related Config ------- #
+
+# MARK: Microsoft Email Channel Config
+- name: AZURE_APP_ID
+  display_title: 'Azure App ID'
+  description: 'O App ID usado para autenticar com contas Microsoft dos clientes. Registre o app no portal Azure (Entra ID > Registros de aplicativo) para obter o valor.'
+  locked: false
+- name: AZURE_APP_SECRET
+  display_title: 'Azure App Secret'
+  locked: false
+  type: secret
+# End of Microsoft Email Channel Config
+
+# MARK: IA Config
+# Chaves dos provedores de IA do HDEV CRM. Uma chave por instância; o rateio
+# entre contas e agências é feito pela quota em Ai::QuotaService, não por
+# chave separada.
+- name: ANTHROPIC_API_KEY
+  display_title: 'Chave de API da Anthropic (Claude)'
+  description: 'Chave usada para autenticar as requisições à Anthropic. Provedor padrão do agente de IA e dos nós de IA do chatbot.'
+  locked: false
+  type: secret
+- name: OPENAI_API_KEY
+  display_title: 'Chave de API da OpenAI (opcional)'
+  description: 'Chave usada para autenticar as requisições à OpenAI. Necessária apenas se algum modelo GPT estiver selecionado.'
+  locked: false
+  type: secret
+- name: GEMINI_API_KEY
+  display_title: 'Chave de API do Gemini (opcional)'
+  description: 'Chave usada para autenticar as requisições ao Google Gemini. Necessária apenas se algum modelo Gemini estiver selecionado.'
+  locked: false
+  type: secret
+# End of IA Config
+
+# MARK: Captain Config
+- name: CAPTAIN_OPEN_AI_API_KEY
+  display_title: 'Chave de API da OpenAI'
+  description: 'A chave de API usada para autenticar as requisições aos serviços da OpenAI para o Captain AI.'
+  locked: false
+  type: secret
+- name: CAPTAIN_OPEN_AI_MODEL
+  display_title: 'Modelo da OpenAI'
+  description: 'O modelo da OpenAI configurado para uso no Captain AI. Padrão: gpt-4.1-mini'
+  locked: false
+- name: CAPTAIN_OPEN_AI_ENDPOINT
+  display_title: 'Endpoint da API da OpenAI (opcional)'
+  description: 'O endpoint da OpenAI configurado para uso no Captain AI. Padrão: https://api.openai.com/'
+  locked: false
+- name: CAPTAIN_EMBEDDING_MODEL
+  display_title: 'Modelo de embedding (opcional)'
+  description: 'O modelo de embedding configurado para uso no Captain AI. Padrão: text-embedding-3-small'
+  locked: false
+- name: CAPTAIN_FIRECRAWL_API_KEY
+  display_title: 'Chave de API do FireCrawl (opcional)'
+  description: 'A chave de API do FireCrawl para o serviço Captain AI'
+  locked: false
+  type: secret
+- name: CAPTAIN_CLOUD_PLAN_LIMITS
+  display_title: 'Limites do Captain por plano (cloud)'
+  description: 'Os limites do serviço Captain AI para os diferentes planos'
+  value:
+  type: code
+- name: CAPTAIN_DOCUMENT_AUTO_SYNC_INTERVALS
+  display_title: 'Intervalos de sincronização automática de documentos do Captain'
+  description: 'Mapa JSON com os intervalos (em horas) de sincronização automática de documentos do Captain por plano. Use null para desabilitar a sincronização automática de um plano.'
+  value:
+  locked: false
+  type: code
+- name: CAPTAIN_DOCUMENT_AUTO_SYNC_PER_ACCOUNT_BATCH_LIMIT
+  display_title: 'Limite de lote por conta na sincronização automática do Captain'
+  description: 'Número máximo de documentos sincronizáveis do Captain a enfileirar por conta em cada execução do agendador. Padrão: 50.'
+  value: 50
+  locked: false
+  type: number
+- name: CAPTAIN_DOCUMENT_AUTO_SYNC_GLOBAL_BATCH_LIMIT
+  display_title: 'Limite de lote global na sincronização automática do Captain'
+  description: 'Número máximo de documentos sincronizáveis do Captain a enfileirar globalmente em cada execução do agendador. Padrão: 1000.'
+  value: 1000
+  locked: false
+  type: number
+# End of Captain Config
+
+# ------- Context.dev Config ------- #
+- name: CONTEXT_DEV_API_KEY
+  display_title: 'Chave de API do Context.dev'
+  description: 'Chave de API do serviço de branding Context.dev usado durante o onboarding de contas'
+  type: secret
+# ------- End of Context.dev Config ------- #
+
+# ------- Chatwoot Internal Config for Cloud ----#
+- name: CHATWOOT_INBOX_TOKEN
+  value:
+  display_title: 'Token da caixa de entrada'
+  description: 'O token da caixa de entrada do Hdev CRM para o suporte de contato no Cloud'
+  locked: false
+  type: secret
+- name: CHATWOOT_INBOX_HMAC_KEY
+  value:
+  display_title: 'Chave HMAC da caixa de entrada'
+  description: 'A chave HMAC da caixa de entrada do Hdev CRM para o suporte de contato no Cloud'
+  locked: false
+  type: secret
+- name: CHATWOOT_CLOUD_PLANS
+  display_title: 'Planos do Cloud'
+  value:
+  description: 'Configuração para armazenar os planos do Stripe para o cloud'
+- name: CAPTAIN_TOPUP_OPTIONS
+  display_title: 'Opções de recarga do Captain'
+  value: {}
+  description: 'Pacotes de recarga de créditos de IA por moeda, ex.: {"usd":[{"credits":1000,"amount":20.0}],"brl":[{"credits":1000,"amount":100.0}]}'
+  type: code
+- name: ENABLE_MULTI_CURRENCY_BILLING
+  display_title: 'Habilitar cobrança em múltiplas moedas'
+  value: false
+  locked: false
+  description: 'Cobrar novas contas na moeda local delas (ex.: BRL) e exibir recargas de créditos na moeda correta; quando desligado, todos são cobrados em USD'
+  type: boolean
+- name: MARKETING_CONVERSION_TRACKING_CONFIG
+  value:
+  display_title: 'Configuração de rastreamento de conversão de marketing'
+  description: 'Configuração JSON para rastreamento de conversão de cadastro e ativação de plano no Hdev CRM Cloud'
+  locked: true
+  type: code
+- name: CHATWOOT_CLOUD_PLAN_FEATURES
+  display_title: 'Lista de recursos por plano'
+  value:
+  description: 'Configuração dos recursos e seus planos associados'
+- name: DEPLOYMENT_ENV
+  value: self-hosted
+  description: 'O ambiente de implantação da instalação, para diferenciar entre o Hdev CRM cloud e o self-hosted'
+- name: CLOUD_ANALYTICS_TOKEN
+  value:
+  display_title: 'Token de analytics'
+  description: 'A chave de API de analytics do Amplitude para o Hdev CRM cloud'
+  type: secret
+- name: CLEARBIT_API_KEY
+  value:
+  display_title: 'Chave de API do Clearbit'
+  description: 'Esta chave de API é usada no onboarding dos usuários, para pré-preencher os dados da conta.'
+  type: secret
+- name: DASHBOARD_SCRIPTS
+  value:
+  display_title: 'Scripts do painel'
+  description: 'Os scripts são carregados como o último item da tag <body>'
+  type: code
+- name: BLOCKED_EMAIL_DOMAINS
+  value:
+  display_title: 'Domínios de e-mail bloqueados'
+  description: 'Adicione um domínio por linha para bloqueá-los no cadastro; aceita Regex'
+  type: code
+- name: SKIP_INCOMING_BCC_PROCESSING
+  value:
+  display_title: 'Pular processamento de BCC para'
+  description: 'Lista de IDs de conta separados por vírgula que devem ser ignorados no processamento de BCC de entrada'
+- name: INACTIVE_WHATSAPP_NUMBERS
+  value: ''
+  display_title: 'Números de WhatsApp inativos'
+  description: 'Lista de números de WhatsApp separados por vírgula que devem ser rejeitados com erro 422'
+  type: code
+# ------- End of Chatwoot Internal Config for Cloud ----#
+
+# ------- Chatwoot Internal Config for Self Hosted ----#
+- name: INSTALLATION_PRICING_PLAN
+  value: 'community'
+  description: 'O plano de preços da instalação, obtido da API de cobrança'
+- name: INSTALLATION_PRICING_PLAN_QUANTITY
+  value: 0
+  description: 'O número de licenças compradas para a instalação, obtido da API de cobrança'
+- name: CHATWOOT_SUPPORT_WEBSITE_TOKEN
+  value:
+  description: 'O token do site do Hdev CRM, usado para identificar a caixa de entrada do Hdev CRM e exibir a opção "Falar com o suporte" na página de cobrança'
+  type: secret
+- name: CHATWOOT_SUPPORT_SCRIPT_URL
+  value:
+  description: 'A URL base do script do Hdev CRM, para exibir a opção "Falar com o suporte" na página de cobrança'
+- name: CHATWOOT_SUPPORT_IDENTIFIER_HASH
+  value:
+  description: 'O hash identificador do Hdev CRM, para validar o contato na janela de chat ao vivo.'
+  type: secret
+- name: ACCOUNT_SECURITY_NOTIFICATION_WEBHOOK_URL
+  display_title: 'URL de webhook para envio de análises de segurança'
+  value:
+  description: 'Usada para notificar o Hdev CRM sobre abusos de conta e ameaças potenciais (deve ser uma URL de webhook do Discord)'
+# ------- End of Chatwoot Internal Config for Self Hosted ----#
+
+# ------- Compliance Related Config ----#
+- name: CHATWOOT_INSTANCE_ADMIN_EMAIL
+  display_title: 'E-mail do administrador da instância'
+  value:
+  description: 'O e-mail do administrador da instância para receber notificações relacionadas a conformidade'
+  locked: false
+# ------- End of Compliance Related Config ----#
+
+## ------ Configs added for enterprise clients ------ ##
+- name: API_CHANNEL_NAME
+  value:
+  description: 'Nome personalizado para o canal de API'
+- name: API_CHANNEL_THUMBNAIL
+  value:
+  description: 'Miniatura personalizada para o canal de API'
+- name: LOGOUT_REDIRECT_LINK
+  value: /app/login
+  locked: false
+  description: 'Redirecionar para um link diferente após sair'
+- name: DISABLE_USER_PROFILE_UPDATE
+  value: false
+  locked: false
+  description: 'Desabilitar a exibição da página de atualização de perfil para os usuários'
+## ------ End of Configs added for enterprise clients ------ ##
+
+## ------ Configs added for FCM v1 notifications ------ ##
+- name: FIREBASE_PROJECT_ID
+  display_title: 'ID do projeto Firebase'
+  value:
+  locked: false
+  description: 'ID do projeto Firebase'
+- name: FIREBASE_CREDENTIALS
+  display_title: 'Credenciais do Firebase'
+  value:
+  locked: false
+  type: secret
+  description: 'Conteúdo do seu arquivo JSON de credenciais do Firebase'
+## ------ End of Configs added for FCM v1 notifications ------ ##
+
+## ------ Configs added for Linear ------ ##
+- name: LINEAR_CLIENT_ID
+  display_title: 'Linear Client ID'
+  value:
+  locked: false
+  description: 'Client ID do Linear'
+- name: LINEAR_CLIENT_SECRET
+  display_title: 'Linear Client Secret'
+  value:
+  locked: false
+  description: 'Client secret do Linear'
+  type: secret
+## ------ End of Configs added for Linear ------ ##
+
+## ------ Configs added for Notion ------ ##
+- name: NOTION_CLIENT_ID
+  display_title: 'Notion Client ID'
+  value:
+  locked: false
+  description: 'Client ID do Notion'
+- name: NOTION_CLIENT_SECRET
+  display_title: 'Notion Client Secret'
+  value:
+  locked: false
+  description: 'Client secret do Notion'
+  type: secret
+- name: NOTION_VERSION
+  display_title: 'Versão do Notion'
+  value: '2022-06-28'
+  locked: false
+  description: 'Versão do Notion'
+## ------ End of Configs added for Notion ------ ##
+
+## ------ Configs added for Slack ------ ##
+- name: SLACK_CLIENT_ID
+  display_title: 'Slack Client ID'
+  value:
+  locked: false
+  description: 'Client ID do Slack'
+- name: SLACK_CLIENT_SECRET
+  display_title: 'Slack Client Secret'
+  value:
+  locked: false
+  description: 'Client secret do Slack'
+  type: secret
+## ------ End of Configs added for Slack ------ ##
+
+# ------- Shopify Integration Config ------- #
+- name: SHOPIFY_CLIENT_ID
+  display_title: 'Shopify Client ID'
+  description: 'O Client ID (API Key) da sua conta Shopify Partner'
+  locked: false
+  type: secret
+- name: SHOPIFY_CLIENT_SECRET
+  display_title: 'Shopify Client Secret'
+  description: 'O Client Secret (API Secret Key) da sua conta Shopify Partner'
+  locked: false
+  type: secret
+# ------- End of Shopify Related Config ------- #
+
+# ------- Instagram Channel Related Config ------- #
+- name: INSTAGRAM_APP_ID
+  display_title: 'Instagram App ID'
+  locked: false
+- name: INSTAGRAM_APP_SECRET
+  display_title: 'Instagram App Secret'
+  description: 'O App Secret usado para autenticação no Instagram'
+  locked: false
+  type: secret
+- name: INSTAGRAM_VERIFY_TOKEN
+  display_title: 'Token de verificação do Instagram'
+  description: 'O token de verificação usado no webhook do Instagram'
+  locked: false
+  type: secret
+- name: ENABLE_INSTAGRAM_CHANNEL_HUMAN_AGENT
+  display_title: 'Habilitar agente humano no canal Instagram'
+  value: false
+  locked: false
+  description: 'Habilitar agente humano no canal Instagram para um período maior de resposta. Exige aprovação adicional do app: https://developers.facebook.com/docs/features-reference/human-agent/'
+  type: boolean
+- name: INSTAGRAM_API_VERSION
+  display_title: 'Versão da API do Instagram'
+  description: 'Configure isto se quiser usar uma versão diferente da API do Instagram. Garanta que comece com o prefixo `v`'
+  value: 'v22.0'
+  locked: true
+# ------- End of Instagram Channel Related Config ------- #
+
+# ------- TikTok Channel Related Config ------- #
+- name: TIKTOK_API_VERSION
+  display_title: 'Versão da API do TikTok'
+  description: 'Configure isto se quiser usar uma versão diferente da API do TikTok. Garanta que comece com o prefixo `v`'
+  value: 'v1.3'
+  locked: false
+- name: TIKTOK_APP_ID
+  display_title: 'TikTok App ID'
+  locked: false
+- name: TIKTOK_APP_SECRET
+  display_title: 'TikTok App Secret'
+  locked: false
+  type: secret
+# ------- End of TikTok Channel Related Config ------- #
+
+# ------- OG Image Related Config ------- #
+- name: OG_IMAGE_CDN_URL
+  display_title: 'URL do CDN de imagens OG'
+  description: 'A URL do CDN para servir as imagens OG'
+  value: ''
+  locked: false
+- name: OG_IMAGE_CLIENT_REF
+  display_title: 'Referência de cliente de imagens OG'
+  description: 'Token usado para bloquear acesso não autorizado às imagens OG'
+  value: ''
+  locked: false
+  type: secret
+# ------- End of OG Image Related Config ------- #
+
+## ------ Configs added for Google OAuth ------ ##
+- name: GOOGLE_OAUTH_CLIENT_ID
+  display_title: 'Google OAuth Client ID'
+  value:
+  locked: false
+  description: 'Client ID do Google OAuth para autenticação por e-mail'
+- name: GOOGLE_OAUTH_CLIENT_SECRET
+  display_title: 'Google OAuth Client Secret'
+  value:
+  locked: false
+  description: 'Client Secret do Google OAuth para autenticação por e-mail'
+  type: secret
+- name: GOOGLE_OAUTH_REDIRECT_URI
+  display_title: 'URI de redirecionamento do Google OAuth'
+  value:
+  locked: false
+  description: 'A URI de redirecionamento configurada no seu app Google OAuth'
+- name: ENABLE_GOOGLE_OAUTH_LOGIN
+  display_title: 'Habilitar login com Google OAuth'
+  value: true
+  locked: false
+  description: 'Exibir o Google OAuth como opção de login quando as credenciais estiverem configuradas'
+  type: boolean
+## ------ End of Configs added for Google OAuth ------ ##
+
+## ------ Configs added for SAML SSO ------ ##
+- name: ENABLE_SAML_SSO_LOGIN
+  display_title: 'Habilitar login com SAML SSO'
+  value: true
+  locked: false
+  description: 'Exibir o SAML SSO como opção de login. Não pode ser desabilitado se houver usuários usando autenticação SAML.'
+  type: boolean
+## ------ End of Configs added for SAML SSO ------ ##
+
+## ------ Configs added for Cloudflare ------ ##
+- name: CLOUDFLARE_API_KEY
+  display_title: 'Chave de API da Cloudflare'
+  value:
+  locked: false
+  description: 'Chave de API para autenticação na conta Cloudflare'
+  type: secret
+- name: CLOUDFLARE_ZONE_ID
+  display_title: 'Zone ID da Cloudflare'
+  value:
+  locked: false
+  description: 'Zone ID do domínio na Cloudflare'
+## ------ End of Configs added for Cloudflare ------ ##
+
+## ------ Customizations for Customers ------ ##
+- name: WIDGET_TOKEN_EXPIRY
+  display_title: 'Expiração do token do widget'
+  value: 180
+  locked: false
+  description: 'Expiração do token em dias'
+## ------ End of Customizations for Customers ------ ##
+
+## ----- LLM Observability ---- ##
+- name: OTEL_PROVIDER
+  display_title: 'Provedor OpenTelemetry'
+  description: 'Provedor de observabilidade de LLM (langfuse, langsmith etc.)'
+  value: ''
+  locked: false
+- name: LANGFUSE_PUBLIC_KEY
+  display_title: 'Chave pública do Langfuse'
+  description: 'Chave pública para autenticação no Langfuse'
+  value: ''
+  locked: false
+  type: secret
+- name: LANGFUSE_SECRET_KEY
+  display_title: 'Chave secreta do Langfuse'
+  description: 'Chave secreta para autenticação no Langfuse'
+  value: ''
+  locked: false
+  type: secret
+- name: LANGFUSE_BASE_URL
+  display_title: 'URL base do Langfuse'
+  description: 'Endpoint do Langfuse (EUA: https://us.cloud.langfuse.com, Europa: https://cloud.langfuse.com)'
+  value: 'https://us.cloud.langfuse.com'
+  locked: false
+## ---- End of LLM Observability ---- ##
