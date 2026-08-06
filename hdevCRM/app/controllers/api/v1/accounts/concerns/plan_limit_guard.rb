@@ -2,13 +2,9 @@
 # canal e teto de instâncias baileys — a instância nasce junto do canal
 # whatsapp provider=baileys criado no #create (provision é callback do model),
 # então o guard roda ANTES do canal existir e nada de HTTP externo acontece.
+# O before_action fica no controller (Rails/LexicallyScopedActionFilter exige
+# a action definida no mesmo escopo do filtro).
 module Api::V1::Accounts::Concerns::PlanLimitGuard
-  extend ActiveSupport::Concern
-
-  included do
-    before_action :validate_plan_limits, only: [:create]
-  end
-
   private
 
   def validate_plan_limits
