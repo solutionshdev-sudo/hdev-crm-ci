@@ -7,6 +7,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
 
   include Api::V1::Accounts::Concerns::WhatsappHealthManagement
   include Api::V1::Accounts::Concerns::PlanLimitGuard
+  before_action :validate_plan_limits, only: [:create]
 
   def index
     @inboxes = policy_scope(Current.account.inboxes)
