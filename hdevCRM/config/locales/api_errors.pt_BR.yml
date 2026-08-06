@@ -12,6 +12,8 @@ pt_BR:
       already_subscribed: 'Já existe um plano vigente. Use o portal de cobrança para trocar'
       no_billing_account: 'Ainda não há cadastro de cobrança. Conclua uma contratação primeiro'
       agency_managed: 'A cobrança desta conta é gerenciada pela agência'
+    ai_agents:
+      model_not_in_plan: 'Este modelo de IA não está incluído no seu plano'
     api:
       common:
         resource_not_found: 'Recurso não encontrado'

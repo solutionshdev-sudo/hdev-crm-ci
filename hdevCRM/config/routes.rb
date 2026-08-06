@@ -67,7 +67,9 @@ Rails.application.routes.draw do
           namespace :actions do
             resource :contact_merge, only: [:create]
           end
-          resource :ai_agent, only: [:show, :update]
+          resource :ai_agent, only: [:show, :update] do
+            get :models
+          end
           resource :ai_usage, only: [:show]
           # Billing direto com a plataforma. O controller herda de Api::BaseController
           # de propósito (dono suspenso/inadimplente precisa alcançar o pagamento).

@@ -12,6 +12,8 @@ en:
       already_subscribed: 'There is already an active plan. Use the billing portal to change it'
       no_billing_account: 'No billing account yet. Complete a checkout first'
       agency_managed: 'Billing for this account is managed by its agency'
+    ai_agents:
+      model_not_in_plan: 'This AI model is not included in your plan'
     api:
       common:
         resource_not_found: 'Resource could not be found'
