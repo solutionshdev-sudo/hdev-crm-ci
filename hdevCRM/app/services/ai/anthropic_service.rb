@@ -99,7 +99,6 @@ module Ai
         feature: feature,
         conversation: conversation
       )
-      QuotaService.new(account: account).check_thresholds!
     end
   end
 end
