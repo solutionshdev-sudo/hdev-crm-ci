@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe AiModel do
+  before { Ai::CatalogBootstrap.run! }
+
   describe 'validations' do
     it 'rejects a duplicate canonical_id' do
       create(:ai_model, canonical_id: 'modelo-x')

@@ -5,6 +5,8 @@ RSpec.describe 'Account AI Agent API', type: :request do
   let(:administrator) { create(:user, account: account, role: :administrator) }
   let(:agent) { create(:user, account: account, role: :agent) }
 
+  before { Ai::CatalogBootstrap.run! }
+
   describe 'GET /api/v1/accounts/{account.id}/ai_agent' do
     it 'returns unauthorized for agents' do
       get "/api/v1/accounts/#{account.id}/ai_agent", headers: agent.create_new_auth_token

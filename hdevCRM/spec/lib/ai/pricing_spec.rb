@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Ai::Pricing do
+  before { Ai::CatalogBootstrap.run! }
+
   describe '.for_model' do
     it 'returns the price entry for known models' do
       expect(described_class.for_model('claude-opus-4-8')).to eq(input: 5.0, output: 25.0)
