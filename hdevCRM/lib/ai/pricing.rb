@@ -1,28 +1,51 @@
 module Ai
-  # Price map used to convert tokens into USD cost. Values are USD per
-  # 1M tokens, taken from Anthropic's public price list (2026-07). Unknown
-  # models fall back to DEFAULT so usage is never recorded with zero cost.
+  # Preço vem de ai_model_prices (linha vigente = superseded_at IS NULL) com
+  # cache em memória de 5 min — compute_totals roda a cada AiUsageEvent e não
+  # pode custar um SELECT por evento. Modelo fora do catálogo cai no DEFAULT
+  # (nunca gravar custo zero). A antiga constante PRICES virou seed de
+  # migration (20260806000004) e saiu do runtime.
   class Pricing
-    PRICES = {
-      'claude-fable-5' => { input: 10.0, output: 50.0 },
-      'claude-opus-5' => { input: 5.0, output: 25.0 },
-      'claude-opus-4-8' => { input: 5.0, output: 25.0 },
-      'claude-opus-4-7' => { input: 5.0, output: 25.0 },
-      'claude-opus-4-6' => { input: 5.0, output: 25.0 },
-      'claude-sonnet-5' => { input: 3.0, output: 15.0 },
-      'claude-sonnet-4-6' => { input: 3.0, output: 15.0 },
-      'claude-haiku-4-5' => { input: 1.0, output: 5.0 }
-    }.freeze
-
     DEFAULT = { input: 5.0, output: 25.0 }.freeze
+    CACHE_TTL = 5.minutes
 
-    def self.for_model(model)
-      PRICES.fetch(model.to_s, DEFAULT)
-    end
+    class << self
+      def for_model(model)
+        cents = cents_for(model)
+        { input: cents[:input] / 100.0, output: cents[:output] / 100.0 }
+      end
 
-    def self.cost(model, input_tokens, output_tokens)
-      prices = for_model(model)
-      ((input_tokens.to_i * prices[:input]) + (output_tokens.to_i * prices[:output])) / 1_000_000.0
+      def cost(model, input_tokens, output_tokens)
+        cents = cents_for(model)
+        total_cents_per_million = (input_tokens.to_i * cents[:input]) + (output_tokens.to_i * cents[:output])
+        total_cents_per_million / 100_000_000.0
+      end
+
+      # Specs e troca de preço pelo painel derrubam o cache do processo.
+      def reset_cache!
+        @cache = {}
+      end
+
+      private
+
+      def cents_for(model)
+        @cache ||= {}
+        entry = @cache[model.to_s]
+        return entry[:value] if entry && entry[:at] > CACHE_TTL.ago
+
+        value = lookup(model.to_s) || { input: (DEFAULT[:input] * 100).to_i, output: (DEFAULT[:output] * 100).to_i }
+        @cache[model.to_s] = { value: value, at: Time.zone.now }
+        value
+      end
+
+      def lookup(canonical_id)
+        price = AiModelPrice.joins(:ai_model)
+                            .where(ai_models: { canonical_id: canonical_id }, superseded_at: nil)
+                            .order(effective_from: :desc)
+                            .first
+        return nil if price.blank?
+
+        { input: price.input_cents_per_million, output: price.output_cents_per_million }
+      end
     end
   end
 end
