@@ -29,12 +29,16 @@ module Ai
     def raw_chat(messages:, system: nil, tools: nil, model: DEFAULT_MODEL, max_tokens: DEFAULT_MAX_TOKENS)
       raise Ai::QuotaExceededError, 'AI token quota exceeded' if QuotaService.new(account: account).exceeded?
 
-      params = { model: model, max_tokens: max_tokens, messages: messages }
+      # F8: resolver a cada chamada é o gate de execução — downgrade de plano
+      # com modelo caro salvo em custom_attributes é interceptado aqui.
+      resolution = Ai::ModelResolver.new(account: account).resolve!(model)
+
+      params = { model: resolution.provider_model_id, max_tokens: max_tokens, messages: messages }
       params[:system] = system if system.present?
       params[:tools] = tools.map { |tool_class| tool_definition(tool_class) } if tools.present?
 
-      response = client.messages.create(**params)
-      record_usage(model, response)
+      response = client_for(resolution).messages.create(**params)
+      record_usage(resolution.model.canonical_id, response)
       response
     end
 
@@ -82,12 +86,25 @@ module Ai
       block.type.to_s
     end
 
-    def client
-      @client ||= Anthropic::Client.new(api_key: api_key)
+    # F8: o client nasce da conexão do catálogo — direta e Bedrock viram a
+    # mesma classe. Memoizado por conexão (uma instância de service pode
+    # tocar mais de uma conexão num tool loop com modelos distintos).
+    def client_for(resolution)
+      @clients ||= {}
+      @clients[resolution.connection.id] ||= build_client(resolution.connection)
     end
 
-    def api_key
-      GlobalConfigService.load('ANTHROPIC_API_KEY', nil)
+    def build_client(connection)
+      case connection.modality
+      when 'bedrock'
+        Anthropic::BedrockMantleClient.new(
+          aws_region: connection.region,
+          aws_access_key: connection.aws_access_key_id,
+          aws_secret_access_key: connection.aws_secret_access_key
+        )
+      else
+        Anthropic::Client.new(api_key: connection.resolved_api_key)
+      end
     end
 
     def record_usage(model, response)
