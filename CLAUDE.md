@@ -22,6 +22,8 @@ negócio e as skills do HDEV.
 - `hdevCRM/` — o código da plataforma (fork do Chatwoot)
 - `baileys-service/` — microserviço Node do WhatsApp não-oficial (Baileys); conversa com o Rails por HTTP interno + webhook HMAC
 - `_sistema/` — núcleo de regras do HDEV (não sobrescrever)
+- `scripts/` — utilitários de operação; o `sync-ci-mirror.sh` mora aqui e é
+  peça central do fluxo de CI desde 05/08 (ver seção CI)
 - `templates/`, `.claude/skills/` — moldes e skills do sistema
 - `PRODUCT.md` / `DESIGN.md` (raiz) — contexto de produto e design system
   oficial da plataforma (tokens `n-*`, regras de acento white-label). Toda tela
@@ -38,7 +40,13 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
 
 - **HDEV CRM** — CRM / plataforma de atendimento white-label, fork do
   Chatwoot. Cliente-alvo: agências que revendem pros próprios clientes.
-- Estrutura de planos de revenda: em definição.
+- **Estrutura de planos de revenda: implementada em 06/08 (F6 comercial).**
+  `Plan` tem limites reais (agentes, caixas, instâncias WhatsApp, contas de
+  cliente, tokens de IA, e teto por tipo de canal em `channel_limits`), o
+  `Plan::LimitEnforcer` é o único lugar que responde "pode?", e o CRUD vive em
+  `/super_admin/plans`. A agência distribui sua fatia pelas contas filhas via
+  `accounts.plan_allocations`. **Falta o dinheiro**: `Subscription` só vira
+  ativa por escrita manual até a F7 (Stripe) ligar o webhook.
 
 ## Regras do sistema
 

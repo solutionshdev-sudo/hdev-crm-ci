@@ -484,9 +484,42 @@ timestamp relativo do modal de atividades em inglês ("about 9 hours ago" —
 date-fns sem locale pt-BR naquele componente, herdado) e o card auto-criado
 nascendo com o display_id da conversa como título.
 
-## O que pode esperar
+## Quinta trilha: camada comercial (F6–F11) — plano aprovado 05/08, F6 no ar 06/08
 
-- Definição da estrutura de planos de revenda pras agências (ainda em estudo).
+O motor (F1–F5) existe, mas nada disso podia ser **vendido**: o `Plan` era tabela
+decorativa (limites nunca lidos), não havia CRUD de plano, o webhook do Stripe estava
+numa rota morta dentro de `if HdevApp.enterprise?`, e o modelo de IA era string livre
+que qualquer conta trocava por um 5× mais caro. O plano das seis fases está em
+`plano-fases-6-11.md` na raiz. Decisões travadas: conta direta **é** a empresa (sem
+filhas), **a agência paga** (só ela tem `Subscription`; filhas recebem alocação), RAG
+com embedding OpenAI na F9, e **zero "Captain" em qualquer lugar** — inclusive nome de
+tabela (a F9 renomeia `captain_*` → `ai_assistant*`).
+
+**Feito (05-06/08, PR #33 mergeado em `5198106`) — F6, o desbloqueador:** os limites de
+plano viraram regra de negócio. `Plan::LimitEnforcer` é o único lugar que responde
+"pode?", resolvendo **por chave** numa cadeia: alocação da agência (chave presente
+vence, `null` = ilimitado explícito) → assinatura direta vigente (decide sozinha, não
+cai pro degrau seguinte) → plano da agência (vale **por conta**) → nada = ilimitado
+(grandfathering). Cinco pontos passaram a consultar: criação de inbox (caixas + teto por
+tipo de canal + instância baileys, com o guard rodando **antes** do canal nascer),
+`Account#usage_limits` (o `validate_limit` do agents_controller continuou intacto — só
+trocou a fonte), criação de conta-filha de agência e o `Ai::QuotaService`. Duas colunas
+jsonb novas (`plans.channel_limits`, `accounts.plan_allocations`) e CRUD em
+`/super_admin/plans`. CI verde 4/4 no espelho (run 31058720729); **migrations aplicadas
+em produção 06/08 e o enforcer respondendo no container.**
+
+Nada muda de comportamento até o primeiro plano ser criado no painel — sem plano, tudo é
+ilimitado.
+
+**Próximo: F7 (Stripe)** — é o que liga o dinheiro. Hoje `Subscription#activate!`,
+`#mark_past_due!` e `#cancel!` **não têm um único chamador**: tirar a rota do bloco morto,
+escrever `Webhooks::StripeController` com HMAC e idempotência (o model
+`StripeWebhookEvent` já existe sem controller), e o checkout a partir do
+`plan.stripe_price_id`. Depois: F7.5 (quota por contador atômico, independente e barata)
+→ F8 (conexões de IA, catálogo de modelos, gate por plano) → F9 (cérebro por caixa) →
+F10 (painel da agência) → F11 (analítica e saúde).
+
+## O que pode esperar
 - **Reconstrução das features enterprise: virou lista de espera com gatilho por
   pedido de cliente, não roadmap** (decisão de 29/07). Há zero agências pagantes
   hoje e cada uma é código a manter sem demanda. **Companies foi cortada de vez**
@@ -500,9 +533,13 @@ nascendo com o display_id da conversa como título.
   lista e vale mais que as quatro — áudio no WhatsApp é expectativa no Brasil.
   Saiu barata porque o contrato inteiro era MIT e já estava no core: faltava só
   quem preenche o `meta['transcribed_text']`.
-- Ainda de pé como candidata barata: os **campos de limite/feature do super
-  admin** (~20 linhas de `Administrate::Field`) — é a UI que liga feature e seta
-  limite por conta, ou seja, a mecânica dos planos de revenda.
+- ~~Campos de limite/feature do super admin~~ — **a metade dos limites saiu em
+  06/08 na F6** (`PlanDashboard` + `Plan::LimitEnforcer`), só que por **plano**, não
+  por conta avulsa. O que sobrou dessa ideia é a UI de **feature por conta** — e ela
+  esbarra no `AccountDashboard`, que ainda referencia `AccountLimitsField`,
+  `AccountFeaturesField` e `CaptainModelOverridesField`, **três classes que não
+  existem mais no repo** (hoje inertes atrás de `HdevApp.enterprise?` = false). A
+  limpeza está agendada na F11.
 - Skills de marketing/conteúdo do template (carrossel, SEO, ads) — o foco
   agora é produto, não divulgação.
 
