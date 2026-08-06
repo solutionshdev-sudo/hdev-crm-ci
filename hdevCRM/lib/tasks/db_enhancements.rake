@@ -4,6 +4,8 @@ Rake::Task['db:migrate'].enhance do
     puts 'Loading Installation config'
     ConfigLoader.new.process
   end
+
+  Ai::CatalogBootstrap.run! if ActiveRecord::Base.connection.table_exists?('ai_connections')
 end
 
 # we are creating a custom database prepare task

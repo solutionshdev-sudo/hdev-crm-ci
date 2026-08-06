@@ -17,6 +17,8 @@ class AiModelPrice < ApplicationRecord
   def supersede_previous_current
     return if superseded_at.present?
 
-    self.class.current.where(ai_model_id: ai_model_id).where.not(id: id).update_all(superseded_at: Time.zone.now)
+    self.class.current.where(ai_model_id: ai_model_id).where.not(id: id).find_each do |price|
+      price.update!(superseded_at: Time.zone.now)
+    end
   end
 end

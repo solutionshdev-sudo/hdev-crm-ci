@@ -4,12 +4,15 @@ RSpec.describe Ai::AnthropicService do
   let(:account) { create(:account) }
   let(:service) { described_class.new(account: account, feature: 'chatbot') }
   let(:api_response) do
-    double('anthropic response', usage: double('usage', input_tokens: 10, output_tokens: 5))
+    instance_double(
+      Anthropic::Models::Message,
+      usage: instance_double(Anthropic::Models::Usage, input_tokens: 10, output_tokens: 5)
+    )
   end
 
   def stub_client
-    messages = double('messages')
-    client = double('anthropic client', messages: messages)
+    messages = instance_double(Anthropic::Resources::Messages)
+    client = instance_double(Anthropic::Client, messages: messages)
     allow(service).to receive(:build_client).and_return(client)
     messages
   end
