@@ -52,5 +52,28 @@ RSpec.describe Ai::CatalogBootstrap do
       expect(model.current_price).to eq(price)
       expect(restricted_plan.reload.ai_models).to be_empty
     end
+
+    it 'rolls back all plan links when a link creation fails and seeds them on the next run' do
+      plans = create_list(:plan, 2)
+      described_class.run!
+      PlanAiModel.delete_all
+
+      creation_attempts = 0
+      allow(PlanAiModel).to receive(:create!).and_wrap_original do |create_link, *args, **kwargs, &block|
+        creation_attempts += 1
+        raise StandardError, 'simulated plan link failure' if creation_attempts == 2
+
+        create_link.call(*args, **kwargs, &block)
+      end
+
+      expect { described_class.run! }.to raise_error(StandardError, 'simulated plan link failure')
+      expect(PlanAiModel.count).to eq(0)
+
+      allow(PlanAiModel).to receive(:create!).and_call_original
+
+      described_class.run!
+
+      expect(PlanAiModel.where(plan: plans).count).to eq(16)
+    end
   end
 end
