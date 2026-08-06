@@ -3,7 +3,9 @@ require 'rails_helper'
 RSpec.describe StripeBilling::CheckoutSession do
   let(:account) { create(:account) }
   let(:plan) { create(:plan, :with_stripe_price) }
-  let(:stripe_session) { instance_double(Stripe::Checkout::Session, url: 'https://stripe.test/checkout') }
+  # construct_from cria o objeto real da gem — instance_double falharia se os
+  # atributos forem dinâmicos (method_missing do StripeObject).
+  let(:stripe_session) { Stripe::Checkout::Session.construct_from(id: 'cs_spec', url: 'https://stripe.test/checkout') }
 
   before do
     allow(Stripe::Checkout::Session).to receive(:create).and_return(stripe_session)

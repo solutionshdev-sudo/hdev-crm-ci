@@ -9,9 +9,9 @@ RSpec.describe 'Agency Subscriptions API', type: :request do
   before do
     create(:agency_user, agency: agency, user: agency_admin)
     allow(Stripe::Checkout::Session).to receive(:create)
-      .and_return(instance_double(Stripe::Checkout::Session, url: 'https://stripe.test/checkout'))
+      .and_return(Stripe::Checkout::Session.construct_from(id: 'cs_spec', url: 'https://stripe.test/checkout'))
     allow(Stripe::BillingPortal::Session).to receive(:create)
-      .and_return(instance_double(Stripe::BillingPortal::Session, url: 'https://stripe.test/portal'))
+      .and_return(Stripe::BillingPortal::Session.construct_from(id: 'bps_spec', url: 'https://stripe.test/portal'))
   end
 
   describe 'POST /api/v1/agencies/:agency_id/subscription/checkout' do
