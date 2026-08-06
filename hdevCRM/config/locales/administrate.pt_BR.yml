@@ -52,6 +52,12 @@ pt_BR:
       platform_app: App de plataforma
       direct: Diretos
       agency: De agência
+      pending: Pendentes
+      processed: Processados
+      failed: Com falha
+      ignored: Ignorados
+      past_due: Inadimplentes
+      canceled: Canceladas
     sidebar:
       collapse: Recolher menu
       expand: Expandir menu
@@ -64,6 +70,11 @@ pt_BR:
       plan_type:
         direct: Direto
         agency: Agência
+      subscription_status:
+        pending: Pendente
+        active: Ativa
+        past_due: Inadimplente
+        canceled: Cancelada
       banner_type:
         info: Informativo
         warning: Aviso
@@ -84,6 +95,12 @@ pt_BR:
           JSON com teto por tipo de canal, ex: {"Channel::Whatsapp": 1}.
           Chave ausente ou null = ilimitado. Limites vazios também são
           ilimitados.
+      subscription:
+        status: >-
+          Mudança manual de status ignora o Stripe — use só pra cortesia ou
+          corrigir divergência. Suspensão por abuso deve cancelar a
+          assinatura também no Stripe, senão o próximo invoice.paid reativa
+          o dono.
   helpers:
     submit:
       create: 'Criar %{model}'
@@ -235,6 +252,26 @@ pt_BR:
         subscriptions: Assinaturas
         created_at: Criado em
         updated_at: Atualizado em
+      subscription:
+        id: ID
+        owner: Dono
+        plan: Plano
+        status: Status
+        stripe_customer_id: Customer ID do Stripe
+        stripe_subscription_id: Subscription ID do Stripe
+        current_period_end: Fim do período atual
+        created_at: Criado em
+        updated_at: Atualizado em
+      stripe_webhook_event:
+        id: ID
+        stripe_event_id: Event ID do Stripe
+        event_type: Tipo do evento
+        status: Status
+        error: Motivo/erro
+        payload: Payload
+        processed_at: Processado em
+        created_at: Recebido em
+        updated_at: Atualizado em
   activerecord:
     models:
       account:
@@ -270,6 +307,12 @@ pt_BR:
       plan:
         one: Plano
         other: Planos
+      subscription:
+        one: Assinatura
+        other: Assinaturas
+      stripe_webhook_event:
+        one: Evento do Stripe
+        other: Eventos do Stripe
   # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
   # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
   attributes:

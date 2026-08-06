@@ -48,6 +48,10 @@ Rails.application.routes.draw do
         scope module: :agencies do
           resources :accounts, only: [:index, :create]
           resource :ai_usage, only: [:show]
+          resource :subscription, only: [] do
+            post :checkout
+            post :portal
+          end
         end
       end
 
@@ -65,6 +69,12 @@ Rails.application.routes.draw do
           end
           resource :ai_agent, only: [:show, :update]
           resource :ai_usage, only: [:show]
+          # Billing direto com a plataforma. O controller herda de Api::BaseController
+          # de propósito (dono suspenso/inadimplente precisa alcançar o pagamento).
+          resource :subscription, only: [] do
+            post :checkout
+            post :portal
+          end
           resource :copilot, only: [:create] do
             post :apply
           end
@@ -507,29 +517,6 @@ Rails.application.routes.draw do
     end
   end
 
-  if HdevApp.enterprise?
-    namespace :enterprise, defaults: { format: 'json' } do
-      namespace :api do
-        namespace :v1 do
-          resources :accounts do
-            member do
-              post :checkout
-              post :subscription
-              post :select_billing_currency
-              get :limits
-              post :toggle_deletion
-              post :topup_checkout
-              get :topup_options
-            end
-          end
-        end
-      end
-
-      post 'webhooks/stripe', to: 'webhooks/stripe#process_payload'
-      post 'webhooks/firecrawl', to: 'webhooks/firecrawl#process_payload'
-    end
-  end
-
   # ----------------------------------------------------------------------
   # Routes for platform APIs
   namespace :platform, defaults: { format: 'json' } do
@@ -615,6 +602,7 @@ Rails.application.routes.draw do
   get 'webhooks/whatsapp/:phone_number', to: 'webhooks/whatsapp#verify'
   post 'webhooks/whatsapp/:phone_number', to: 'webhooks/whatsapp#process_payload'
   post 'webhooks/baileys/:instance_id', to: 'webhooks/baileys#process_payload'
+  post 'webhooks/stripe', to: 'webhooks/stripe#process_payload'
   get 'webhooks/instagram', to: 'webhooks/instagram#verify'
   post 'webhooks/instagram', to: 'webhooks/instagram#events'
   post 'webhooks/tiktok', to: 'webhooks/tiktok#events'
@@ -674,6 +662,10 @@ Rails.application.routes.draw do
 
       # order of resources affect the order of sidebar navigation in super admin
       resources :plans, only: [:index, :new, :create, :show, :edit, :update, :destroy]
+      # Sem new/destroy de propósito: assinatura nasce no checkout do Stripe e
+      # morre pelo cancelamento lá; o painel só vê e ajusta (plano/status).
+      resources :subscriptions, only: [:index, :show, :edit, :update]
+      resources :stripe_webhook_events, only: [:index, :show]
       resources :accounts, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
         post :seed, on: :member
         post :reset_cache, on: :member

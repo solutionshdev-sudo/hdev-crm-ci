@@ -6,6 +6,12 @@ en:
       baileys_instance: 'Plan WhatsApp instance limit reached. Upgrade the plan to add more instances'
       client_account: 'Plan client account limit reached. Upgrade the plan to add more client accounts'
       channel: 'Plan limit for this channel type reached. Upgrade the plan to add more inboxes of this channel'
+    subscriptions:
+      plan_unavailable: 'This plan is not available for checkout'
+      plan_type_mismatch: 'This plan does not match this type of customer'
+      already_subscribed: 'There is already an active plan. Use the billing portal to change it'
+      no_billing_account: 'No billing account yet. Complete a checkout first'
+      agency_managed: 'Billing for this account is managed by its agency'
     api:
       common:
         resource_not_found: 'Resource could not be found'

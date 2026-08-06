@@ -6,6 +6,12 @@ pt_BR:
       baileys_instance: 'Limite de instâncias de WhatsApp do plano atingido. Faça upgrade do plano para adicionar mais instâncias'
       client_account: 'Limite de contas de cliente do plano atingido. Faça upgrade do plano para adicionar mais contas'
       channel: 'Limite deste tipo de canal atingido no plano. Faça upgrade do plano para adicionar mais caixas deste canal'
+    subscriptions:
+      plan_unavailable: 'Este plano não está disponível para contratação'
+      plan_type_mismatch: 'Este plano não corresponde a este tipo de cliente'
+      already_subscribed: 'Já existe um plano vigente. Use o portal de cobrança para trocar'
+      no_billing_account: 'Ainda não há cadastro de cobrança. Conclua uma contratação primeiro'
+      agency_managed: 'A cobrança desta conta é gerenciada pela agência'
     api:
       common:
         resource_not_found: 'Recurso não encontrado'

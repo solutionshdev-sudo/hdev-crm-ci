@@ -484,7 +484,7 @@ timestamp relativo do modal de atividades em inglês ("about 9 hours ago" —
 date-fns sem locale pt-BR naquele componente, herdado) e o card auto-criado
 nascendo com o display_id da conversa como título.
 
-## Quinta trilha: camada comercial (F6–F11) — plano aprovado 05/08, F6 no ar 06/08
+## Quinta trilha: camada comercial (F6–F11) — plano aprovado 05/08, F6 no ar e F7 pronta 06/08
 
 O motor (F1–F5) existe, mas nada disso podia ser **vendido**: o `Plan` era tabela
 decorativa (limites nunca lidos), não havia CRUD de plano, o webhook do Stripe estava
@@ -511,13 +511,41 @@ em produção 06/08 e o enforcer respondendo no container.**
 Nada muda de comportamento até o primeiro plano ser criado no painel — sem plano, tudo é
 ilimitado.
 
-**Próximo: F7 (Stripe)** — é o que liga o dinheiro. Hoje `Subscription#activate!`,
-`#mark_past_due!` e `#cancel!` **não têm um único chamador**: tirar a rota do bloco morto,
-escrever `Webhooks::StripeController` com HMAC e idempotência (o model
-`StripeWebhookEvent` já existe sem controller), e o checkout a partir do
-`plan.stripe_price_id`. Depois: F7.5 (quota por contador atômico, independente e barata)
-→ F8 (conexões de IA, catálogo de modelos, gate por plano) → F9 (cérebro por caixa) →
-F10 (painel da agência) → F11 (analítica e saúde).
+**Feito (06/08, PR #34) — F7, o dinheiro: código completo, CI verde 4/4 (run 31104702530,
+6452 exemplos / 0 falhas), API do Stripe ainda NÃO conectada.** `activate!`,
+`mark_past_due!` e `cancel!` ganharam chamador: `Webhooks::StripeController` verifica a
+assinatura HMAC (`construct_event`, que também dá a janela anti-replay) e despacha 5
+eventos pelo `StripeBilling::EventHandler`. **Idempotência fecha contra corrida E contra
+crash**: `find_or_create_by!` + `with_lock` + re-checagem dentro do lock, com a mutação e
+o `mark_processed!` na mesma transação — crash no meio faz rollback dos dois, a linha
+volta a `pending` e o retry do Stripe reprocessa. Evento órfão vira status `ignored`
+(novo, sem migration) + 200, nunca cria assinatura por webhook. Entrou também o Customer
+Portal, e com ele o 5º evento (`customer.subscription.updated`), que sincroniza plano
+(via `stripe_price_id`), status e período — sem isso a troca de plano no portal mudaria
+no Stripe e os limites daqui ficariam velhos.
+
+**Decisão do Harvey que virou regra dura, não só UI:** só **dono de agência** e **conta
+direta** veem Stripe. Conta-filha de agência recebe **403** — ela paga a agência por
+fora e seus limites vêm de `plan_allocations`. E os controllers de billing **pulam os
+guards de suspensão de propósito**: agência `pending_payment` no 1º pagamento e dono
+suspenso por inadimplência precisam alcançar o checkout — pagar é o caminho de volta.
+Checkout recusa (422) quem já tem plano vigente; troca de plano é o portal.
+
+Três campos da API mudaram de lugar e os exemplos antigos quebrariam calado:
+`invoice.parent.subscription_details.subscription` (o `invoice.subscription` de topo não
+existe mais), `lines.data[].period.end` (não `invoice.period_end`) e
+`items.data[].current_period_end` (saiu do topo do Subscription).
+
+**Pendente da F7: ligar a conta Stripe.** Roteiro em checkbox, do zero (chaves no
+EasyPanel, endpoint com os 5 eventos, products + `stripe_price_id` nos planos, Customer
+Portal com `subscription_update`, ponta-a-ponta com cartão de teste, replay manual e
+simulação de inadimplência) em
+`docs/superpowers/specs/2026-08-06-f7-stripe-testes-pendentes.md`. A UI de upgrade
+(dashboard da conta e painel da agência) também ficou pra depois — hoje é só API.
+
+**Próximo:** F7.5 (quota por contador atômico, independente e barata) → F8 (conexões de
+IA, catálogo de modelos, gate por plano) → F9 (cérebro por caixa) → F10 (painel da
+agência) → F11 (analítica e saúde).
 
 ## O que pode esperar
 - **Reconstrução das features enterprise: virou lista de espera com gatilho por

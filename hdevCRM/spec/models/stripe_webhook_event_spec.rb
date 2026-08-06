@@ -27,5 +27,15 @@ RSpec.describe StripeWebhookEvent do
       expect(event.reload).to be_failed
       expect(event.error).to eq('assinatura inválida')
     end
+
+    it 'marks as ignored keeping the reason and a timestamp' do
+      event = create(:stripe_webhook_event)
+
+      event.mark_ignored!('no local subscription for sub_123')
+
+      expect(event.reload).to be_ignored
+      expect(event.processed_at).to be_present
+      expect(event.error).to eq('no local subscription for sub_123')
+    end
   end
 end

@@ -18,7 +18,11 @@
 #  index_stripe_webhook_events_on_stripe_event_id        (stripe_event_id) UNIQUE
 #
 class StripeWebhookEvent < ApplicationRecord
-  enum :status, { pending: 0, processed: 1, failed: 2 }
+  # ignored: evento autêntico que não casa com nada local (assinatura criada
+  # direto no dashboard do Stripe, price sem Plan). Fica de auditoria — o
+  # super admin resolve na mão pelo SubscriptionDashboard. Valor novo só no
+  # fim (enum por posição no banco).
+  enum :status, { pending: 0, processed: 1, failed: 2, ignored: 3 }
 
   validates :stripe_event_id, presence: true, uniqueness: true
   validates :event_type, presence: true
@@ -29,5 +33,9 @@ class StripeWebhookEvent < ApplicationRecord
 
   def mark_failed!(message)
     update!(status: :failed, error: message.to_s.truncate(5000))
+  end
+
+  def mark_ignored!(reason)
+    update!(status: :ignored, processed_at: Time.zone.now, error: reason.to_s.truncate(5000))
   end
 end
