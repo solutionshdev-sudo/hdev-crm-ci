@@ -9,6 +9,24 @@
 Produto no ar (EasyPanel, 26/07/2026) — em processo de desvinculação total do
 Chatwoot antes de abrir pra agências.
 
+## Foco atual (06/08): camada comercial F6–F11
+
+Plano aprovado em 05/08 (`plano-fases-6-11.md` na raiz). Estado:
+
+- **F6 (planos/limites), F7 (Stripe) e F7.5 (quota por contador atômico) na
+  main** — PRs #33, #34 e #35, todas com CI verde no espelho.
+- **Conta Stripe real deliberadamente NÃO criada** — só depois da F8, quando
+  o conteúdo dos planos fecha (gate de modelos de IA). Roteiro dos testes
+  pendentes em `docs/superpowers/specs/2026-08-06-f7-stripe-testes-pendentes.md`.
+- **F8 (conexões de IA, catálogo, gate por plano): desenhada e planejada em
+  06/08** — design em `docs/superpowers/specs/2026-08-06-f8-conexoes-ia-design.md`
+  (decisões: gate estrito + seed; runtime degrada com log; credencial só no
+  super admin) e plano de 10 tasks em
+  `docs/superpowers/plans/2026-08-06-f8-conexoes-ia.md`. Próximo passo:
+  executar.
+- Depois: F9 (cérebro por caixa + RAG, zero "captain"), F10 (painel da
+  agência), F11 (analítica/saúde).
+
 ## Infra de desenvolvimento (28/07, revisada em 05/08)
 
 > **MUDANÇA DE 05/08 — o CI saiu do repo privado.** O GitHub Actions da conta

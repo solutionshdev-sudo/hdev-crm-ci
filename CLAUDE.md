@@ -45,8 +45,15 @@ os clientes delas com a marca delas (ou a minha, conforme o plano).
   cliente, tokens de IA, e teto por tipo de canal em `channel_limits`), o
   `Plan::LimitEnforcer` é o único lugar que responde "pode?", e o CRUD vive em
   `/super_admin/plans`. A agência distribui sua fatia pelas contas filhas via
-  `accounts.plan_allocations`. **Falta o dinheiro**: `Subscription` só vira
-  ativa por escrita manual até a F7 (Stripe) ligar o webhook.
+  `accounts.plan_allocations`. **O dinheiro em código está pronto (06/08):**
+  a F7 (PR #34) ligou o webhook Stripe idempotente que dirige
+  `Subscription#activate!/#mark_past_due!/#cancel!`, checkout e portal; a
+  F7.5 (PR #35) trocou o `SUM()` da quota de IA por contador atômico
+  (`ai_usage_counters`) e tirou o mailer da request (`Ai::QuotaAlertJob`).
+  **Falta só ligar a conta Stripe real** — decisão do Harvey: depois da F8
+  (gate de modelos por plano), senão os products cadastrados lá teriam que
+  ser refeitos. Roteiro:
+  `docs/superpowers/specs/2026-08-06-f7-stripe-testes-pendentes.md`.
 
 ## Regras do sistema
 
