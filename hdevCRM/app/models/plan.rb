@@ -29,6 +29,8 @@ class Plan < ApplicationRecord
   LIMIT_ATTRIBUTES = %w[max_agents max_inboxes max_baileys_instances max_client_accounts ai_monthly_tokens].freeze
 
   has_many :subscriptions, dependent: :restrict_with_error
+  has_many :plan_ai_models, dependent: :destroy
+  has_many :ai_models, through: :plan_ai_models
 
   enum :plan_type, { direct: 0, agency: 1 }
 

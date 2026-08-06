@@ -7,4 +7,9 @@ FactoryBot.define do
     provider_model_id { canonical_id }
     display_name { "Modelo #{canonical_id}" }
   end
+
+  factory :plan_ai_model do
+    plan
+    ai_model
+  end
 end
