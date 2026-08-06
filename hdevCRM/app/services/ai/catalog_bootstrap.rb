@@ -58,10 +58,12 @@ class Ai::CatalogBootstrap
     end
 
     def seed_plan_links(models)
-      return unless PlanAiModel.none?
+      PlanAiModel.transaction do
+        next unless PlanAiModel.none?
 
-      Plan.find_each do |plan|
-        models.each { |model| PlanAiModel.create!(plan: plan, ai_model: model) }
+        Plan.find_each do |plan|
+          models.each { |model| PlanAiModel.create!(plan: plan, ai_model: model) }
+        end
       end
     end
   end

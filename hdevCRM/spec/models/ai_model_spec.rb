@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe AiModel do
-  before { Ai::CatalogBootstrap.run! }
-
   describe 'validations' do
     it 'rejects a duplicate canonical_id' do
       create(:ai_model, canonical_id: 'modelo-x')
@@ -18,7 +16,9 @@ RSpec.describe AiModel do
     end
   end
 
-  describe 'seed da migration' do
+  describe 'catalog bootstrap' do
+    before { Ai::CatalogBootstrap.run! }
+
     it 'contains the 8 models from the old PRICES constant, haiku as default' do
       seeded = described_class.where(canonical_id: %w[claude-fable-5 claude-opus-5 claude-opus-4-8
                                                       claude-opus-4-7 claude-opus-4-6 claude-sonnet-5
