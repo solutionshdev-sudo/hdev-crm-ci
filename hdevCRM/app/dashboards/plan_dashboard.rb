@@ -23,6 +23,7 @@ class PlanDashboard < Administrate::BaseDashboard
     active: Field::Boolean,
     position: Field::Number,
     subscriptions: Field::HasMany,
+    ai_models: Field::HasMany,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -53,6 +54,7 @@ class PlanDashboard < Administrate::BaseDashboard
     active
     position
     subscriptions
+    ai_models
     created_at
     updated_at
   ].freeze
@@ -72,6 +74,7 @@ class PlanDashboard < Administrate::BaseDashboard
     channel_limits_json
     active
     position
+    ai_models
   ].freeze
 
   COLLECTION_FILTERS = {

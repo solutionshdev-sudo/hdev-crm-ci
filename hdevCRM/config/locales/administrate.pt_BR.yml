@@ -75,6 +75,14 @@ pt_BR:
         active: Ativa
         past_due: Inadimplente
         canceled: Cancelada
+      provider:
+        anthropic: Anthropic
+        openai: OpenAI
+        google: Google
+      modality:
+        direct: API direta
+        bedrock: AWS Bedrock
+        vertex: Google Vertex
       banner_type:
         info: Informativo
         warning: Aviso

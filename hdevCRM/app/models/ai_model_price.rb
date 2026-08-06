@@ -6,4 +6,17 @@ class AiModelPrice < ApplicationRecord
   validates :effective_from, presence: true
 
   scope :current, -> { where(superseded_at: nil) }
+
+  # Troca de preço = criar linha nova, nunca editar: a vigente anterior do
+  # mesmo modelo é marcada como superseded aqui — AiUsageEvent antigo mantém
+  # o custo da época.
+  after_create :supersede_previous_current
+
+  private
+
+  def supersede_previous_current
+    return if superseded_at.present?
+
+    self.class.current.where(ai_model_id: ai_model_id).where.not(id: id).update_all(superseded_at: Time.zone.now)
+  end
 end

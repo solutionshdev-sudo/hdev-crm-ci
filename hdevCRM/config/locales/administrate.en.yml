@@ -18,6 +18,14 @@ en:
         active: Active
         past_due: Past due
         canceled: Canceled
+      provider:
+        anthropic: Anthropic
+        openai: OpenAI
+        google: Google
+      modality:
+        direct: Direct API
+        bedrock: AWS Bedrock
+        vertex: Google Vertex
     # Hint nativo do gem: o _form.html.erb do próprio administrate procura
     # "administrate.field_hints.<resource>.<attribute>" e renderiza em
     # .field-unit__hint quando a chave existe (ver _form.html.erb no gem).

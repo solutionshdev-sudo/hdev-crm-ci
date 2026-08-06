@@ -667,6 +667,11 @@ Rails.application.routes.draw do
       # Sem new/destroy de propósito: assinatura nasce no checkout do Stripe e
       # morre pelo cancelamento lá; o painel só vê e ajusta (plano/status).
       resources :subscriptions, only: [:index, :show, :edit, :update]
+      resources :ai_connections, only: [:index, :new, :create, :show, :edit, :update]
+      resources :ai_models, only: [:index, :new, :create, :show, :edit, :update]
+      # Sem edit/update/destroy de propósito: preço se troca supersedendo +
+      # criando linha nova, nunca editando (after_create do AiModelPrice).
+      resources :ai_model_prices, only: [:index, :new, :create, :show]
       resources :stripe_webhook_events, only: [:index, :show]
       resources :accounts, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
         post :seed, on: :member
