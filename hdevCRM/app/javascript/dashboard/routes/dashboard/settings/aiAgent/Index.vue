@@ -8,18 +8,12 @@ import NextButton from 'dashboard/components-next/button/Button.vue';
 
 const { t } = useI18n();
 
-const DEFAULT_MODEL = 'claude-opus-4-8';
-const MODEL_OPTIONS = [
-  'claude-opus-4-8',
-  'claude-sonnet-5',
-  'claude-haiku-4-5',
-];
-
 const config = reactive({
   ai_agent_enabled: false,
   ai_agent_prompt: '',
-  ai_agent_model: DEFAULT_MODEL,
+  ai_agent_model: '',
 });
+const modelOptions = ref([]);
 const usage = ref(null);
 const isSaving = ref(false);
 
@@ -39,13 +33,20 @@ const formattedCost = computed(() => {
 
 const fetchAll = async () => {
   try {
-    const [{ data: configData }, { data: usageData }] = await Promise.all([
-      AiAgentAPI.getConfig(),
-      AiAgentAPI.getUsage(),
-    ]);
+    const [{ data: configData }, { data: usageData }, { data: modelsData }] =
+      await Promise.all([
+        AiAgentAPI.getConfig(),
+        AiAgentAPI.getUsage(),
+        AiAgentAPI.getModels(),
+      ]);
+    modelOptions.value = modelsData;
+    const defaultModel =
+      modelsData.find(model => model.default)?.canonical_id ||
+      modelsData[0]?.canonical_id ||
+      '';
     config.ai_agent_enabled = Boolean(configData.ai_agent_enabled);
     config.ai_agent_prompt = configData.ai_agent_prompt || '';
-    config.ai_agent_model = configData.ai_agent_model || DEFAULT_MODEL;
+    config.ai_agent_model = configData.ai_agent_model || defaultModel;
     usage.value = usageData;
   } catch {
     useAlert(t('AI_AGENT_SETTINGS.API.FETCH_ERROR'));
@@ -105,8 +106,12 @@ onMounted(fetchAll);
           v-model="config.ai_agent_model"
           class="w-full px-3 py-2 text-sm border rounded-lg outline-none border-n-weak bg-n-background text-n-slate-12"
         >
-          <option v-for="model in MODEL_OPTIONS" :key="model" :value="model">
-            {{ model }}
+          <option
+            v-for="model in modelOptions"
+            :key="model.canonical_id"
+            :value="model.canonical_id"
+          >
+            {{ model.display_name }}
           </option>
         </select>
       </label>

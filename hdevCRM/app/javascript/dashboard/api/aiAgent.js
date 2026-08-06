@@ -18,6 +18,10 @@ class AiAgentAPI extends ApiClient {
   getUsage() {
     return axios.get(`${this.baseUrl()}/ai_usage`);
   }
+
+  getModels() {
+    return axios.get(`${this.url}/models`);
+  }
 }
 
 export default new AiAgentAPI();
