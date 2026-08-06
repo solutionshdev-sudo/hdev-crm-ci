@@ -192,3 +192,25 @@ Modelo fora da tabela → `DEFAULT` atual (nunca custo zero). A constante
    todos os modelos; conexão seedada resolve via GlobalConfig.
 6. Vitest no `Index.vue` novo; eslint local.
 7. Suíte inteira verde + artifact `schema` commitado.
+
+## Adendo: bootstrap após `schema:load`
+
+O CI prepara o banco com `db:schema:load db:migrate`. Quando o `schema.rb`
+já inclui as tabelas da F8, o DML das migrations antigas não é executado e
+o banco pode nascer sem conexão, modelos, preços ou vínculos por plano.
+
+`Ai::CatalogBootstrap.run!` roda ao final de `db:migrate` quando todas as
+tabelas necessárias existem. Em um banco sem dados da F8, ele cria a conexão
+Anthropic padrão, os oito modelos, seus preços iniciais e o produto cartesiano
+de planos e modelos.
+
+O bootstrap é conservador em bancos já administrados:
+
+- modelos existentes mantêm conexão, `provider_model_id`, nome e default;
+- modelos com preço vigente mantêm esse preço;
+- vínculos por plano só recebem o seed inicial quando a tabela inteira está
+  vazia, preservando remoções feitas pelo super admin;
+- execuções repetidas não criam duplicatas.
+
+Os specs devem cobrir os dois limites: reconstrução completa em banco vazio
+e preservação de customizações em banco populado.
