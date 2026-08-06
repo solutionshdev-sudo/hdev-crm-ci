@@ -34,8 +34,11 @@ RSpec.describe 'Super Admin stripe webhook events', type: :request do
     expect(response.body).to include('no local subscription for cus_x')
   end
 
+  # show_exceptions está ligado no test env: rota inexistente vira 404, não
+  # ActionController::RoutingError.
   it 'has no edit route (audit trail is read-only)' do
-    expect { get "/super_admin/stripe_webhook_events/#{event.id}/edit" }
-      .to raise_error(ActionController::RoutingError)
+    get "/super_admin/stripe_webhook_events/#{event.id}/edit"
+
+    expect(response).to have_http_status(:not_found)
   end
 end

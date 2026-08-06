@@ -46,11 +46,17 @@ class Webhooks::StripeController < ActionController::API
     head :bad_request
   end
 
+  # find primeiro (create_or_find_by! criaria primeiro e esbarraria na
+  # validação de uniqueness do model — RecordInvalid — em todo replay).
+  # A corrida de INSERT do mesmo event_id fica pro índice único: o perdedor
+  # recarrega a linha vencedora no rescue.
   def find_or_create_event(stripe_event)
-    StripeWebhookEvent.create_or_find_by!(stripe_event_id: stripe_event.id) do |event|
+    StripeWebhookEvent.find_or_create_by!(stripe_event_id: stripe_event.id) do |event|
       event.event_type = stripe_event.type
       event.payload = stripe_event.to_hash
     end
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+    StripeWebhookEvent.find_by!(stripe_event_id: stripe_event.id)
   end
 
   def apply(event)

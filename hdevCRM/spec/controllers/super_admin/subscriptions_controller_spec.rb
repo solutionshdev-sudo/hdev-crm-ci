@@ -35,13 +35,19 @@ RSpec.describe 'Super Admin subscriptions', type: :request do
     expect(subscription).to be_active
   end
 
+  # show_exceptions está ligado no test env: rota inexistente vira 404, não
+  # ActionController::RoutingError.
   it 'has no create route (subscriptions are born in checkout)' do
-    expect { post '/super_admin/subscriptions', params: { subscription: { plan_id: plan.id } } }
-      .to raise_error(ActionController::RoutingError)
+    post '/super_admin/subscriptions', params: { subscription: { plan_id: plan.id } }
+
+    expect(response).to have_http_status(:not_found)
+    expect(Subscription.count).to eq(1)
   end
 
   it 'has no destroy route (cancellation happens in Stripe)' do
-    expect { delete "/super_admin/subscriptions/#{subscription.id}" }
-      .to raise_error(ActionController::RoutingError)
+    delete "/super_admin/subscriptions/#{subscription.id}"
+
+    expect(response).to have_http_status(:not_found)
+    expect(subscription.reload).to be_persisted
   end
 end
