@@ -1,5 +1,11 @@
 pt_BR:
   errors:
+    plan_limits:
+      agent: 'Limite de agentes do plano atingido. Faça upgrade do plano para adicionar mais agentes'
+      inbox: 'Limite de caixas de entrada do plano atingido. Faça upgrade do plano para adicionar mais caixas'
+      baileys_instance: 'Limite de instâncias de WhatsApp do plano atingido. Faça upgrade do plano para adicionar mais instâncias'
+      client_account: 'Limite de contas de cliente do plano atingido. Faça upgrade do plano para adicionar mais contas'
+      channel: 'Limite deste tipo de canal atingido no plano. Faça upgrade do plano para adicionar mais caixas deste canal'
     api:
       common:
         resource_not_found: 'Recurso não encontrado'

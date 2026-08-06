@@ -116,6 +116,38 @@ RSpec.describe Ai::QuotaService do
 
       expect(service.account_limit).to eq(600)
     end
+
+    # F6: a fatia que a agência alocou (plan_allocations) vence a cadeia
+    # inteira quando a chave existe.
+    context 'with a plan allocation from the agency (F6)' do
+      it 'wins over the plan of an active subscription' do
+        plan = create(:plan, ai_monthly_tokens: 9000)
+        create(:subscription, owner: account, plan: plan, status: 'active')
+        account.update!(plan_allocations: { 'ai_monthly_tokens' => 1000 })
+
+        expect(service.account_limit).to eq(1000)
+      end
+
+      it 'treats an explicit null allocation as unlimited, even with extra tokens' do
+        plan = create(:plan, ai_monthly_tokens: 9000)
+        create(:subscription, owner: account, plan: plan, status: 'active')
+        account.update!(plan_allocations: { 'ai_monthly_tokens' => nil }, ai_extra_tokens: 500)
+
+        expect(service.account_limit).to be_nil
+      end
+
+      it 'sums ai_extra_tokens on top of a finite allocation' do
+        account.update!(plan_allocations: { 'ai_monthly_tokens' => 1000 }, ai_extra_tokens: 200)
+
+        expect(service.account_limit).to eq(1200)
+      end
+
+      it 'keeps the regular chain when the allocation lacks the key' do
+        account.update!(plan_allocations: { 'max_agents' => 2 }, custom_attributes: { 'ai_monthly_tokens' => 400 })
+
+        expect(service.account_limit).to eq(400)
+      end
+    end
   end
 
   describe '#agency_limit' do

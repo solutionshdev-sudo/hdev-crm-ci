@@ -50,6 +50,8 @@ pt_BR:
       user: Usuário
       agent_bot: Robô de agente
       platform_app: App de plataforma
+      direct: Diretos
+      agency: De agência
     sidebar:
       collapse: Recolher menu
       expand: Expandir menu
@@ -59,6 +61,9 @@ pt_BR:
         active: Ativa
         suspended: Suspensa
         pending_payment: Aguardando pagamento
+      plan_type:
+        direct: Direto
+        agency: Agência
       banner_type:
         info: Informativo
         warning: Aviso
@@ -74,6 +79,11 @@ pt_BR:
         suspended_reason: >-
           Suspensão manual por abuso deve vir acompanhada do cancelamento da
           assinatura no Stripe — o próximo invoice.paid reativa a agência.
+      plan:
+        channel_limits_json: >-
+          JSON com teto por tipo de canal, ex: {"Channel::Whatsapp": 1}.
+          Chave ausente ou null = ilimitado. Limites vazios também são
+          ilimitados.
   helpers:
     submit:
       create: 'Criar %{model}'
@@ -205,6 +215,26 @@ pt_BR:
         value: Valor
         created_at: Criado em
         updated_at: Atualizado em
+      plan:
+        id: ID
+        name: Nome
+        plan_type: Tipo do plano
+        price_cents: Preço (centavos)
+        currency: Moeda
+        billing_interval: Intervalo de cobrança
+        stripe_price_id: Price ID do Stripe
+        max_agents: Máx. de agentes
+        max_inboxes: Máx. de caixas de entrada
+        max_baileys_instances: Máx. de instâncias de WhatsApp
+        max_client_accounts: Máx. de contas de cliente
+        ai_monthly_tokens: Tokens de IA por mês
+        channel_limits: Limites por canal
+        channel_limits_json: Limites por canal (JSON)
+        active: Ativo
+        position: Posição
+        subscriptions: Assinaturas
+        created_at: Criado em
+        updated_at: Atualizado em
   activerecord:
     models:
       account:
@@ -237,6 +267,9 @@ pt_BR:
       installation_config:
         one: Configuração da instalação
         other: Configurações da instalação
+      plan:
+        one: Plano
+        other: Planos
   # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
   # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
   attributes:

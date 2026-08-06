@@ -6,6 +6,8 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   before_action :check_authorization, except: [:show]
 
   include Api::V1::Accounts::Concerns::WhatsappHealthManagement
+  include Api::V1::Accounts::Concerns::PlanLimitGuard
+  before_action :validate_plan_limits, only: [:create]
 
   def index
     @inboxes = policy_scope(Current.account.inboxes)
@@ -104,9 +106,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
     account_channels_method.create!(permitted_params(channel_type_from_params::EDITABLE_ATTRS)[:channel].except(:type))
   end
 
-  def allowed_channel_types
-    %w[web_widget api email line telegram whatsapp sms]
-  end
+  def allowed_channel_types = %w[web_widget api email line telegram whatsapp sms]
 
   def update_inbox_working_hours
     @inbox.update_working_hours(params.permit(working_hours: Inbox::OFFISABLE_ATTRS)[:working_hours]) if params[:working_hours]

@@ -25,7 +25,12 @@ module Ai
       agency_limit.present? && agency_usage >= agency_limit
     end
 
+    # F6: a fatia que a agência alocou (plan_allocations) vence a cadeia
+    # inteira quando a chave existe — null na alocação = ilimitado explícito.
+    # O extra segue a regra do effective_limit: só soma sobre base finita.
     def account_limit
+      return allocation_limit if account.plan_allocations&.key?('ai_monthly_tokens')
+
       effective_limit(account, account_fallback_limit)
     end
 
@@ -89,6 +94,13 @@ module Ai
       return nil if base.blank?
 
       base.to_i + owner.ai_extra_tokens.to_i
+    end
+
+    def allocation_limit
+      base = account.plan_allocations['ai_monthly_tokens']
+      return nil if base.nil?
+
+      base.to_i + account.ai_extra_tokens.to_i
     end
 
     def account_fallback_limit

@@ -1,6 +1,10 @@
 class Api::V1::Agencies::AccountsController < Api::BaseController
   include EnsureAgencyAccess
 
+  # Roda depois dos guards do EnsureAgencyAccess (incluído acima), então
+  # @agency já está resolvida e autorizada.
+  before_action :validate_client_account_limit, only: [:create]
+
   rescue_from CustomExceptions::Account::InvalidEmail,
               CustomExceptions::Account::UserExists,
               CustomExceptions::Account::UserErrors,
@@ -28,6 +32,10 @@ class Api::V1::Agencies::AccountsController < Api::BaseController
   end
 
   private
+
+  def validate_client_account_limit
+    Plan::LimitEnforcer.new(agency: @agency).allow!(:client_account)
+  end
 
   def permitted_params
     params.permit(:account_name, :email, :user_full_name, :password)

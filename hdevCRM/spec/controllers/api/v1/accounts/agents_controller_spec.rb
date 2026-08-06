@@ -177,6 +177,21 @@ RSpec.describe 'Agents API', type: :request do
         expect(response.parsed_body['email']).to eq(params[:email])
         expect(account.users.last.name).to eq('NewUser')
       end
+
+      # F6: o validate_limit não mudou — só a fonte de Account#usage_limits,
+      # que agora resolve o max_agents do plano via Plan::LimitEnforcer.
+      it 'returns payment_required when the plan agent limit is reached' do
+        plan = create(:plan, max_agents: 1)
+        create(:subscription, owner: account, plan: plan, status: 'active')
+
+        post "/api/v1/accounts/#{account.id}/agents",
+             params: params,
+             headers: admin.create_new_auth_token,
+             as: :json
+
+        expect(response).to have_http_status(:payment_required)
+        expect(response.parsed_body['error']).to eq(I18n.t('errors.api.account.agent_limit_exceeded'))
+      end
     end
   end
 

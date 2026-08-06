@@ -516,6 +516,66 @@ RSpec.describe 'Inboxes API', type: :request do
         json_response = response.parsed_body
         expect(json_response['allow_messages_after_resolved']).to be true
       end
+
+      # F6: limites do plano barram a criação ANTES do canal nascer (o guard
+      # roda antes do create_channel, então nada de HTTP externo acontece).
+      context 'with plan limits (F6)' do
+        it 'returns payment_required when the plan inbox limit is reached' do
+          plan = create(:plan, max_inboxes: 1)
+          create(:subscription, owner: account, plan: plan, status: 'active')
+          create(:inbox, account: account)
+
+          post "/api/v1/accounts/#{account.id}/inboxes",
+               headers: admin.create_new_auth_token,
+               params: valid_params,
+               as: :json
+
+          expect(response).to have_http_status(:payment_required)
+          expect(response.parsed_body['error']).to eq(I18n.t('errors.plan_limits.inbox'))
+        end
+
+        it 'returns payment_required when the channel type limit is reached' do
+          plan = create(:plan, max_inboxes: nil, channel_limits: { 'Channel::WebWidget' => 1 })
+          create(:subscription, owner: account, plan: plan, status: 'active')
+          create(:inbox, account: account, channel: create(:channel_widget, account: account))
+
+          post "/api/v1/accounts/#{account.id}/inboxes",
+               headers: admin.create_new_auth_token,
+               params: valid_params,
+               as: :json
+
+          expect(response).to have_http_status(:payment_required)
+          expect(response.parsed_body['error']).to eq(I18n.t('errors.plan_limits.channel'))
+        end
+
+        it 'returns payment_required when the baileys instance limit is reached' do
+          plan = create(:plan, max_baileys_instances: 1)
+          create(:subscription, owner: account, plan: plan, status: 'active')
+          # o factory de channel_whatsapp já cria a inbox no after(:create)
+          create(:channel_whatsapp, account: account, provider: 'baileys', validate_provider_config: false, sync_templates: false)
+
+          post "/api/v1/accounts/#{account.id}/inboxes",
+               headers: admin.create_new_auth_token,
+               params: { name: 'Baileys', channel: { type: 'whatsapp', provider: 'baileys', phone_number: '+5511999990000' } },
+               as: :json
+
+          expect(response).to have_http_status(:payment_required)
+          expect(response.parsed_body['error']).to eq(I18n.t('errors.plan_limits.baileys_instance'))
+        end
+
+        it 'creates the inbox while under the plan limit' do
+          plan = create(:plan, max_inboxes: 2, channel_limits: { 'Channel::WebWidget' => 2 })
+          create(:subscription, owner: account, plan: plan, status: 'active')
+          create(:inbox, account: account)
+
+          post "/api/v1/accounts/#{account.id}/inboxes",
+               headers: admin.create_new_auth_token,
+               params: valid_params,
+               as: :json
+
+          expect(response).to have_http_status(:success)
+        end
+      end
     end
   end
 
