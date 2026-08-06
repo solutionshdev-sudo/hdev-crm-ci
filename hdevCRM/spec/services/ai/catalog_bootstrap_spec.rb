@@ -16,9 +16,9 @@ RSpec.describe Ai::CatalogBootstrap do
       expect(AiModelPrice.where(superseded_at: nil).count).to eq(8)
       expect(PlanAiModel.where(plan: plans).count).to eq(16)
 
-      expect { described_class.run! }.not_to(change {
+      expect { described_class.run! }.not_to(change do
         [AiConnection.count, AiModel.count, AiModelPrice.count, PlanAiModel.count]
-      })
+      end)
     end
 
     it 'preserves models, prices, and plan restrictions already administered' do

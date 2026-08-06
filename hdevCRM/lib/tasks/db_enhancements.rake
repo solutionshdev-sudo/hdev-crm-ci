@@ -12,6 +12,10 @@ Rake::Task['db:schema:load'].enhance do
   Ai::CatalogBootstrap.run! if ActiveRecord::Base.connection.table_exists?('ai_connections')
 end
 
+Rake::Task['db:test:load_schema'].enhance do
+  Ai::CatalogBootstrap.run! if ActiveRecord::Base.connection.table_exists?('ai_connections')
+end
+
 # we are creating a custom database prepare task
 # the default rake db:prepare task isn't ideal for environments like heroku
 # In heroku the database is already created before the first run of db:prepare
