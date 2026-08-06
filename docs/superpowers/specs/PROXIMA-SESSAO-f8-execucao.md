@@ -24,13 +24,10 @@ Estado (2026-08-06, tudo na main com CI verde no espelho):
   `docs/superpowers/specs/2026-08-06-f7-stripe-testes-pendentes.md`).
 
 O que fazer, nesta ordem:
-1. Conferir pendências da F7.5:
-   - Run 31116957671 do espelho: o job `lint` caiu por INFRA ("Set up job" do
-     runner; rspec/vitest/baileys verdes) e o rerun ficou na fila no fim da
-     sessão — `gh run view 31116957671 --repo solutionshdev-sudo/hdev-crm-ci`.
-     Se ainda vermelho por infra, rerun de novo (`gh run rerun ... --failed`).
-   - (Quando houver deploy) sanidade do backfill no terminal EasyPanel:
-     contador vs `SUM(ai_usage_events)` por dono/mês.
+1. Pendência única da F7.5 (o CI do espelho fechou VERDE 4/4, run 31116957671,
+   após 2 reruns de infra — nada a conferir lá): quando houver deploy, rodar a
+   sanidade do backfill no terminal EasyPanel — contador de `ai_usage_counters`
+   vs `SUM(ai_usage_events)` por dono/mês.
 2. Executar o plano da F8 com superpowers:executing-plans (execução INLINE —
    foi a escolha nas fases anteriores), task por task, commits pequenos.
 3. Task 10: sync do espelho (eu dou o push), CI verde 4/4, artifact `schema`
