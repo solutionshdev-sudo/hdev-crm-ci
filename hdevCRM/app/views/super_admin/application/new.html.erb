@@ -1,0 +1,35 @@
+<%#
+# New
+
+Override do template da gem administrate (v0.20.1): a versão original monta o
+título com o nome do recurso no PLURAL ("Novo(a) Usuários"). Aqui usamos
+singular + minúscula, igual ao botão do índice.
+
+## Local variables:
+
+- `page`:
+  An instance of [Administrate::Page::Form][1].
+
+[1]: http://www.rubydoc.info/gems/administrate/Administrate/Page/Form
+%>
+
+<% content_for(:title) do %>
+  <%= t(
+    "administrate.actions.new_resource",
+    name: display_resource_name(page.resource_name, singular: true).downcase
+  ) %>
+<% end %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>
+  </h1>
+
+  <div>
+    <%= link_to t("administrate.actions.back"), :back, class: "button" %>
+  </div>
+</header>
+
+<section class="main-content__body">
+  <%= render "form", page: page %>
+</section>

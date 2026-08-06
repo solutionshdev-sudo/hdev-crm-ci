@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Cienījamais klient 👋, lūdzu, veltiet savu laiku, lai sniegtu atsauksmes par sarunu, kas Jums bija ar {inboxName}.",
+    "RATING": {
+      "LABEL": "Novērtējiet savu sarunu",
+      "SUCCESS_MESSAGE": "Paldies, ka iesniedzāt vērtējumu"
+    },
+    "FEEDBACK": {
+      "LABEL": "Vai jums ir kādas domas, ar kurām vēlaties dalīties?",
+      "PLACEHOLDER": "Jūsu atsauksmes (izvēles kārtībā)",
+      "BUTTON_TEXT": "Iesniedziet atsauksmes"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Aptauja ir veiksmīgi atjaunināta",
+      "ERROR_MESSAGE": "Nevar izveidot savienojumu ar Woot serveri. Lūdzu, vēlāk pamēģiniet vēlreiz"
+    }
+  },
+  "POWERED_BY": "Darbināts ar Hdev CRM"
+}

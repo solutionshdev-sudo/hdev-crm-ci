@@ -1,0 +1,383 @@
+# Tradução pt-BR do Administrate (Super Admin). O gem só embarca a chave
+# "pt-BR" (com hífen); o app roda com :pt_BR, então as chaves vivem aqui.
+pt_BR:
+  administrate:
+    actions:
+      back: Voltar
+      confirm: Tem certeza?
+      destroy: Excluir
+      edit: Editar
+      edit_resource: Editar %{name}
+      show_resource: Detalhes de %{name}
+      new_resource: Novo(a) %{name}
+    controller:
+      create:
+        success: '%{resource} criado(a) com sucesso.'
+      destroy:
+        success: '%{resource} excluído(a) com sucesso.'
+      update:
+        success: '%{resource} atualizado(a) com sucesso.'
+    fields:
+      has_many:
+        more: 'Mostrando %{count} de %{total_count}'
+        none: Nenhum
+      has_one:
+        none: Nenhum
+      polymorphic:
+        none: Nenhum
+      # Gem administrate-field-active_storage (botões do campo de anexo)
+      active_storage:
+        add: Adicionar
+        replace: Substituir
+        remove: Remover
+    form:
+      error: erro
+      errors: '%{pluralized_errors} impediram que este(a) %{resource_name} fosse salvo(a):'
+    search:
+      clear: Limpar busca
+      label: Buscar %{resource}
+    # Nomes dos COLLECTION_FILTERS dos dashboards (o partial _filters.html.erb
+    # consulta administrate.filters.<nome> com fallback pro titleize inglês).
+    filters:
+      active: Ativas
+      suspended: Suspensas
+      marked_for_deletion: Marcadas pra exclusão
+      recent: Recentes
+      confirmed: Confirmados
+      unconfirmed: Não confirmados
+      super_admin: Super admins
+      open: Abertos
+      user: Usuário
+      agent_bot: Robô de agente
+      platform_app: App de plataforma
+      direct: Diretos
+      agency: De agência
+      pending: Pendentes
+      processed: Processados
+      failed: Com falha
+      ignored: Ignorados
+      past_due: Inadimplentes
+      canceled: Canceladas
+    sidebar:
+      collapse: Recolher menu
+      expand: Expandir menu
+    # Valores de selects/enums dos dashboards (consultados via lambda em runtime)
+    values:
+      status:
+        active: Ativa
+        suspended: Suspensa
+        pending_payment: Aguardando pagamento
+      plan_type:
+        direct: Direto
+        agency: Agência
+      subscription_status:
+        pending: Pendente
+        active: Ativa
+        past_due: Inadimplente
+        canceled: Cancelada
+      banner_type:
+        info: Informativo
+        warning: Aviso
+        error: Erro
+      role:
+        agent: Agente
+        administrator: Administrador
+    # Hint nativo do gem: o _form.html.erb do próprio administrate procura
+    # "administrate.field_hints.<resource>.<attribute>" e renderiza em
+    # .field-unit__hint quando a chave existe (ver _form.html.erb no gem).
+    field_hints:
+      agency:
+        suspended_reason: >-
+          Suspensão manual por abuso deve vir acompanhada do cancelamento da
+          assinatura no Stripe — o próximo invoice.paid reativa a agência.
+      plan:
+        channel_limits_json: >-
+          JSON com teto por tipo de canal, ex: {"Channel::Whatsapp": 1}.
+          Chave ausente ou null = ilimitado. Limites vazios também são
+          ilimitados.
+      subscription:
+        status: >-
+          Mudança manual de status ignora o Stripe — use só pra cortesia ou
+          corrigir divergência. Suspensão por abuso deve cancelar a
+          assinatura também no Stripe, senão o próximo invoice.paid reativa
+          o dono.
+  helpers:
+    submit:
+      create: 'Criar %{model}'
+      update: 'Salvar %{model}'
+      submit: 'Salvar %{model}'
+    # Cabeçalhos de coluna e rótulos por recurso. As views do Administrate
+    # consultam helpers.label.<recurso>.<atributo> ANTES do fallback
+    # human_attribute_name — sem essas chaves o índice fica em inglês.
+    label:
+      account:
+        id: ID
+        name: Nome
+        locale: Idioma
+        users: Usuários
+        conversations: Conversas
+        status: Status
+        agency: Agência
+        agency_id: Agência
+        account_users: Vínculos de conta
+        custom_attributes: Atributos personalizados
+        limits: Limites
+        all_features: Todos os recursos
+        captain_models: Modelos do Captain
+        manually_managed_features: Recursos gerenciados manualmente
+        created_at: Criado em
+        updated_at: Atualizado em
+      user:
+        id: ID
+        avatar_url: Avatar
+        avatar: Avatar
+        name: Nome
+        display_name: Nome de exibição
+        email: E-mail
+        unconfirmed_email: E-mail não confirmado
+        password: Senha
+        provider: Provedor
+        uid: UID
+        type: Tipo
+        accounts: Contas
+        account_users: Vínculos de conta
+        access_token: Token de acesso
+        tokens: Tokens
+        pubsub_token: Token pub/sub
+        sign_in_count: Total de logins
+        current_sign_in_at: Login atual em
+        last_sign_in_at: Último login em
+        current_sign_in_ip: IP do login atual
+        last_sign_in_ip: IP do último login
+        confirmation_token: Token de confirmação
+        confirmed_at: Confirmado em
+        confirmation_sent_at: Confirmação enviada em
+        mfa_enabled: MFA
+        created_at: Criado em
+        updated_at: Atualizado em
+      agency:
+        id: ID
+        name: Nome
+        slug: Slug
+        custom_domain: Domínio customizado
+        status: Status
+        suspended_reason: Motivo da suspensão
+        installation_name: Nome da instalação
+        brand_name: Nome da marca
+        brand_url: URL da marca
+        widget_brand_url: URL da marca no widget
+        terms_url: URL dos termos de uso
+        privacy_url: URL de privacidade
+        primary_color: Cor primária
+        logo: Logo
+        logo_dark: Logo (tema escuro)
+        logo_thumbnail: Ícone do logo
+        accounts: Contas
+        agency_users: Vínculos da agência
+        created_at: Criado em
+        updated_at: Atualizado em
+      agent_bot:
+        id: ID
+        avatar_url: Avatar
+        avatar: Avatar
+        name: Nome
+        account: Conta
+        account_id: Conta
+        description: Descrição
+        outgoing_url: URL de saída
+        access_token: Token de acesso
+        created_at: Criado em
+        updated_at: Atualizado em
+      platform_app:
+        id: ID
+        name: Nome
+        access_token: Token de acesso
+        created_at: Criado em
+        updated_at: Atualizado em
+      account_user:
+        id: ID
+        account: Conta
+        account_id: Conta
+        user: Usuário
+        user_id: Usuário
+        inviter: Convidado por
+        role: Papel
+        created_at: Criado em
+        updated_at: Atualizado em
+      agency_user:
+        id: ID
+        agency: Agência
+        agency_id: Agência
+        user: Usuário
+        user_id: Usuário
+        role: Papel
+        created_at: Criado em
+        updated_at: Atualizado em
+      platform_banner:
+        id: ID
+        banner_message: Mensagem do banner
+        banner_type: Tipo do banner
+        active: Ativo
+        created_at: Criado em
+        updated_at: Atualizado em
+      access_token:
+        id: ID
+        owner: Dono
+        token: Token
+        created_at: Criado em
+        updated_at: Atualizado em
+      installation_config:
+        id: ID
+        name: Nome
+        value: Valor
+        created_at: Criado em
+        updated_at: Atualizado em
+      plan:
+        id: ID
+        name: Nome
+        plan_type: Tipo do plano
+        price_cents: Preço (centavos)
+        currency: Moeda
+        billing_interval: Intervalo de cobrança
+        stripe_price_id: Price ID do Stripe
+        max_agents: Máx. de agentes
+        max_inboxes: Máx. de caixas de entrada
+        max_baileys_instances: Máx. de instâncias de WhatsApp
+        max_client_accounts: Máx. de contas de cliente
+        ai_monthly_tokens: Tokens de IA por mês
+        channel_limits: Limites por canal
+        channel_limits_json: Limites por canal (JSON)
+        active: Ativo
+        position: Posição
+        subscriptions: Assinaturas
+        created_at: Criado em
+        updated_at: Atualizado em
+      subscription:
+        id: ID
+        owner: Dono
+        plan: Plano
+        status: Status
+        stripe_customer_id: Customer ID do Stripe
+        stripe_subscription_id: Subscription ID do Stripe
+        current_period_end: Fim do período atual
+        created_at: Criado em
+        updated_at: Atualizado em
+      stripe_webhook_event:
+        id: ID
+        stripe_event_id: Event ID do Stripe
+        event_type: Tipo do evento
+        status: Status
+        error: Motivo/erro
+        payload: Payload
+        processed_at: Processado em
+        created_at: Recebido em
+        updated_at: Atualizado em
+  activerecord:
+    models:
+      account:
+        one: Conta
+        other: Contas
+      user:
+        one: Usuário
+        other: Usuários
+      agency:
+        one: Agência
+        other: Agências
+      agent_bot:
+        one: Robô de agente
+        other: Robôs de agente
+      platform_app:
+        one: App de plataforma
+        other: Apps de plataforma
+      account_user:
+        one: Vínculo de conta
+        other: Vínculos de conta
+      agency_user:
+        one: Vínculo de agência
+        other: Vínculos de agência
+      platform_banner:
+        one: Banner da plataforma
+        other: Banners da plataforma
+      access_token:
+        one: Token de acesso
+        other: Tokens de acesso
+      installation_config:
+        one: Configuração da instalação
+        other: Configurações da instalação
+      plan:
+        one: Plano
+        other: Planos
+      subscription:
+        one: Assinatura
+        other: Assinaturas
+      stripe_webhook_event:
+        one: Evento do Stripe
+        other: Eventos do Stripe
+  # Fallback global: human_attribute_name cai em `attributes.<attr>` quando o
+  # modelo não tem tradução própria — cobre as telas CRUD do Administrate.
+  attributes:
+    id: ID
+    name: Nome
+    display_name: Nome de exibição
+    email: E-mail
+    password: Senha
+    role: Papel
+    account: Conta
+    user: Usuário
+    agency: Agência
+    owner: Dono
+    locale: Idioma
+    domain: Domínio
+    custom_domain: Domínio customizado
+    slug: Slug
+    support_email: E-mail de suporte
+    status: Status
+    type: Tipo
+    uid: UID
+    provider: Provedor
+    feature_flags: Recursos
+    limits: Limites
+    custom_attributes: Atributos personalizados
+    all_features: Todos os recursos
+    captain_models: Modelos do Captain
+    manually_managed_features: Recursos gerenciados manualmente
+    token: Token
+    tokens: Tokens
+    value: Valor
+    access_token: Token de acesso
+    pubsub_token: Token pub/sub
+    confirmation_token: Token de confirmação
+    confirmation_sent_at: Confirmação enviada em
+    unconfirmed_email: E-mail não confirmado
+    sign_in_count: Total de logins
+    current_sign_in_at: Login atual em
+    last_sign_in_at: Último login em
+    current_sign_in_ip: IP do login atual
+    last_sign_in_ip: IP do último login
+    avatar: Avatar
+    avatar_url: Avatar
+    logo: Logo
+    logo_dark: Logo (tema escuro)
+    logo_thumbnail: Ícone do logo
+    installation_name: Nome da instalação
+    brand_name: Nome da marca
+    brand_url: URL da marca
+    widget_brand_url: URL da marca no widget
+    terms_url: URL dos termos de uso
+    privacy_url: URL de privacidade
+    primary_color: Cor primária
+    description: Descrição
+    outgoing_url: URL de saída
+    banner_message: Mensagem do banner
+    banner_type: Tipo do banner
+    active: Ativo
+    inviter: Convidado por
+    accounts: Contas
+    users: Usuários
+    conversations: Conversas
+    account_users: Vínculos de conta
+    agency_users: Vínculos de agência
+    confirmed_at: Confirmado em
+    active_at: Ativo em
+    created_at: Criado em
+    updated_at: Atualizado em

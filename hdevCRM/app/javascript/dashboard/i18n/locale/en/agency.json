@@ -1,0 +1,51 @@
+{
+  "AGENCY_SETTINGS": {
+    "HEADER": "My Agency",
+    "DESCRIPTION": "Manage your agency's brand, client accounts and AI consumption.",
+    "EMPTY_STATE": "Your user does not administer any agency yet. Ask the platform administrator to link you to one.",
+    "STATS": {
+      "ACCOUNTS": "Client accounts",
+      "TOKENS": "AI tokens this month",
+      "COST": "AI cost this month"
+    },
+    "BRANDING": {
+      "TITLE": "Brand",
+      "NAME": "Agency name",
+      "BRAND_NAME": "Brand name",
+      "INSTALLATION_NAME": "Panel name",
+      "PRIMARY_COLOR": "Primary color",
+      "CUSTOM_DOMAIN": "Panel domain",
+      "CUSTOM_DOMAIN_PLACEHOLDER": "panel.youragency.com",
+      "BRAND_URL": "Website URL",
+      "TERMS_URL": "Terms of service URL",
+      "PRIVACY_URL": "Privacy policy URL",
+      "DOMAIN_NOTE": "Point a CNAME from your panel domain to this installation. Your clients will see your brand and color on the login page and throughout the panel.",
+      "SAVE": "Save brand"
+    },
+    "ACCOUNTS": {
+      "TITLE": "Client accounts",
+      "NEW": "New client",
+      "EMPTY": "No client accounts yet.",
+      "TABLE": {
+        "NAME": "Account",
+        "STATUS": "Status",
+        "TOKENS": "AI tokens (month)",
+        "COST": "AI cost (month)"
+      },
+      "FORM": {
+        "ACCOUNT_NAME": "Account name",
+        "USER_NAME": "Admin name",
+        "EMAIL": "Admin email",
+        "PASSWORD": "Admin password",
+        "CREATE": "Create account"
+      }
+    },
+    "API": {
+      "FETCH_ERROR": "Could not load your agency data",
+      "BRANDING_SUCCESS": "Brand saved successfully",
+      "BRANDING_ERROR": "Could not save the brand, please try again",
+      "ACCOUNT_SUCCESS": "Client account created successfully",
+      "ACCOUNT_ERROR": "Could not create the account. Check the data (the email may already be in use)."
+    }
+  }
+}

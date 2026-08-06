@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Değerli misafirimiz 👋, {inboxName} ile yaptığınız görüşmeyi değerlendirmek için lütfen kısa bir süre ayırın.",
+    "RATING": {
+      "LABEL": "Konuşmanızı oylayın",
+      "SUCCESS_MESSAGE": "Konuşmanızı oyladığınız için teşekkürler"
+    },
+    "FEEDBACK": {
+      "LABEL": "Görüşlerinizi bizimle paylaşmak ister misiniz?",
+      "PLACEHOLDER": "Görüşleriniz (isteğe bağlı)",
+      "BUTTON_TEXT": "Görüş bildirin"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Anket başarıyla güncellendi",
+      "ERROR_MESSAGE": "Woot Sunucusuna bağlanılamadı, Lütfen daha sonra tekrar deneyin"
+    }
+  },
+  "POWERED_BY": "Hdev CRM tarafından desteklenmektedir"
+}

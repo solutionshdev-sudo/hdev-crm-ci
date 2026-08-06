@@ -1,0 +1,19 @@
+{
+  "SURVEY": {
+    "DESCRIPTION": "Kedves felhasználónk 👋, kérlek szánj rá kis időt, és értékeld a beszélgetést {inboxName} munkatársunkkal.",
+    "RATING": {
+      "LABEL": "Értékeld a beszélgetést",
+      "SUCCESS_MESSAGE": "Köszönjük, hogy elküldted az értékelést"
+    },
+    "FEEDBACK": {
+      "LABEL": "Van bármi, amit még meg szeretnél osztani velünk?",
+      "PLACEHOLDER": "Visszajelzés (opcionális)",
+      "BUTTON_TEXT": "Visszajelzés elküldése"
+    },
+    "API": {
+      "SUCCESS_MESSAGE": "Felmérés sikeresen frissítve",
+      "ERROR_MESSAGE": "Nem sikerült csatlakozni a Woot szerverhez, kérjük próbáld később"
+    }
+  },
+  "POWERED_BY": "Hdev CRM"
+}

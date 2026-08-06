@@ -1,0 +1,28 @@
+{
+  "AI_AGENT_SETTINGS": {
+    "HEADER": "AI Agent",
+    "DESCRIPTION": "Answer customers automatically with your AI agent. Conversations are handed off to a human whenever the customer asks for one or the agent cannot help.",
+    "FORM": {
+      "ENABLED_LABEL": "Enable AI agent",
+      "ENABLED_NOTE": "The agent replies to incoming messages in unassigned conversations.",
+      "MODEL_LABEL": "Model",
+      "PROMPT_LABEL": "Custom instructions",
+      "PROMPT_PLACEHOLDER": "Extra instructions for the agent — tone of voice, business rules, FAQs…",
+      "SAVE": "Save settings"
+    },
+    "USAGE": {
+      "TITLE": "Usage this month",
+      "TOKENS_USED": "Tokens used",
+      "UNLIMITED": "Unlimited",
+      "INPUT_TOKENS": "Input tokens",
+      "OUTPUT_TOKENS": "Output tokens",
+      "COST": "Estimated cost",
+      "EXCEEDED": "The monthly AI token quota has been reached. The agent will hand conversations off to humans until the next cycle."
+    },
+    "API": {
+      "SUCCESS": "AI agent settings saved successfully",
+      "ERROR": "Could not save the AI agent settings, please try again",
+      "FETCH_ERROR": "Could not load the AI agent settings"
+    }
+  }
+}

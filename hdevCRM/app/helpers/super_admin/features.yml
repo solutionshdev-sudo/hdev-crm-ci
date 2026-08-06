@@ -1,0 +1,113 @@
+# Recursos exibidos na tela Configurações do Super Admin.
+# Entradas enterprise foram removidas: o Hdev CRM roda em modo Community
+# e as features premium serão reconstruídas com código próprio.
+
+# ------- Recursos do produto ------- #
+help_center:
+  name: 'Central de Ajuda'
+  description: 'Permite que agentes criem artigos de ajuda e publiquem em um portal.'
+  enabled: true
+  icon: 'icon-book-2-line'
+captain:
+  name: 'Agente de IA'
+  description: 'Habilita conversas com IA para atender seus clientes.'
+  enabled: true
+  icon: 'icon-captain'
+  config_key: 'captain'
+
+# ------- Canais de comunicação ------- #
+live_chat:
+  name: 'Chat ao Vivo'
+  description: 'Atendimento por chat ao vivo no site do seu cliente.'
+  enabled: true
+  icon: 'icon-chat-smile-3-line'
+email:
+  name: 'E-mail'
+  description: 'Gerencie os atendimentos por e-mail dentro do Hdev CRM.'
+  enabled: true
+  icon: 'icon-mail-send-fill'
+  config_key: 'email'
+sms:
+  name: 'SMS'
+  description: 'Gerencie os atendimentos por SMS dentro do Hdev CRM.'
+  enabled: true
+  icon: 'icon-message-line'
+messenger:
+  name: 'Messenger'
+  description: 'Atenda seus clientes no Facebook e Instagram.'
+  enabled: true
+  icon: 'icon-messenger-line'
+  config_key: 'facebook'
+instagram:
+  name: 'Instagram'
+  description: 'Atenda seus clientes no Instagram.'
+  enabled: true
+  icon: 'icon-instagram'
+  config_key: 'instagram'
+tiktok:
+  name: 'TikTok'
+  description: 'Atenda seus clientes no TikTok.'
+  enabled: true
+  icon: 'icon-tiktok'
+  config_key: 'tiktok'
+whatsapp:
+  name: 'WhatsApp'
+  description: 'Gerencie os atendimentos do WhatsApp Business dentro do Hdev CRM.'
+  enabled: true
+  icon: 'icon-whatsapp-line'
+telegram:
+  name: 'Telegram'
+  description: 'Gerencie os atendimentos do Telegram dentro do Hdev CRM.'
+  enabled: true
+  icon: 'icon-telegram-line'
+line:
+  name: 'Line'
+  description: 'Gerencie os atendimentos do Line dentro do Hdev CRM.'
+  enabled: true
+  icon: 'icon-line-line'
+
+# ------- OAuth e autenticação ------- #
+google:
+  name: 'Google'
+  description: 'Configuração da integração OAuth com o Google.'
+  enabled: true
+  icon: 'icon-google'
+  config_key: 'google'
+microsoft:
+  name: 'Microsoft'
+  description: 'Configuração de e-mail da Microsoft.'
+  enabled: true
+  icon: 'icon-microsoft'
+  config_key: 'microsoft'
+
+# ------- Integrações de terceiros ------- #
+linear:
+  name: 'Linear'
+  description: 'Configuração da integração com o Linear.'
+  enabled: true
+  icon: 'icon-linear'
+  config_key: 'linear'
+notion:
+  name: 'Notion'
+  description: 'Configuração da integração com o Notion.'
+  enabled: true
+  icon: 'icon-notion'
+  config_key: 'notion'
+slack:
+  name: 'Slack'
+  description: 'Configuração da integração com o Slack.'
+  enabled: true
+  icon: 'icon-slack'
+  config_key: 'slack'
+whatsapp_embedded:
+  name: 'WhatsApp Embedded'
+  description: 'Configuração do cadastro embutido do WhatsApp (Embedded Signup).'
+  enabled: true
+  icon: 'icon-whatsapp-line'
+  config_key: 'whatsapp_embedded'
+shopify:
+  name: 'Shopify'
+  description: 'Configuração da integração com o Shopify.'
+  enabled: true
+  icon: 'icon-shopify'
+  config_key: 'shopify'

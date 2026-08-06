@@ -1,0 +1,48 @@
+# == Schema Information
+#
+# Table name: conversation_participants
+#
+#  id              :bigint           not null, primary key
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  account_id      :bigint           not null
+#  conversation_id :bigint           not null
+#  user_id         :bigint           not null
+#
+# Indexes
+#
+#  index_conversation_participants_on_account_id                   (account_id)
+#  index_conversation_participants_on_conversation_id              (conversation_id)
+#  index_conversation_participants_on_user_id                      (user_id)
+#  index_conversation_participants_on_user_id_and_conversation_id  (user_id,conversation_id) UNIQUE
+#
+class ConversationParticipant < ApplicationRecord
+  validates :account_id, presence: true
+  validates :conversation_id, presence: true
+  validates :user_id, presence: true
+  validates :user_id, uniqueness: { scope: [:conversation_id] }
+  validate :ensure_inbox_access
+
+  belongs_to :account
+  belongs_to :conversation
+  belongs_to :user
+
+  before_validation :ensure_account_id
+  after_commit :invalidate_filtered_unread_count_visibility, on: [:create, :destroy]
+
+  private
+
+  def ensure_account_id
+    self.account_id = conversation&.account_id
+  end
+
+  def ensure_inbox_access
+    return unless conversation && conversation.inbox.assignable_agents.exclude?(user)
+
+    errors.add(:user, I18n.t('errors.models.conversation_participant.inbox_access_required'))
+  end
+
+  def invalidate_filtered_unread_count_visibility
+    ::Conversations::UnreadCounts::FilteredCountInvalidator.new(account).user_visibility_changed!(user_id: user_id)
+  end
+end

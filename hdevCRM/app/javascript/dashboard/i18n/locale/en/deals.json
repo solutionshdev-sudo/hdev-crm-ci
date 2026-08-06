@@ -1,0 +1,106 @@
+{
+  "DEALS": {
+    "BOARD": {
+      "TITLE": "Kanban",
+      "NEW_DEAL": "New deal",
+      "NEW_WITH_LABEL": "New {label}",
+      "EMPTY": "No stages in this pipeline yet.",
+      "MOVE_ERROR": "Could not move the deal. Try again.",
+      "CREATE_SUCCESS": "Deal created.",
+      "CREATE_ERROR": "Could not create the deal.",
+      "UPDATE_SUCCESS": "Deal updated.",
+      "UPDATE_ERROR": "Could not update the deal.",
+      "DELETE": "Delete deal",
+      "DELETE_SUCCESS": "Deal deleted.",
+      "DELETE_ERROR": "Could not delete the deal."
+    },
+    "LOST_REASON": {
+      "TITLE": "Why was this deal lost?",
+      "TITLE_VOCAB": "Why was this marked as {lost}?",
+      "SELECT_LABEL": "Reason",
+      "SELECT_PLACEHOLDER": "Select a reason",
+      "OTHER_OPTION": "Other",
+      "REASON_LABEL": "Reason",
+      "REASON_PLACEHOLDER": "Describe the reason",
+      "ERROR": "A reason is required.",
+      "CONFIRM": "Confirm",
+      "CANCEL": "Cancel"
+    },
+    "FORM": {
+      "TITLE": {
+        "LABEL": "Title",
+        "PLACEHOLDER": "E.g. Annual plan — Company X",
+        "ERROR": "Title is required"
+      },
+      "CONTACT": {
+        "LABEL": "Contact",
+        "PLACEHOLDER": "Search by contact name"
+      },
+      "VALUE": {
+        "LABEL": "Value"
+      },
+      "STAGE": {
+        "LABEL": "Stage"
+      },
+      "ASSIGNEE": {
+        "LABEL": "Assignee",
+        "NONE": "Unassigned"
+      },
+      "EXPECTED_CLOSE": {
+        "LABEL": "Expected close date"
+      },
+      "DESCRIPTION": {
+        "LABEL": "Description"
+      },
+      "CREATE": "Create deal",
+      "UPDATE": "Save",
+      "CANCEL": "Cancel"
+    },
+    "ACTIVITY": {
+      "TITLE": "Activity",
+      "LOADING": "Loading activity…",
+      "SYSTEM": "System",
+      "CREATED": "{user} created the deal",
+      "STAGE_CHANGED": "{user} moved from {from} to {to}",
+      "VALUE_CHANGED": "{user} changed the value",
+      "ASSIGNEE_CHANGED": "{user} changed the assignee",
+      "WON": "{user} marked as won 🎉",
+      "LOST": "{user} marked as lost",
+      "NOTE": "{user} added a note",
+      "REOPENED": "{user} reopened the deal"
+    }
+  },
+  "DEAL_PIPELINES": {
+    "TITLE": "Deal pipelines",
+    "DESCRIPTION": "Configure the stages of your sales funnel. Deals move between these stages on the board.",
+    "EDIT": "Edit",
+    "SAVE_SUCCESS": "Pipeline saved.",
+    "SAVE_ERROR": "Could not save the pipeline.",
+    "FORM": {
+      "NAME": "Name",
+      "STAGES": "Stages",
+      "STAGE_NAME": "Stage name",
+      "ADD_STAGE": "Add stage",
+      "CANCEL": "Cancel",
+      "SAVE": "Save",
+      "STAGE_TYPES": {
+        "OPEN": "Open",
+        "WON": "Won",
+        "LOST": "Lost"
+      },
+      "VOCABULARY": {
+        "TITLE": "Terminology",
+        "LEAD": "Lead label",
+        "DEAL": "Deal label",
+        "WON": "Won label",
+        "LOST": "Lost label",
+        "PLACEHOLDERS": {
+          "LEAD": "Lead",
+          "DEAL": "Deal",
+          "WON": "Won",
+          "LOST": "Lost"
+        }
+      }
+    }
+  }
+}

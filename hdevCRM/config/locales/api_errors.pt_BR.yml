@@ -1,0 +1,153 @@
+pt_BR:
+  errors:
+    plan_limits:
+      agent: 'Limite de agentes do plano atingido. Faça upgrade do plano para adicionar mais agentes'
+      inbox: 'Limite de caixas de entrada do plano atingido. Faça upgrade do plano para adicionar mais caixas'
+      baileys_instance: 'Limite de instâncias de WhatsApp do plano atingido. Faça upgrade do plano para adicionar mais instâncias'
+      client_account: 'Limite de contas de cliente do plano atingido. Faça upgrade do plano para adicionar mais contas'
+      channel: 'Limite deste tipo de canal atingido no plano. Faça upgrade do plano para adicionar mais caixas deste canal'
+    subscriptions:
+      plan_unavailable: 'Este plano não está disponível para contratação'
+      plan_type_mismatch: 'Este plano não corresponde a este tipo de cliente'
+      already_subscribed: 'Já existe um plano vigente. Use o portal de cobrança para trocar'
+      no_billing_account: 'Ainda não há cadastro de cobrança. Conclua uma contratação primeiro'
+      agency_managed: 'A cobrança desta conta é gerenciada pela agência'
+    api:
+      common:
+        resource_not_found: 'Recurso não encontrado'
+        action_not_authorized: 'Você não tem autorização para executar essa ação'
+        unauthorized: 'Não autorizado'
+        api_access_disabled: 'O acesso à API não está habilitado para esta conta'
+        query_param_missing: 'Informe o texto de busca no parâmetro q'
+      auth:
+        invalid_access_token: 'Token de acesso inválido'
+        bot_endpoint_not_allowed: 'Bots não têm autorização para acessar este endpoint'
+        invalid_current_password: 'Senha atual inválida'
+      account:
+        suspended: 'A conta está suspensa'
+        agency_suspended: 'A agência está suspensa'
+        bot_not_authorized: 'O bot não tem autorização para acessar esta conta'
+        agent_limit_exceeded: 'Limite de agentes da conta atingido. Adquira mais licenças'
+      widget:
+        not_found: 'O widget do site não existe'
+        invalid_hmac: 'Falha de HMAC: o hash de identificação enviado é inválido'
+      form:
+        field_required: 'Preencha este campo'
+        alphabets_only: 'Apenas letras são permitidas'
+      copilot:
+        quota_exceeded: 'A cota de tokens de IA desta conta acabou'
+        unknown_change: 'Mudança desconhecida: %{name}'
+      csat:
+        locked: 'Não é possível atualizar a pesquisa de satisfação após 14 dias'
+        template_params_required: 'Os parâmetros do template são obrigatórios'
+        channel_not_supported: 'Operações de template de CSAT estão disponíveis apenas para canais WhatsApp e Twilio WhatsApp'
+        message_required: 'A mensagem é obrigatória'
+        captain_required: 'O Captain é necessário para a análise de templates'
+        no_template_to_delete: 'Nenhum template para excluir'
+        no_content_sid: 'Nenhum content SID informado'
+      template:
+        not_found: 'Template não encontrado'
+        creation_failed: 'Falha ao criar o template'
+        not_found_or_invalid: 'Template não encontrado ou nome de template inválido'
+        sync_unavailable: 'A sincronização de templates está disponível apenas para canais WhatsApp'
+        sync_initiated: 'Sincronização de templates iniciada com sucesso'
+      conversation:
+        email_param_missing: 'O parâmetro email é obrigatório'
+        transcript_not_available: 'A transcrição por e-mail não está disponível no seu plano'
+        source_id_not_unique: 'O source_id deve ser único'
+        status_update_api_only: 'A atualização de status de mensagem só é permitida em caixas de entrada de API'
+      inbox:
+        limit_exceeded: 'Limite da conta atingido. Faça upgrade para um plano superior'
+        branded_email_disabled: 'O recurso de templates de e-mail com marca não está habilitado'
+        branded_email_only_email: 'O layout de e-mail com marca só é suportado em caixas de entrada de e-mail'
+        not_baileys: 'Não é uma caixa de entrada WhatsApp Baileys'
+      whatsapp:
+        health_unavailable: 'Os dados de saúde estão disponíveis apenas para canais WhatsApp Cloud API'
+        webhook_registered: 'Webhook registrado com sucesso'
+        account_required: 'A conta é obrigatória'
+        waba_info_required: 'As informações da WABA são obrigatórias'
+        phone_info_required: 'As informações do telefone são obrigatórias'
+        access_token_required: 'O token de acesso é obrigatório'
+        missing_params: 'Parâmetros obrigatórios ausentes: %{params}'
+        channel_required: 'O canal é obrigatório'
+        api_key_missing: 'A chave de API está ausente'
+        phone_number_id_missing: 'O ID do número de telefone está ausente'
+        phone_number_id_required: 'O ID do número de telefone é obrigatório'
+        waba_id_required: 'O ID da WABA é obrigatório'
+        no_phone_numbers: 'Nenhum número de telefone encontrado para a WABA %{waba_id}'
+        coupon_code_blank: 'O código do cupom não pode ficar vazio'
+        coupon_code_too_long: 'O código do cupom não pode ter mais de 15 caracteres'
+        unsupported_media_type: 'Tipo de mídia não suportado: %{media_type}'
+        invalid_url_scheme: 'Esquema de URL inválido: %{scheme}. Apenas http e https são permitidos'
+        url_too_long: 'URL muito longa (máximo de 2000 caracteres)'
+        invalid_url_format: 'Formato de URL inválido: %{message}. Informe uma URL válida, como https://exemplo.com/documento.pdf'
+        phone_number_mismatch: 'Número de telefone divergente. Esperado %{expected}, recebido %{actual}'
+        unknown_legacy_format: 'Formato legado desconhecido: %{format}'
+        authorization_code_required: 'O código de autorização é obrigatório'
+        no_access_token: 'Nenhum token de acesso na resposta: %{response}'
+        webhook_setup_failed: 'Falha na configuração do webhook: %{message}'
+      data_import:
+        in_progress: 'Já existe outra importação de dados em andamento.'
+        access_key_unavailable: 'A chave de acesso do Intercom desta importação não está disponível.'
+        invalid_intercom_key: 'Não foi possível validar esta chave de acesso do Intercom. Verifique a chave e as permissões dela.'
+        intercom_unreachable: 'Não foi possível conectar ao Intercom. Tente novamente.'
+        unsupported_source: 'Fonte de importação não suportada.'
+        access_key_required: 'A chave de acesso do Intercom é obrigatória.'
+        import_type_required: 'Selecione pelo menos um tipo de dado para importar.'
+        unsupported_types: 'Tipos de importação não suportados: %{types}'
+      integrations:
+        shopify:
+          domain_required: 'O domínio da loja é obrigatório'
+          contact_missing: 'Informações de contato ausentes'
+        linear:
+          missing_credentials: 'Credenciais ausentes'
+          missing_team_id: 'ID do time ausente'
+          missing_search_term: 'Termo de busca ausente'
+          missing_link: 'Link ausente'
+          missing_issue_id: 'ID da issue ausente'
+          missing_link_id: 'ID do link ausente'
+          missing_title: 'Título ausente'
+          invalid_priority: 'Valor de prioridade inválido. A prioridade deve ser 0, 1, 2, 3 ou 4.'
+          invalid_label_ids: 'label_ids deve ser um array de strings.'
+          missing_access_token: 'Token de acesso ausente na resposta de token do Linear'
+        dyte:
+          missing_credentials: 'Credenciais ausentes'
+          missing_information: 'Informações ausentes'
+        twitter:
+          subscription_failed: 'Falha na assinatura do Twitter'
+      imap:
+        invalid_mechanism: 'Mecanismo de autenticação IMAP inválido. Valores permitidos: %{allowed_values}'
+      crm:
+        unsupported_event: 'Evento não suportado: %{event_name}'
+        prospect_id_required: 'O ID do prospect é obrigatório'
+        activity_code_required: 'O código do evento de atividade é obrigatório'
+        activity_name_required: 'O nome da atividade é obrigatório'
+        search_key_required: 'A chave de busca é obrigatória'
+        lead_data_required: 'Os dados do lead são obrigatórios'
+        lead_id_required: 'O ID do lead é obrigatório'
+        lead_creation_failed: 'Falha ao criar o lead — nenhum ID retornado'
+        activity_code_not_found: 'Código de atividade %{key} do LeadSquared não encontrado para o hook #%{hook_id}.'
+      mailer:
+        email_domain_missing: 'O domínio de e-mail do canal não está presente.'
+      pdf:
+        upload_failed: 'Falha no upload do PDF'
+        validation_failed: 'Falha na validação do PDF'
+        faq_generation_failed: 'Falha ao gerar o FAQ do PDF'
+      platform:
+        invalid_access_token: 'Token de acesso inválido'
+        non_permissible_resource: 'Recurso não permitido'
+        email_migration_disabled: 'A migração de canal de e-mail não está habilitada'
+        missing_migrations: 'Parâmetro migrations ausente'
+        too_many_migrations: 'Migrações demais (máximo %{max})'
+      devise:
+        invalid_token: 'Token inválido'
+        already_confirmed: 'E-mail já confirmado'
+        failure: 'Falha na confirmação'
+      dashboard:
+        json_not_supported: 'Use as rotas de API em vez das rotas do painel para requisições JSON'
+      report:
+        invalid_group_by: 'group_by inválido'
+      onboarding:
+        invalid_step: 'Etapa de onboarding inválida'
+      team:
+        invalid_user_ids: 'IDs de usuário inválidos'

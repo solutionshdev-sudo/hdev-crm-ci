@@ -1,0 +1,97 @@
+fieldset {
+  background-color: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  font-weight: $font-weight-medium;
+  margin: 0;
+  padding: 0;
+}
+
+label {
+  display: block;
+  font-weight: $font-weight-medium;
+  margin: 0;
+}
+
+input,
+select {
+  display: block;
+  font-family: $base-font-family;
+  font-size: $base-font-size;
+}
+
+[type="color"],
+[type="date"],
+[type="datetime-local"],
+[type="email"],
+[type="month"],
+[type="number"],
+[type="password"],
+[type="search"],
+[type="tel"],
+[type="text"],
+[type="time"],
+[type="url"],
+[type="week"],
+input:not([type]),
+textarea {
+  appearance: none;
+  background-color: $surface-color;
+  border: $base-border;
+  border-radius: $base-border-radius;
+  color: $base-font-color;
+  font-family: $base-font-family;
+  padding: 0.5em;
+  transition: border-color $base-duration $base-timing;
+  width: 100%;
+
+  &:hover {
+    border-color: unquote("var(--sa-slate-8)");
+  }
+
+  &:focus {
+    border-color: $action-color;
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: unquote("var(--sa-slate-3)");
+    cursor: not-allowed;
+
+    &:hover {
+      border: $base-border;
+    }
+  }
+}
+
+textarea {
+  resize: vertical;
+}
+
+[type="checkbox"],
+[type="radio"] {
+  display: inline;
+  margin-right: $small-spacing / 2;
+}
+
+[type="file"] {
+  width: 100%;
+}
+
+select {
+  width: 100%;
+}
+
+[type="checkbox"],
+[type="radio"],
+[type="file"],
+select {
+  &:focus {
+    outline: $focus-outline;
+    outline-offset: $focus-outline-offset;
+  }
+}
