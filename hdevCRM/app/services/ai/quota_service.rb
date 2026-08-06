@@ -40,10 +40,11 @@ module Ai
       effective_limit(agency, agency_fallback_limit)
     end
 
-    # Chamado pelo Ai::AnthropicService#record_usage logo após gravar o
-    # AiUsageEvent. Nunca pode derrubar o fluxo de IA: erro de Redis/mailer
-    # vira só log. Cooldown de 24h por limiar (80/100) em Redis evita floodar
-    # o admin a cada iteração do tool loop.
+    # Chamado pelo Ai::QuotaAlertJob (enfileirado no after_create_commit de
+    # AiUsageEvent — F7.5 tirou o mailer da request). Nunca pode derrubar o
+    # fluxo de IA: erro de Redis/mailer vira só log. Cooldown de 24h por
+    # limiar (80/100) em Redis evita floodar o admin a cada iteração do
+    # tool loop.
     def check_thresholds!
       limit = account_limit
       return if limit.blank?
@@ -58,14 +59,16 @@ module Ai
       Rails.logger.error("Ai::QuotaService#check_thresholds! account_id=#{account.id}: #{e.message}")
     end
 
+    # F7.5: leitura O(1) no contador (ai_usage_counters) em vez de
+    # SUM(total_tokens) — o ToolLoop consulta exceeded? a cada iteração.
     def account_usage
-      AiUsageEvent.where(account_id: account.id).in_period(current_period).sum(:total_tokens)
+      AiUsageCounter.current_for(account)&.tokens || 0
     end
 
     def agency_usage
       return 0 if agency.blank?
 
-      AiUsageEvent.where(agency_id: agency.id).in_period(current_period).sum(:total_tokens)
+      AiUsageCounter.current_for(agency)&.tokens || 0
     end
 
     def account_summary

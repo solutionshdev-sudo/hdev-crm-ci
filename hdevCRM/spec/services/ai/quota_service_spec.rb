@@ -33,8 +33,9 @@ RSpec.describe Ai::QuotaService do
 
     it 'ignores usage from previous months' do
       account.update!(custom_attributes: { 'ai_monthly_tokens' => 1000 })
-      event = create(:ai_usage_event, account: account, input_tokens: 2000, output_tokens: 0)
-      event.update_columns(created_at: 2.months.ago) # rubocop:disable Rails/SkipsModelValidations
+      travel_to(2.months.ago) do
+        create(:ai_usage_event, account: account, input_tokens: 2000, output_tokens: 0)
+      end
       expect(service.exceeded?).to be(false)
     end
   end

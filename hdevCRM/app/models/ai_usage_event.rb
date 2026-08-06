@@ -33,6 +33,9 @@ class AiUsageEvent < ApplicationRecord
   before_validation :set_agency
   before_validation :compute_totals
 
+  after_create :increment_usage_counters
+  after_create_commit :enqueue_quota_alert
+
   scope :in_period, ->(range) { where(created_at: range) }
 
   def self.record!(account:, model:, input_tokens:, output_tokens:, feature: nil, conversation: nil, metadata: {})
@@ -65,5 +68,19 @@ class AiUsageEvent < ApplicationRecord
   def compute_totals
     self.total_tokens = input_tokens.to_i + output_tokens.to_i
     self.cost = Ai::Pricing.cost(model, input_tokens, output_tokens)
+  end
+
+  # F7.5: o contador é quem responde a quota no hot path — incrementa na
+  # mesma transação do evento (consistência) e o alerta de limiar roda em
+  # job pós-commit (o mailer saiu da request). O gatilho mora aqui, não no
+  # AnthropicService: qualquer fonte futura de evento alerta também.
+  def increment_usage_counters
+    period = created_at.in_time_zone.to_date.beginning_of_month
+    AiUsageCounter.record!(owner: account, period_start: period, tokens: total_tokens, cost: cost)
+    AiUsageCounter.record!(owner: agency, period_start: period, tokens: total_tokens, cost: cost) if agency_id.present?
+  end
+
+  def enqueue_quota_alert
+    Ai::QuotaAlertJob.perform_later(account_id)
   end
 end

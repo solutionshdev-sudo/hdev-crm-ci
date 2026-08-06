@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_05_000002) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_06_000001) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -220,6 +220,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_05_000002) do
     t.datetime "updated_at", null: false
     t.index ["owner_type", "owner_id"], name: "index_ai_credit_events_on_owner_type_and_owner_id"
     t.index ["stripe_event_id"], name: "index_ai_credit_events_on_stripe_event_id", unique: true, where: "(stripe_event_id IS NOT NULL)"
+  end
+
+  create_table "ai_usage_counters", force: :cascade do |t|
+    t.string "owner_type", null: false
+    t.bigint "owner_id", null: false
+    t.date "period_start", null: false
+    t.bigint "tokens", default: 0, null: false
+    t.decimal "cost", precision: 14, scale: 8, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id", "period_start"], name: "index_ai_usage_counters_on_owner_and_period", unique: true
   end
 
   create_table "ai_usage_events", force: :cascade do |t|
